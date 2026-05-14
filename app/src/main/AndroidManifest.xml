@@ -38,6 +38,9 @@
         <activity
             android:name=".CourseDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ProfessorDetailsActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"

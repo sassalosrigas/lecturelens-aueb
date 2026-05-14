@@ -53,6 +53,7 @@ public class SearchActivity extends AppCompatActivity {
 
         populateRecentSearches();
         setupCourseChipClickListeners();
+        setupProfessorClickListeners();
 
         ImageView navHome = findViewById(R.id.navHome);
         navHome.setOnClickListener(new View.OnClickListener() {
@@ -151,6 +152,27 @@ public class SearchActivity extends AppCompatActivity {
                 });
             } else if (child instanceof ViewGroup) {
                 findAndSetChipClickListeners((ViewGroup) child);
+            }
+        }
+    }
+
+    private void setupProfessorClickListeners() {
+        ViewGroup container = findViewById(android.R.id.content);
+        findAndSetProfessorClickListeners(container);
+    }
+
+    private void findAndSetProfessorClickListeners(ViewGroup parent) {
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View child = parent.getChildAt(i);
+            if (child.getId() == R.id.professorChipContainer) {
+                child.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(SearchActivity.this, ProfessorDetailsActivity.class));
+                    }
+                });
+            } else if (child instanceof ViewGroup) {
+                findAndSetProfessorClickListeners((ViewGroup) child);
             }
         }
     }
