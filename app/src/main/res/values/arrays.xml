@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="initial_difficulty_values">
+        <item>1.0</item>
+        <item>3.0</item>
+    </array>
+    <array name="initial_hours_values">
+        <item>1.0</item>
+        <item>8.0</item>
+    </array>
+</resources>
