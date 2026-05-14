@@ -270,7 +270,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_today"
+                android:src="@drawable/home"
                 app:tint="@color/text_secondary" />
 
             <ImageView
@@ -280,7 +280,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/chip_background"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_search"
+                android:src="@drawable/search"
                 app:tint="@color/pink_primary" />
 
             <ImageView
@@ -289,7 +289,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_myplaces"
+                android:src="@drawable/profile"
+                android:contentDescription="@null"
                 app:tint="@color/text_secondary" />
 
         </LinearLayout>

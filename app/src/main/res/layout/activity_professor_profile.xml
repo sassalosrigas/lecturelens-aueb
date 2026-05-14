@@ -42,7 +42,7 @@
                 android:id="@+id/profileImage"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:src="@drawable/ic_launcher_foreground"
+                android:src="@drawable/profile"
                 android:contentDescription="Profile Picture"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -300,8 +300,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_today"
-                android:contentDescription="Home"
+                android:src="@drawable/home"
                 app:tint="@color/text_secondary" />
 
             <ImageView
@@ -309,21 +308,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@drawable/chip_background"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_search"
-                android:contentDescription="Search"
-                app:tint="@color/text_secondary" />
+                android:src="@drawable/search"
+                app:tint="@color/pink_primary" />
 
             <ImageView
                 android:id="@+id/navProfile"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/chip_background"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_myplaces"
-                android:contentDescription="Profile"
-                app:tint="@color/pink_primary" />
+                android:src="@drawable/profile"
+                android:contentDescription="@null"
+                app:tint="@color/text_secondary" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

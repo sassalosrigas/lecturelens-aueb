@@ -64,4 +64,6 @@
     <string name="hci_difficulty_demo">3.2 / 5</string>
     <string name="hci_hours_demo">4</string>
     <string name="hci_reviews_full">⭐⭐️⭐️⭐️⭐️️ Based on 120 reviews</string>
+    <string name="informatics_dept">Informatics Department</string>
+    <string name="courses">Courses</string>
 </resources>

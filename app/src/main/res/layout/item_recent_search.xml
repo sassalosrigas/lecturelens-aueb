@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@android:drawable/ic_menu_recent_history"
+        android:src="@drawable/hours"
         android:contentDescription="@null"
         app:tint="@color/text_primary" />
 
