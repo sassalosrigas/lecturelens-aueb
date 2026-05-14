@@ -22,25 +22,108 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Search Bar -->
-    <EditText
-        android:id="@+id/searchEditText"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/searchBarContainer"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="24dp"
-        android:autofillHints="none"
         android:background="@drawable/search_bar_background"
         android:elevation="2dp"
-        android:fontFamily="@font/roboto_semibold"
-        android:gravity="center"
-        android:hint="@string/search_bar_hint"
-        android:inputType="text"
-        android:paddingHorizontal="16dp"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchTitle" />
+        app:layout_constraintTop_toBottomOf="@id/searchTitle">
+
+        <ImageView
+            android:id="@+id/searchIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:contentDescription="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/text_hint" />
+
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:autofillHints="none"
+            android:background="@android:color/transparent"
+            android:fontFamily="@font/roboto_semibold"
+            android:hint="@string/search_bar_hint"
+            android:inputType="text"
+            android:paddingHorizontal="12dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/searchIcon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Recent Searches Section (hidden by default) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/recentSearchesLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/background_light"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
+
+        <TextView
+            android:id="@+id/recentSearchesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/recent_searches"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/cancelSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:fontFamily="@font/roboto_semibold"
+            android:text="@string/cancel"
+            android:textColor="@color/pink_primary"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/recentSearchesTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/recentSearchesTitle" />
+
+        <LinearLayout
+            android:id="@+id/recentSearchesList"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recentSearchesTitle">
+
+            <include layout="@layout/item_recent_search" />
+
+            <include layout="@layout/item_recent_search" />
+
+            <include layout="@layout/item_recent_search" />
+
+            <include layout="@layout/item_recent_search" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Filters -->
     <LinearLayout
@@ -51,7 +134,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchEditText">
+        app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
 
         <TextView
             android:layout_width="wrap_content"

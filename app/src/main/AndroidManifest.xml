@@ -32,6 +32,12 @@
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />
+        <activity
+            android:name=".ProfessorProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CourseDetailsActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"

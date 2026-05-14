@@ -43,4 +43,25 @@
     <string name="manage_my_reviews">Manage my reviews</string>
     <string name="change_my_password">Change my password</string>
     <string name="logout">logout</string>
+    <string name="courses_count">courses</string>
+    <string name="see_my_reviews">See my reviews</string>
+    <string name="rating_label">rating</string>
+    <string name="recent_searches">Recent Searches</string>
+    <string name="cancel">Cancel</string>
+    <string name="search_demo_1">inf144</string>
+    <string name="search_demo_2">vasilakis</string>
+    <string name="search_demo_3">human computer interaction</string>
+    <string name="search_demo_4">operating systems</string>
+    <string name="back">Back</string>
+    <string name="based_on_reviews">Based on %1$d reviews</string>
+    <string name="write_a_review">write a review</string>
+    <string name="student_reviews">Student Reviews</string>
+    <string name="anonymous_user">anonymous user</string>
+    <string name="report">Report</string>
+    <string name="review_demo_text">Amazing lesson, really easy to understand and very useful projects</string>
+    <string name="review_date_demo">March 12, 2025</string>
+    <string name="hci_rating_demo">4.5</string>
+    <string name="hci_difficulty_demo">3.2 / 5</string>
+    <string name="hci_hours_demo">4</string>
+    <string name="hci_reviews_full">⭐⭐️⭐️⭐️⭐️️ Based on 120 reviews</string>
 </resources>

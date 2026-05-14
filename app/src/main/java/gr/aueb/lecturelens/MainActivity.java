@@ -3,6 +3,7 @@ package gr.aueb.lecturelens;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,6 +42,29 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                 }
             });
+        }
+
+        setupCourseClickListeners();
+    }
+
+    private void setupCourseClickListeners() {
+        ViewGroup courseContainer = findViewById(android.R.id.content);
+        findAndSetCourseClickListeners(courseContainer);
+    }
+
+    private void findAndSetCourseClickListeners(ViewGroup parent) {
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View child = parent.getChildAt(i);
+            if (child.getId() == R.id.courseDetailsCard) {
+                child.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(MainActivity.this, CourseDetailsActivity.class));
+                    }
+                });
+            } else if (child instanceof ViewGroup) {
+                findAndSetCourseClickListeners((ViewGroup) child);
+            }
         }
     }
 }
