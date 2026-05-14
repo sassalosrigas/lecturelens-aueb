@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Lecture Lens AUEB</string>
+    <string name="lecture_lens">LectureLens</string>
+    <string name="transparency_subtitle">Transparency in your Studies</string>
 </resources>
