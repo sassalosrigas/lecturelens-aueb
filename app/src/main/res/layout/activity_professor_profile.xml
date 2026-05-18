@@ -7,6 +7,54 @@
     android:background="@color/background_light"
     tools:context=".ProfessorProfileActivity">
 
+    <!-- Alert Box -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/alertBox"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="27dp"
+        android:layout_marginTop="55dp"
+        android:background="@drawable/alert_success_background"
+        android:elevation="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/alertIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="11dp"
+            android:src="@drawable/circle_pink"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@android:drawable/checkbox_on_background"
+            app:layout_constraintBottom_toBottomOf="@id/alertIcon"
+            app:layout_constraintEnd_toEndOf="@id/alertIcon"
+            app:layout_constraintStart_toStartOf="@id/alertIcon"
+            app:layout_constraintTop_toTopOf="@id/alertIcon"
+            app:tint="@android:color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/password_changed_success"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/alertIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/profileTitle"
         android:layout_width="wrap_content"

@@ -7,12 +7,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ProfessorDetailsActivity extends AppCompatActivity {
+public class ManageReviewsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_professor_details_st);
+        setContentView(R.layout.activity_manage_reviews);
 
         TextView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -26,7 +26,7 @@ public class ProfessorDetailsActivity extends AppCompatActivity {
         navHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfessorDetailsActivity.this, MainActivity.class);
+                Intent intent = new Intent(ManageReviewsActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
@@ -37,7 +37,7 @@ public class ProfessorDetailsActivity extends AppCompatActivity {
         navSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfessorDetailsActivity.this, SearchActivity.class);
+                Intent intent = new Intent(ManageReviewsActivity.this, SearchActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -47,18 +47,9 @@ public class ProfessorDetailsActivity extends AppCompatActivity {
         navProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfessorDetailsActivity.this, ProfileActivity.class);
+                Intent intent = new Intent(ManageReviewsActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 finish();
-            }
-        });
-
-        View btnWriteReview = findViewById(R.id.btnWriteReview);
-        btnWriteReview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfessorDetailsActivity.this, ProfessorReviewActivity.class);
-                startActivity(intent);
             }
         });
     }

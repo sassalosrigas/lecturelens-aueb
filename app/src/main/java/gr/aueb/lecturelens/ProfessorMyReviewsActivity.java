@@ -3,6 +3,7 @@ package gr.aueb.lecturelens;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,5 +54,28 @@ public class ProfessorMyReviewsActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        setupCourseChipClickListeners();
+    }
+
+    private void setupCourseChipClickListeners() {
+        ViewGroup container = findViewById(android.R.id.content);
+        findAndSetChipClickListeners(container);
+    }
+
+    private void findAndSetChipClickListeners(ViewGroup parent) {
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            View child = parent.getChildAt(i);
+            if (child.getId() == R.id.courseChipCard) {
+                child.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(ProfessorMyReviewsActivity.this, CourseDetailsProfActivity.class));
+                    }
+                });
+            } else if (child instanceof ViewGroup) {
+                findAndSetChipClickListeners((ViewGroup) child);
+            }
+        }
     }
 }

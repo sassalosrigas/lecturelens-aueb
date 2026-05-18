@@ -188,6 +188,7 @@
                 android:layout_weight="1"
                 android:padding="12dp"
                 android:src="@drawable/home"
+                android:contentDescription="@null"
                 app:tint="@color/text_secondary" />
 
             <ImageView
@@ -195,9 +196,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/chip_background"
                 android:padding="12dp"
                 android:src="@drawable/search"
+                android:contentDescription="@null"
                 app:tint="@color/pink_primary" />
 
             <ImageView

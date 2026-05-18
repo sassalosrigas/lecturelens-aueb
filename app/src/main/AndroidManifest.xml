@@ -33,6 +33,12 @@
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageReviewsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfessorProfileActivity"
             android:exported="false" />
         <activity
@@ -40,6 +46,27 @@
             android:exported="false" />
         <activity
             android:name=".ProfessorDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfessorMyReviewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CourseDetailsProfActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfessorReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfessorSeeReviewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfessorChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CourseReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SubmissionSuccessActivity"
             android:exported="false" />
 
         <meta-data

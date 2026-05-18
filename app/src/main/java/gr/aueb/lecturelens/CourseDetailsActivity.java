@@ -52,5 +52,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        View btnWriteReview = findViewById(R.id.btnWriteReview);
+        btnWriteReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CourseDetailsActivity.this, CourseReviewActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

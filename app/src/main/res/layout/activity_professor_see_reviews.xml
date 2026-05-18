@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
-    tools:context=".ProfessorMyReviewsActivity">
+    tools:context=".ProfessorSeeReviewsActivity">
 
     <!-- Header -->
     <TextView
@@ -22,105 +22,56 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/profName"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:fontFamily="@font/poppins_semibold"
-        android:text="@string/professor_name"
+        android:text="@string/my_reviews"
         android:textColor="@color/text_primary"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack" />
+        app:layout_constraintTop_toTopOf="@id/btnBack" />
 
-    <TextView
-        android:id="@+id/profDept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:text="@string/informatics_dept"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profName" />
-
-    <!-- Large Rating -->
-    <TextView
-        android:id="@+id/largeRating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/poppins_semibold"
-        android:text="@string/hci_rating_demo"
-        android:textColor="@color/text_primary"
-        android:textSize="48sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profDept" />
-
-    <TextView
-        android:id="@+id/reviewCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_medium"
-        android:text="@string/hci_reviews_full"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/largeRating" />
-
-    <!-- Courses Section -->
-    <TextView
-        android:id="@+id/coursesTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+    <!-- Pink Summary Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/summaryCard"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginHorizontal="24dp"
         android:layout_marginTop="24dp"
-        android:fontFamily="@font/poppins_semibold"
-        android:text="@string/courses"
-        android:textColor="@color/text_primary"
-        android:textSize="18sp"
+        app:cardBackgroundColor="@color/pink_light"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/reviewCount" />
-
-    <HorizontalScrollView
-        android:id="@+id/courseChipsScroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:clipToPadding="false"
-        android:paddingHorizontal="24dp"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/coursesTitle">
+        app:layout_constraintTop_toBottomOf="@id/title">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <include layout="@layout/item_course_chip" />
-            <include layout="@layout/item_course_chip" />
-            <include layout="@layout/item_course_chip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="@string/hci_rating_summary"
+                android:textColor="@color/text_primary"
+                android:textSize="48sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/hci_reviews_full"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
 
         </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- Student Reviews Title -->
-    <TextView
-        android:id="@+id/reviewsTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/poppins_semibold"
-        android:text="@string/student_reviews"
-        android:textColor="@color/text_primary"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/courseChipsScroll" />
+    </androidx.cardview.widget.CardView>
 
     <!-- Reviews List -->
     <ScrollView
@@ -132,17 +83,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/reviewsTitle">
+        app:layout_constraintTop_toBottomOf="@id/summaryCard">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include layout="@layout/item_review" />
-            <include layout="@layout/item_review" />
-            <include layout="@layout/item_review" />
-            <include layout="@layout/item_review" />
+            <include layout="@layout/item_review_with_course" />
+            <include layout="@layout/item_review_with_course" />
+            <include layout="@layout/item_review_with_course" />
+            <include layout="@layout/item_review_with_course" />
 
         </LinearLayout>
     </ScrollView>
@@ -181,7 +132,6 @@
                 android:layout_weight="1"
                 android:padding="12dp"
                 android:src="@drawable/search"
-                android:background="@drawable/chip_background"
                 android:contentDescription="@null"
                 app:tint="@color/text_secondary" />
 
@@ -190,6 +140,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@drawable/chip_background"
                 android:padding="12dp"
                 android:src="@drawable/profile"
                 android:contentDescription="@null"
