@@ -36,11 +36,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
         });
 
         ImageView navSearch = findViewById(R.id.navSearch);
-        View navSearchBg = findViewById(R.id.navSearchBg);
-
-        navSearchBg.setVisibility(View.VISIBLE);
-        navSearch.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.pink_primary)));
-
         navSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
