@@ -2,9 +2,14 @@ package gr.aueb.lecturelens;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import gr.aueb.lecturelens.model.UserSession;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,6 +18,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 1. Initialize your helper session class
+        UserSession session = new UserSession(this);
+
+        // 2. Read the username straight out of storage
+        String username = session.getUsername();
+
+        // Debug printing to verify it worked!
+        Log.d("LectureLensDebug", "MainActivity opened. Saved username is: " + username);
+
+        // 3. Use it in your layout
+        // 3. Log the result to Logcat
+        if (username != null) {
+            Log.d("LectureLensDebug", " Successfully retrieved username: " + username);
+        } else {
+            Log.w("LectureLensDebug", "⚠️ No username found in this session.");
+        }
         View searchBar = findViewById(R.id.searchEditText);
         if (searchBar != null) {
             searchBar.setFocusable(false);
