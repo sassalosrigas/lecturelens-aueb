@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import gr.aueb.lecturelens.java.AppCache;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.CourseChipAdapter;
 import gr.aueb.lecturelens.java.Professor;
@@ -118,7 +120,17 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     private void fetchRecommendationsFromDatabase() {
-        // Execution task targeting Course Sampling Endpoint
+        AppCache cache = AppCache.getInstance();
+
+        if (cache.loaded) {
+            randomCourseList.addAll(cache.cachedCourses);
+            randomProfessorList.addAll(cache.cachedProfessors);
+            courseChipAdapter.notifyDataSetChanged();
+            professorAdapter.notifyDataSetChanged();
+            return;
+        }
+
+        // Courses thread
         new Thread(() -> {
             try {
                 URL url = new URL("http://10.0.2.2:8081/api/courses/random");
@@ -127,12 +139,12 @@ public class SearchActivity extends AppCompatActivity implements
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder res = new StringBuilder();
                     String line;
-                    while((line = in.readLine()) != null) res.append(line);
+                    while ((line = in.readLine()) != null) res.append(line);
                     in.close();
 
                     JSONArray array = new JSONArray(res.toString());
                     randomCourseList.clear();
-                    for(int i=0; i<array.length(); i++) {
+                    for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
                         randomCourseList.add(new Course(
                                 obj.optString("id", obj.optString("_id")),
@@ -147,7 +159,12 @@ public class SearchActivity extends AppCompatActivity implements
                                 obj.optString("description", "")
                         ));
                     }
-                    new Handler(Looper.getMainLooper()).post(() -> courseChipAdapter.notifyDataSetChanged());
+                    cache.cachedCourses.clear();
+                    cache.cachedCourses.addAll(randomCourseList);
+
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            courseChipAdapter.notifyDataSetChanged()
+                    );
                 }
                 conn.disconnect();
             } catch (Exception e) { e.printStackTrace(); }
@@ -161,47 +178,34 @@ public class SearchActivity extends AppCompatActivity implements
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder res = new StringBuilder();
                     String line;
-                    while((line = in.readLine()) != null) res.append(line);
+                    while ((line = in.readLine()) != null) res.append(line);
                     in.close();
 
-                    // Replace the professor parsing loop in SearchActivity.java with this fail-safe check:
                     JSONArray array = new JSONArray(res.toString());
                     randomProfessorList.clear();
-                    for(int i = 0; i < array.length(); i++) {
+                    for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
-
-                        // 1. Try to find the first name across all possible JSON serialization formats
-                        String fName = obj.optString("firstName", ""); // Try Spring Boot standard camelCase
-                        if (fName.isEmpty()) {
-                            fName = obj.optString("first_name", "");  // Try Raw MongoDB snake_case
-                        }
-                        if (fName.isEmpty()) {
-                            fName = obj.optString("firstname", "");   // Try flat lowercase format
-                        }
-
-                        // 2. Try to find the last name across all possible JSON serialization formats
-                        String lName = obj.optString("lastName", "");  // Try Spring Boot standard camelCase
-                        if (lName.isEmpty()) {
-                            lName = obj.optString("last_name", "");   // Try Raw MongoDB snake_case
-                        }
-                        if (lName.isEmpty()) {
-                            lName = obj.optString("lastname", "");    // Try flat lowercase format
-                        }
-
-                        // 3. Combine them cleanly
+                        Log.d("ObjectName", obj.toString());
+                        String fName = obj.optString("firstName", "");
+                        String lName = obj.optString("lastName", "");
+                        Log.d("ProfName", fName + lName);
                         String combinedName = (fName + " " + lName).trim();
-
-                        // Fallback if everything fails to resolve
-                        if (combinedName.isEmpty()) {
-                            combinedName = "Unknown Professor";
-                        }
+                        if (combinedName.isEmpty()) combinedName = "Unknown Professor";
 
                         randomProfessorList.add(new Professor(
                                 obj.optString("id", obj.optString("_id")),
-                                combinedName,
+                                obj.optString("firstName", ""),
+                                obj.optString("lastName", ""),
                                 obj.optString("title", "Faculty")
                         ));
                     }
+                    cache.cachedProfessors.clear();
+                    cache.cachedProfessors.addAll(randomProfessorList);
+                    cache.loaded = true; // Mark as loaded only after both threads finish
+
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            professorAdapter.notifyDataSetChanged()
+                    );
                 }
                 conn.disconnect();
             } catch (Exception e) { e.printStackTrace(); }

@@ -1,14 +1,25 @@
 package gr.aueb.lecturelens.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "professors")
 public class Professor {
     @Id
     private String id;
+
+    @Field("firstName")
+    @JsonProperty("firstName")
     private String firstName;
+
+    @Field("lastName")
+    @JsonProperty("lastName")
     private String lastName;
+
+    @Field("title")
+    @JsonProperty("title")
     private String title;
 
     public Professor() {}
@@ -28,4 +39,7 @@ public class Professor {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }

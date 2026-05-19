@@ -18,7 +18,7 @@
         app:tint="@color/text_secondary" />
 
     <TextView
-        android:id="@+id/profName"
+        android:id="@+id/professorNameText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="@id/profAvatar" />
 
     <TextView
-        android:id="@+id/profTitle"
+        android:id="@+id/professorTitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/roboto_regular"
@@ -39,8 +39,8 @@
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/viewText"
-        app:layout_constraintStart_toStartOf="@id/profName"
-        app:layout_constraintTop_toBottomOf="@id/profName" />
+        app:layout_constraintStart_toStartOf="@id/professorNameText"
+        app:layout_constraintTop_toBottomOf="@id/professorNameText" />
 
     <TextView
         android:id="@+id/viewText"

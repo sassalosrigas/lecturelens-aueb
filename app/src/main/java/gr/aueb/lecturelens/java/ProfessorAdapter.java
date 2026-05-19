@@ -34,9 +34,17 @@ public class ProfessorAdapter extends RecyclerView.Adapter<ProfessorAdapter.Prof
     @Override
     public void onBindViewHolder(@NonNull ProfViewHolder holder, int position) {
         Professor prof = professorList.get(position);
-        holder.txtName.setText(prof.getFullName());
-        holder.txtTitle.setText(prof.getTitle());
-        holder.itemView.setOnClickListener(v -> { if (listener != null) listener.onProfClick(prof); });
+
+        if (holder.txtName != null) {
+            holder.txtName.setText(prof.getFullName());
+        }
+        if (holder.txtTitle != null) {
+            holder.txtTitle.setText(prof.getTitle());
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onProfClick(prof);
+        });
     }
 
     @Override
@@ -48,8 +56,11 @@ public class ProfessorAdapter extends RecyclerView.Adapter<ProfessorAdapter.Prof
 
         public ProfViewHolder(@NonNull View itemView) {
             super(itemView);
-            txtName = itemView.findViewById(R.id.profName);
-            txtTitle = itemView.findViewById(R.id.profTitle);
+
+            // FIXED: Mapped explicitly to the exact resource layout IDs inside item_professor_chip.xml
+            txtName = itemView.findViewById(R.id.professorNameText);
+            txtTitle = itemView.findViewById(R.id.professorTitleText);
         }
     }
 }
+
