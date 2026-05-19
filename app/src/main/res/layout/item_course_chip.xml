@@ -17,6 +17,7 @@
         android:padding="12dp">
 
         <TextView
+            android:id="@+id/courseChipCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_semibold"
@@ -25,6 +26,7 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/courseChipTitle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="4dp"
@@ -37,6 +39,7 @@
             android:textSize="13sp" />
 
         <TextView
+            android:id="@+id/courseChipRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

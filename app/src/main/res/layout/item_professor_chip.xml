@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="@id/profAvatar" />
 
     <TextView
-        android:id="@+id/profDept"
+        android:id="@+id/profTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/roboto_regular"
