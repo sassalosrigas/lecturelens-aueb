@@ -48,7 +48,7 @@ public class CourseReviewActivity extends AppCompatActivity {
             hoursSlider.setValue(getIntent().getFloatExtra("hours", 5.0f));
 
             String reviewText = getIntent().getStringExtra("reviewText");
-            TextView reviewInput = findViewById(R.id.etReviewComment);
+            TextView reviewInput = findViewById(R.id.reviewEditText);
             if (reviewText != null && reviewInput != null) reviewInput.setText(reviewText);
         }
 
