@@ -64,6 +64,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/courseTitle" />
 
+        <TextView
+            android:id="@+id/courseMetadata"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/metadata"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/professorName" />
+
         <LinearLayout
             android:id="@+id/chipsLayout"
             android:layout_width="wrap_content"

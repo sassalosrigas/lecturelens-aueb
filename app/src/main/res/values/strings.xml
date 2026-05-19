@@ -111,4 +111,5 @@
     <string name="report_demo_text">This course is ****** difficult</string>
     <string name="pending_reports_count">12</string>
     <string name="deleted_reviews_count">45</string>
+    <string name="metadata">Semester 8 | 6 ECTS</string>
 </resources>
