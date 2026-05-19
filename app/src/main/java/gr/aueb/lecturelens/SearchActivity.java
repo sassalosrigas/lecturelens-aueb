@@ -1,24 +1,53 @@
 package gr.aueb.lecturelens;
 
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.android.material.slider.RangeSlider;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-public class SearchActivity extends AppCompatActivity {
+import gr.aueb.lecturelens.java.Course;
+import gr.aueb.lecturelens.java.CourseChipAdapter;
+import gr.aueb.lecturelens.java.Professor;
+import gr.aueb.lecturelens.java.ProfessorAdapter;
+
+public class SearchActivity extends AppCompatActivity implements
+        CourseChipAdapter.OnCourseChipClickListener, ProfessorAdapter.OnProfClickListener {
 
     private View recentSearchesLayout;
     private EditText searchEditText;
     private View searchBarContainer;
+
+    private RecyclerView recommendedCoursesRecycler;
+    private RecyclerView recommendedProfessorsRecycler;
+    private CourseChipAdapter courseChipAdapter;
+    private ProfessorAdapter professorAdapter;
+
+    private final List<Course> randomCourseList = new ArrayList<>();
+    private final List<Professor> randomProfessorList = new ArrayList<>();
+
+    private float[] selectedDifficulty = {1f, 5f};
+    private float[] selectedHours = {1f, 9f};
+    private float selectedRating = 4f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,93 +59,169 @@ public class SearchActivity extends AppCompatActivity {
         searchBarContainer = findViewById(R.id.searchBarContainer);
         TextView cancelSearch = findViewById(R.id.cancelSearch);
 
-        searchEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showRecentSearches();
-                }
-            }
+        recommendedCoursesRecycler = findViewById(R.id.recommendedCoursesRecyclerView);
+        recommendedProfessorsRecycler = findViewById(R.id.recommendedProfessorsRecyclerView);
+
+        recommendedCoursesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        courseChipAdapter = new CourseChipAdapter(randomCourseList, this);
+        recommendedCoursesRecycler.setAdapter(courseChipAdapter);
+
+        recommendedProfessorsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        professorAdapter = new ProfessorAdapter(randomProfessorList, this);
+        recommendedProfessorsRecycler.setAdapter(professorAdapter);
+
+        searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) showRecentSearches();
         });
 
-        searchEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRecentSearches();
-            }
-        });
-
-        cancelSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideRecentSearches();
-            }
-        });
+        searchEditText.setOnClickListener(v -> showRecentSearches());
+        cancelSearch.setOnClickListener(v -> hideRecentSearches());
 
         populateRecentSearches();
-        setupCourseChipClickListeners();
-        setupProfessorClickListeners();
-
-        ImageView navHome = findViewById(R.id.navHome);
-        navHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SearchActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        // Add more listeners as needed
-        ImageView navProfile = findViewById(R.id.navProfile);
-        navProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SearchActivity.this, ProfileActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+        setupNavigationListeners();
 
         LinearLayout filtersLayout = findViewById(R.id.filtersLayout);
-        filtersLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showFilterBottomSheet();
-            }
+        filtersLayout.setOnClickListener(v -> showFilterBottomSheet());
+
+        // Trigger dynamic aggregation requests
+        fetchRecommendationsFromDatabase();
+    }
+
+    private void setupNavigationListeners() {
+        ImageView navHome = findViewById(R.id.navHome);
+        navHome.setOnClickListener(v -> {
+            startActivity(new Intent(SearchActivity.this, MainActivity.class));
+            finish();
+        });
+
+        ImageView navProfile = findViewById(R.id.navProfile);
+        navProfile.setOnClickListener(v -> {
+            startActivity(new Intent(SearchActivity.this, ProfileActivity.class));
+            finish();
         });
     }
 
-    private float[] selectedDifficulty = {1f, 5f};
-    private float[] selectedHours = {1f, 9f};
-    private float selectedRating = 4f;
+    @Override
+    public void onCourseChipClick(Course course) {
+        Intent intent = new Intent(SearchActivity.this, CourseDetailsActivity.class);
+        intent.putExtra("COURSE_ID", course.getId());
+        intent.putExtra("COURSE_TITLE", course.getTitle());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onProfClick(Professor prof) {
+        Intent intent = new Intent(SearchActivity.this, ProfessorDetailsActivity.class);
+        intent.putExtra("PROFESSOR_ID", prof.getId());
+        intent.putExtra("PROFESSOR_NAME", prof.getFullName());
+        startActivity(intent);
+    }
+
+    private void fetchRecommendationsFromDatabase() {
+        // Execution task targeting Course Sampling Endpoint
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/courses/random");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder res = new StringBuilder();
+                    String line;
+                    while((line = in.readLine()) != null) res.append(line);
+                    in.close();
+
+                    JSONArray array = new JSONArray(res.toString());
+                    randomCourseList.clear();
+                    for(int i=0; i<array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+                        randomCourseList.add(new Course(
+                                obj.optString("id", obj.optString("_id")),
+                                obj.optString("code", ""),
+                                obj.optString("title", ""),
+                                obj.optInt("semester", 1),
+                                obj.optInt("ects", 6),
+                                obj.optString("professorName", "Staff"),
+                                obj.optDouble("rating", 0.0),
+                                obj.optString("difficulty", "Medium"),
+                                obj.optString("studyHours", "4"),
+                                obj.optString("description", "")
+                        ));
+                    }
+                    new Handler(Looper.getMainLooper()).post(() -> courseChipAdapter.notifyDataSetChanged());
+                }
+                conn.disconnect();
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/professors/random");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder res = new StringBuilder();
+                    String line;
+                    while((line = in.readLine()) != null) res.append(line);
+                    in.close();
+
+                    // Replace the professor parsing loop in SearchActivity.java with this fail-safe check:
+                    JSONArray array = new JSONArray(res.toString());
+                    randomProfessorList.clear();
+                    for(int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+
+                        // 1. Try to find the first name across all possible JSON serialization formats
+                        String fName = obj.optString("firstName", ""); // Try Spring Boot standard camelCase
+                        if (fName.isEmpty()) {
+                            fName = obj.optString("first_name", "");  // Try Raw MongoDB snake_case
+                        }
+                        if (fName.isEmpty()) {
+                            fName = obj.optString("firstname", "");   // Try flat lowercase format
+                        }
+
+                        // 2. Try to find the last name across all possible JSON serialization formats
+                        String lName = obj.optString("lastName", "");  // Try Spring Boot standard camelCase
+                        if (lName.isEmpty()) {
+                            lName = obj.optString("last_name", "");   // Try Raw MongoDB snake_case
+                        }
+                        if (lName.isEmpty()) {
+                            lName = obj.optString("lastname", "");    // Try flat lowercase format
+                        }
+
+                        // 3. Combine them cleanly
+                        String combinedName = (fName + " " + lName).trim();
+
+                        // Fallback if everything fails to resolve
+                        if (combinedName.isEmpty()) {
+                            combinedName = "Unknown Professor";
+                        }
+
+                        randomProfessorList.add(new Professor(
+                                obj.optString("id", obj.optString("_id")),
+                                combinedName,
+                                obj.optString("title", "Faculty")
+                        ));
+                    }
+                }
+                conn.disconnect();
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
 
     private void showFilterBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View bottomSheetView = getLayoutInflater().inflate(
-                R.layout.layout_filter_bottom_sheet, null);
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
-        // --- Rating Bar ---
-        android.widget.RatingBar ratingBar =
-                bottomSheetView.findViewById(R.id.ratingBar);
+        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.ratingBar);
         ratingBar.setRating(selectedRating);
 
-        // --- Difficulty Slider ---
-        RangeSlider difficultySlider =
-                bottomSheetView.findViewById(R.id.difficultySlider);
+        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.difficultySlider);
         difficultySlider.setValues(selectedDifficulty[0], selectedDifficulty[1]);
-        difficultySlider.setLabelFormatter(value ->
-                String.valueOf((int) value));
 
-        // --- Hours Slider ---
-        RangeSlider hoursSlider =
-                bottomSheetView.findViewById(R.id.hoursSlider);
+        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.hoursSlider);
         hoursSlider.setValues(selectedHours[0], selectedHours[1]);
-        hoursSlider.setLabelFormatter(value ->
-                value >= 9f ? "9+" : String.valueOf((int) value));
 
-        // --- Clear All ---
         TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);
         clearAll.setOnClickListener(v -> {
             ratingBar.setRating(4f);
@@ -124,22 +229,15 @@ public class SearchActivity extends AppCompatActivity {
             hoursSlider.setValues(1f, 9f);
         });
 
-        // --- Apply Button ---
         View applyButton = bottomSheetView.findViewById(R.id.applyButton);
         applyButton.setOnClickListener(v -> {
-            // Save selected values for next time sheet opens
             selectedRating = ratingBar.getRating();
-
-            List<Float> diffVals = difficultySlider.getValues();
-            selectedDifficulty[0] = diffVals.get(0);
-            selectedDifficulty[1] = diffVals.get(1);
-
-            List<Float> hourVals = hoursSlider.getValues();
-            selectedHours[0] = hourVals.get(0);
-            selectedHours[1] = hourVals.get(1);
+            selectedDifficulty[0] = difficultySlider.getValues().get(0);
+            selectedDifficulty[1] = difficultySlider.getValues().get(1);
+            selectedHours[0] = hoursSlider.getValues().get(0);
+            selectedHours[1] = hoursSlider.getValues().get(1);
 
             performSearch(searchEditText.getText().toString());
-
             bottomSheetDialog.dismiss();
         });
 
@@ -147,7 +245,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void performSearch(String query) {
-        // Implementation for filtering courses based on query, selectedRating, selectedDifficulty, and selectedHours
+        // Filters calculation workflow
     }
 
     private void showRecentSearches() {
@@ -155,11 +253,14 @@ public class SearchActivity extends AppCompatActivity {
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
     }
 
+    private void viewClearFocus() {
+        searchEditText.clearFocus();
+    }
+
     private void hideRecentSearches() {
         recentSearchesLayout.setVisibility(View.GONE);
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_background);
-        searchEditText.clearFocus();
-        // Hide keyboard
+        viewClearFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
@@ -180,48 +281,6 @@ public class SearchActivity extends AppCompatActivity {
             TextView text = item.findViewById(R.id.searchText);
             if (text != null) {
                 text.setText(demoSearches[i]);
-            }
-        }
-    }
-
-    private void setupCourseChipClickListeners() {
-        ViewGroup container = findViewById(android.R.id.content);
-        findAndSetChipClickListeners(container);
-    }
-
-    private void findAndSetChipClickListeners(ViewGroup parent) {
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View child = parent.getChildAt(i);
-            if (child.getId() == R.id.courseChipCard) {
-                child.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivity(new Intent(SearchActivity.this, CourseDetailsActivity.class));
-                    }
-                });
-            } else if (child instanceof ViewGroup) {
-                findAndSetChipClickListeners((ViewGroup) child);
-            }
-        }
-    }
-
-    private void setupProfessorClickListeners() {
-        ViewGroup container = findViewById(android.R.id.content);
-        findAndSetProfessorClickListeners(container);
-    }
-
-    private void findAndSetProfessorClickListeners(ViewGroup parent) {
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View child = parent.getChildAt(i);
-            if (child.getId() == R.id.professorChipContainer) {
-                child.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivity(new Intent(SearchActivity.this, ProfessorDetailsActivity.class));
-                    }
-                });
-            } else if (child instanceof ViewGroup) {
-                findAndSetProfessorClickListeners((ViewGroup) child);
             }
         }
     }

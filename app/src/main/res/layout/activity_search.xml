@@ -181,80 +181,64 @@
 
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        android:clipToPadding="false"
-        android:paddingBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filtersLayout">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Recommended Courses -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="@string/recommended_courses"
-                android:textColor="@color/text_primary"
-                android:textSize="18sp" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+            <ScrollView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="24dp"
                 android:clipToPadding="false"
-                android:paddingHorizontal="24dp"
-                android:scrollbars="none">
+                android:paddingBottom="100dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/filtersLayout">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <include layout="@layout/item_course_chip" />
-                    <include layout="@layout/item_course_chip" />
-                    <include layout="@layout/item_course_chip" />
-                    <include layout="@layout/item_course_chip" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:text="@string/recommended_courses"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recommendedCoursesRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="24dp"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_course_chip" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="32dp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:text="@string/recommended_professors"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recommendedProfessorsRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:nestedScrollingEnabled="false"
+                        android:paddingHorizontal="24dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_professor_chip" />
 
                 </LinearLayout>
-            </HorizontalScrollView>
-
-            <!-- Recommended Professors -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="32dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="@string/recommended_professors"
-                android:textColor="@color/text_primary"
-                android:textSize="18sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="vertical"
-                android:paddingHorizontal="24dp">
-
-                <include layout="@layout/item_professor_chip" />
-                <include layout="@layout/item_professor_chip" />
-                <include layout="@layout/item_professor_chip" />
-                <include layout="@layout/item_professor_chip" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
+            </ScrollView>
 
     <!-- Navigation Bar -->
     <androidx.cardview.widget.CardView
