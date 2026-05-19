@@ -20,6 +20,12 @@ public class CourseController {
         return courseRepository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Course getCourseById(@PathVariable String id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+    }
+
     // Allows you to add new courses manually via Postman if needed
     @PostMapping
     public Course createCourse(@RequestBody Course course) {
