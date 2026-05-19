@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/warningIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#EF4444" />
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/delete_review_title"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/warningIcon" />
+
+        <TextView
+            android:id="@+id/dialogMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
+            android:text="@string/delete_review_message"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialogTitle" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            app:layout_constraintTop_toBottomOf="@id/dialogMessage">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="#F3F4F6"
+                android:fontFamily="@font/roboto_semibold"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:textColor="#6B7280"
+                app:cornerRadius="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="#EF4444"
+                android:fontFamily="@font/roboto_semibold"
+                android:text="@string/delete"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

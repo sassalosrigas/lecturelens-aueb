@@ -98,4 +98,7 @@
     <string name="password_changed_success">Password changed successfully</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="edit_review">Edit Review</string>
+    <string name="delete_review_title">Delete Review?</string>
+    <string name="delete_review_message">Are you sure? This action cannot be undone.</string>
 </resources>

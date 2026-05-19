@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".EditReviewActivity">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="60dp"
+            android:fontFamily="@font/roboto_semibold"
+            android:text="@string/cancel"
+            android:textColor="@color/pink_primary"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/reviewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/edit_review"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/btnCancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/btnCancel" />
+
+        <!-- Course Name Box -->
+        <TextView
+            android:id="@+id/courseNameBox"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="24dp"
+            android:background="#F3F4F6"
+            android:fontFamily="@font/roboto_semibold"
+            android:gravity="center"
+            android:text="@string/hci_full_demo"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/reviewTitle" />
+
+        <!-- Rating Section -->
+        <TextView
+            android:id="@+id/rateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/rate_course"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseNameBox" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:numStars="5"
+            android:progressTint="@color/pink_primary"
+            android:rating="4"
+            android:stepSize="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rateLabel" />
+
+        <!-- Difficulty Section -->
+        <TextView
+            android:id="@+id/diffLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/how_hard"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ratingBar" />
+
+        <LinearLayout
+            android:id="@+id/diffContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/diffLabel"
+            app:layout_constraintTop_toBottomOf="@id/diffLabel">
+
+            <TextView
+                android:id="@+id/diff1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/difficulty_circle_selector"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/diff2"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/difficulty_circle_selector"
+                android:gravity="center"
+                android:text="2"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/diff3"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/difficulty_circle_selector"
+                android:gravity="center"
+                android:text="3"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/diff4"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/difficulty_circle_selector"
+                android:gravity="center"
+                android:text="4"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/diff5"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/difficulty_circle_selector"
+                android:gravity="center"
+                android:text="5"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/very_easy"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/diffContainer"
+            app:layout_constraintTop_toBottomOf="@id/diffContainer" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/very_hard"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/diffContainer"
+            app:layout_constraintTop_toBottomOf="@id/diffContainer" />
+
+        <!-- Hours Section -->
+        <TextView
+            android:id="@+id/hoursLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/hours_studying"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/diffContainer" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/hoursSlider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="48dp"
+            android:layout_marginTop="48dp"
+            android:valueFrom="1.0"
+            android:valueTo="9.0"
+            android:value="4.0"
+            app:labelBehavior="withinBounds"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/hoursLabel"
+            app:thumbColor="@color/pink_primary"
+            app:trackColorActive="@color/pink_primary"
+            app:trackColorInactive="@color/border_gray" />
+
+        <TextView
+            android:id="@+id/hoursMin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/hoursSlider"
+            app:layout_constraintTop_toBottomOf="@id/hoursSlider" />
+
+        <TextView
+            android:id="@+id/hoursMax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9+"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@id/hoursSlider"
+            app:layout_constraintTop_toBottomOf="@id/hoursSlider" />
+
+        <!-- Opinion Section -->
+        <TextView
+            android:id="@+id/opinionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/your_opinion_optional"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/hoursMax" />
+
+        <EditText
+            android:id="@+id/reviewEditText"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_marginHorizontal="48dp"
+            android:layout_marginTop="12dp"
+            android:autofillHints="none"
+            android:background="@drawable/edit_text_background"
+            android:gravity="top"
+            android:hint="@string/review_placeholder"
+            android:inputType="textMultiLine"
+            android:padding="16dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/opinionLabel" />
+
+        <!-- Anonymous Submission Section -->
+        <TextView
+            android:id="@+id/anonLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/anonymous_submission"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/reviewEditText" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/anonSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="48dp"
+            android:checked="true"
+            app:layout_constraintBottom_toBottomOf="@id/anonLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/anonLabel"
+            app:trackTint="@color/pink_primary" />
+
+        <TextView
+            android:id="@+id/anonInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/anon_info"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/anonLabel" />
+
+        <!-- Submit Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSubmitReview"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginHorizontal="48dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:backgroundTint="@color/pink_primary"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/save_changes"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:cornerRadius="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/anonInfo" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

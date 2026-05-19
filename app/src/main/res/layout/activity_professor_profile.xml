@@ -17,12 +17,13 @@
         android:background="@drawable/alert_success_background"
         android:elevation="8dp"
         android:visibility="gone"
+        android:translationZ="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/alertIcon"
+            android:id="@+id/alertIconFrame"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="11dp"
@@ -35,23 +36,24 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@android:drawable/checkbox_on_background"
-            app:layout_constraintBottom_toBottomOf="@id/alertIcon"
-            app:layout_constraintEnd_toEndOf="@id/alertIcon"
-            app:layout_constraintStart_toStartOf="@id/alertIcon"
-            app:layout_constraintTop_toTopOf="@id/alertIcon"
+            app:layout_constraintBottom_toBottomOf="@id/alertIconFrame"
+            app:layout_constraintEnd_toEndOf="@id/alertIconFrame"
+            app:layout_constraintStart_toStartOf="@id/alertIconFrame"
+            app:layout_constraintTop_toTopOf="@id/alertIconFrame"
             app:tint="@android:color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
             android:fontFamily="@font/roboto_medium"
             android:text="@string/password_changed_success"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/alertIcon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/alertIconFrame"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.3" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -59,7 +61,7 @@
         android:id="@+id/profileTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="68dp"
         android:fontFamily="@font/poppins_semibold"
         android:text="@string/my_profile"
         android:textColor="@color/text_primary"
@@ -74,7 +76,7 @@
         android:layout_width="0dp"
         android:layout_height="170dp"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="27dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"

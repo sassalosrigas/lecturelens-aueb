@@ -71,6 +71,9 @@
         <activity
             android:name=".SubmissionSuccessActivity"
             android:exported="false" />
+        <activity
+            android:name=".EditReviewActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"
