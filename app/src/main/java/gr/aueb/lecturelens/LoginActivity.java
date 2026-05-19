@@ -79,6 +79,17 @@ public class LoginActivity extends AppCompatActivity {
                 conn.disconnect();
 
                 if (responseCode == 200) {
+                    android.util.Log.d("LectureLensDebug", "Raw Server Response: " + response.toString());
+
+                    // 2. Parse the JSON
+                    JSONObject responseJson = new JSONObject(response.toString());
+
+                    // CRITICAL CHECK: Make sure your backend json uses the exact key "username"
+                    final String username = responseJson.optString("username", "User");
+
+                    // 3. Use your custom UserSession class to save the session globally!
+                    gr.aueb.lecturelens.model.UserSession session = new gr.aueb.lecturelens.model.UserSession(LoginActivity.this);
+                    session.createLoginSession(username);
                     runOnUiThread(() -> {
                         Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -101,36 +112,4 @@ public class LoginActivity extends AppCompatActivity {
             }
         }).start();
     }
-    /*
-     * Spawns a background thread to send an HTTP POST request to the Spring Boot server
-
-    private void sendDummyUserToBackend() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("http://10.0.2.2:8081/api/users/test");
-
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setConnectTimeout(5000);
-                    conn.setReadTimeout(5000);
-
-                    int responseCode = conn.getResponseCode();
-
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        // Success! Check your Logcat console in Android Studio
-                        android.util.Log.d("LectureLens_DB_Test", "SUCCESS: Dummy user posted through backend to MongoDB!");
-                    } else {
-                        android.util.Log.e("LectureLens_DB_Test", "FAILED: Server returned response code: " + responseCode);
-                    }
-
-                    conn.disconnect();
-                } catch (Exception e) {
-                    android.util.Log.e("LectureLens_DB_Test", "CRITICAL ERROR: Could not connect to local server.", e);
-                }
-            }
-        }).start();
-    }
-     */
 }

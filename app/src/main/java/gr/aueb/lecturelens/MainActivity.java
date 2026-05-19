@@ -1,13 +1,12 @@
 package gr.aueb.lecturelens;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
+
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,6 +25,8 @@ import java.util.List;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.CourseAdapter;
 
+import gr.aueb.lecturelens.model.UserSession;
+
 public class MainActivity extends AppCompatActivity implements CourseAdapter.OnCourseClickListener {
 
     private RecyclerView coursesRecyclerView;
@@ -37,6 +38,22 @@ public class MainActivity extends AppCompatActivity implements CourseAdapter.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 1. Initialize your helper session class
+        UserSession session = new UserSession(this);
+
+        // 2. Read the username straight out of storage
+        String username = session.getUsername();
+
+        // Debug printing to verify it worked!
+        Log.d("LectureLensDebug", "MainActivity opened. Saved username is: " + username);
+
+        // 3. Use it in your layout
+        // 3. Log the result to Logcat
+        if (username != null) {
+            Log.d("LectureLensDebug", " Successfully retrieved username: " + username);
+        } else {
+            Log.w("LectureLensDebug", "⚠️ No username found in this session.");
+        }
         // Initialize RecyclerView Layout Structure
         coursesRecyclerView = findViewById(R.id.coursesRecyclerView);
         coursesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
