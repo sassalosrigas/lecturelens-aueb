@@ -1,11 +1,13 @@
 package gr.aueb.lecturelens;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class CourseDetailsActivity extends AppCompatActivity {
 
@@ -34,6 +36,11 @@ public class CourseDetailsActivity extends AppCompatActivity {
         });
 
         ImageView navSearch = findViewById(R.id.navSearch);
+        View navSearchBg = findViewById(R.id.navSearchBg);
+
+        navSearchBg.setVisibility(View.VISIBLE);
+        navSearch.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.pink_primary)));
+
         navSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
