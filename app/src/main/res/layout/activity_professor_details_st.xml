@@ -7,7 +7,6 @@
     android:background="@color/background_light"
     tools:context=".ProfessorDetailsActivity">
 
-    <!-- Header -->
     <TextView
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
@@ -46,7 +45,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/profName" />
 
-    <!-- Large Rating -->
     <TextView
         android:id="@+id/largeRating"
         android:layout_width="wrap_content"
@@ -72,7 +70,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/largeRating" />
 
-    <!-- Courses Section -->
     <TextView
         android:id="@+id/coursesTitle"
         android:layout_width="wrap_content"
@@ -108,7 +105,6 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- Write Review Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnWriteReview"
         android:layout_width="0dp"
@@ -121,12 +117,12 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp"
+        android:visibility="visible"
         app:cornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/courseChipsScroll" />
 
-    <!-- Student Reviews Title -->
     <TextView
         android:id="@+id/reviewsTitle"
         android:layout_width="wrap_content"
@@ -140,7 +136,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnWriteReview" />
 
-    <!-- Reviews List -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -160,11 +155,11 @@
             <include layout="@layout/item_review" />
             <include layout="@layout/item_review" />
             <include layout="@layout/item_review" />
+            <include layout="@layout/item_review" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Navigation Bar -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="68dp"
@@ -181,35 +176,80 @@
             android:orientation="horizontal"
             android:weightSum="3">
 
-            <ImageView
-                android:id="@+id/navHome"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="12dp"
-                android:src="@drawable/home"
-                android:contentDescription="@null"
-                app:tint="@color/text_secondary" />
+                android:layout_gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/navSearch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="12dp"
-                android:src="@drawable/search"
-                android:contentDescription="@null"
-                app:tint="@color/pink_primary" />
+                <View
+                    android:id="@+id/navHomeBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/chip_background"
+                    android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/navProfile"
+                <ImageView
+                    android:id="@+id/navHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    android:src="@drawable/home"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary" />
+
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="12dp"
-                android:src="@drawable/profile"
-                android:contentDescription="@null"
-                app:tint="@color/text_secondary" />
+                android:layout_gravity="center_vertical">
+
+                <View
+                    android:id="@+id/navSearchBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/chip_background"
+                    android:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/navSearch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    android:src="@drawable/search"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical">
+
+                <View
+                    android:id="@+id/navProfileBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/chip_background"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/navProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    android:src="@drawable/profile"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary" />
+
+            </FrameLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

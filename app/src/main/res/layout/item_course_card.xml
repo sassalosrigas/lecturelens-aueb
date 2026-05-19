@@ -41,6 +41,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/courseRating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
@@ -73,30 +74,33 @@
             app:layout_constraintTop_toBottomOf="@id/professorName">
 
             <TextView
+                android:id="@+id/difficultyChip"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:background="@drawable/chip_background"
                 android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
                 android:text="@string/difficulty_label"
                 android:textColor="@color/pink_primary"
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/hoursChip"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/chip_background"
                 android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
                 android:text="@string/hours_label"
                 android:textColor="@color/pink_primary"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
+            android:id="@+id/courseDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"

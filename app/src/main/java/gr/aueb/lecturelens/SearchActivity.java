@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.google.android.material.slider.RangeSlider;
+import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -85,20 +87,67 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    private float[] selectedDifficulty = {1f, 5f};
+    private float[] selectedHours = {1f, 9f};
+    private float selectedRating = 4f;
+
     private void showFilterBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
+        View bottomSheetView = getLayoutInflater().inflate(
+                R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
+        // --- Rating Bar ---
+        android.widget.RatingBar ratingBar =
+                bottomSheetView.findViewById(R.id.ratingBar);
+        ratingBar.setRating(selectedRating);
+
+        // --- Difficulty Slider ---
+        RangeSlider difficultySlider =
+                bottomSheetView.findViewById(R.id.difficultySlider);
+        difficultySlider.setValues(selectedDifficulty[0], selectedDifficulty[1]);
+        difficultySlider.setLabelFormatter(value ->
+                String.valueOf((int) value));
+
+        // --- Hours Slider ---
+        RangeSlider hoursSlider =
+                bottomSheetView.findViewById(R.id.hoursSlider);
+        hoursSlider.setValues(selectedHours[0], selectedHours[1]);
+        hoursSlider.setLabelFormatter(value ->
+                value >= 9f ? "9+" : String.valueOf((int) value));
+
+        // --- Clear All ---
+        TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);
+        clearAll.setOnClickListener(v -> {
+            ratingBar.setRating(4f);
+            difficultySlider.setValues(1f, 5f);
+            hoursSlider.setValues(1f, 9f);
+        });
+
+        // --- Apply Button ---
         View applyButton = bottomSheetView.findViewById(R.id.applyButton);
-        applyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bottomSheetDialog.dismiss();
-            }
+        applyButton.setOnClickListener(v -> {
+            // Save selected values for next time sheet opens
+            selectedRating = ratingBar.getRating();
+
+            List<Float> diffVals = difficultySlider.getValues();
+            selectedDifficulty[0] = diffVals.get(0);
+            selectedDifficulty[1] = diffVals.get(1);
+
+            List<Float> hourVals = hoursSlider.getValues();
+            selectedHours[0] = hourVals.get(0);
+            selectedHours[1] = hourVals.get(1);
+
+            performSearch(searchEditText.getText().toString());
+
+            bottomSheetDialog.dismiss();
         });
 
         bottomSheetDialog.show();
+    }
+
+    private void performSearch(String query) {
+        // Implementation for filtering courses based on query, selectedRating, selectedDifficulty, and selectedHours
     }
 
     private void showRecentSearches() {

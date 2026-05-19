@@ -10,4 +10,7 @@
     <color name="text_hint">#9CA3AF</color>
     <color name="text_secondary">#6B7280</color>
     <color name="star_yellow">#FFD700</color>
+    <color name="report_banner_bg">#FEE2E2</color>
+    <color name="report_banner_text">#B91C1C</color>
+    <color name="delete_red">#EF4444</color>
 </resources>

@@ -101,4 +101,14 @@
     <string name="edit_review">Edit Review</string>
     <string name="delete_review_title">Delete Review?</string>
     <string name="delete_review_message">Are you sure? This action cannot be undone.</string>
+    <string name="professor_email_demo">professoremail@aueb.gr</string>
+    <string name="admin_title">LectureLens - Admin</string>
+    <string name="pending_reports">Pending Reports</string>
+    <string name="deleted_reviews">Deleted Reviews</string>
+    <string name="ignore">Ignore</string>
+    <string name="reported_times">Reported %1$d times</string>
+    <string name="reported_3_times">Reported 3 times</string>
+    <string name="report_demo_text">This course is ****** difficult</string>
+    <string name="pending_reports_count">12</string>
+    <string name="deleted_reviews_count">45</string>
 </resources>

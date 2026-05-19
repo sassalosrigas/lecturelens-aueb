@@ -11,11 +11,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
 
-        TextView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         findViewById(R.id.btnSaveChanges).setOnClickListener(v -> {
-            // Logic to save password would go here
+            // Password save logic here
             setResult(RESULT_OK);
             finish();
         });

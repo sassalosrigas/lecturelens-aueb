@@ -24,6 +24,16 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        View navHome = findViewById(R.id.navHome);
+        if (navHome != null) {
+            navHome.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //already on main
+                }
+            });
+        }
+
         View navSearch = findViewById(R.id.navSearch);
         if (navSearch != null) {
             navSearch.setOnClickListener(new View.OnClickListener() {

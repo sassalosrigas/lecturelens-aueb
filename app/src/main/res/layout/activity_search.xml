@@ -39,7 +39,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="16dp"
-            android:src="@android:drawable/ic_menu_search"
+            android:src="@drawable/search"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,6 +71,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:background="@color/background_light"
+        android:elevation="4dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,20 +129,23 @@
     <!-- Filters -->
     <LinearLayout
         android:id="@+id/filtersLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:orientation="horizontal"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/chip_background"
             android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
             android:text="@string/rating"
@@ -149,11 +153,13 @@
             android:textSize="12sp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/chip_background"
             android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
             android:text="@string/difficulty"
@@ -161,15 +167,18 @@
             android:textSize="12sp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
             android:background="@drawable/chip_background"
             android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
             android:text="@string/hours_wk"
             android:textColor="@color/pink_primary"
             android:textSize="12sp" />
+
     </LinearLayout>
 
     <ScrollView
@@ -264,34 +273,80 @@
             android:orientation="horizontal"
             android:weightSum="3">
 
-            <ImageView
-                android:id="@+id/navHome"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="12dp"
-                android:src="@drawable/home"
-                app:tint="@color/text_secondary" />
+                android:layout_gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/navSearch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/chip_background"
-                android:padding="12dp"
-                android:src="@drawable/search"
-                app:tint="@color/pink_primary" />
+                <View
+                    android:id="@+id/navHomeBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/chip_background"
+                    android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/navProfile"
+                <ImageView
+                    android:id="@+id/navHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    android:src="@drawable/home"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary" />
+
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="12dp"
-                android:src="@drawable/profile"
-                android:contentDescription="@null"
-                app:tint="@color/text_secondary" />
+                android:layout_gravity="center_vertical">
+
+                <View
+                    android:id="@+id/navSearchBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/chip_background"
+                    android:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/navSearch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    android:src="@drawable/search"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical">
+
+                <View
+                    android:id="@+id/navProfileBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/chip_background"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/navProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    android:src="@drawable/profile"
+                    android:contentDescription="@null"
+                    app:tint="@color/text_secondary" />
+
+            </FrameLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -14,52 +14,40 @@ public class CourseDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_details);
 
+        boolean isProfessor = getIntent().getBooleanExtra("isProfessor", false);
+
+        // Back button
         TextView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        btnBack.setOnClickListener(v -> finish());
 
-        ImageView navHome = findViewById(R.id.navHome);
-        navHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CourseDetailsActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        ImageView navSearch = findViewById(R.id.navSearch);
-        navSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CourseDetailsActivity.this, SearchActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        ImageView navProfile = findViewById(R.id.navProfile);
-        navProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CourseDetailsActivity.this, ProfileActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
+        // Write Review — only visible for students
         View btnWriteReview = findViewById(R.id.btnWriteReview);
-        btnWriteReview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CourseDetailsActivity.this, CourseReviewActivity.class);
-                startActivity(intent);
-            }
+        if (isProfessor) {
+            btnWriteReview.setVisibility(View.GONE);
+        } else {
+            btnWriteReview.setOnClickListener(v -> {
+                startActivity(new Intent(CourseDetailsActivity.this, CourseReviewActivity.class));
+            });
+        }
+
+        // Nav bar
+        findViewById(R.id.navHome).setOnClickListener(v -> {
+            Intent intent = new Intent(CourseDetailsActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        findViewById(R.id.navSearch).setOnClickListener(v -> {
+            startActivity(new Intent(CourseDetailsActivity.this, SearchActivity.class));
+            finish();
+        });
+
+        findViewById(R.id.navProfile).setOnClickListener(v -> {
+            Intent intent = new Intent(CourseDetailsActivity.this, ProfileActivity.class);
+            intent.putExtra("isProfessor", isProfessor); // pass the flag through
+            startActivity(intent);
+            finish();
         });
     }
 }

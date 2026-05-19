@@ -10,29 +10,53 @@ import com.google.android.material.slider.Slider;
 
 public class CourseReviewActivity extends AppCompatActivity {
 
+    private TextView[] diffButtons;
+    private boolean isEditMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_review);
 
-        TextView btnCancel = findViewById(R.id.btnCancel);
-        btnCancel.setOnClickListener(v -> finish());
+        isEditMode = getIntent().getBooleanExtra("isEditMode", false);
 
-        View btnSubmitReview = findViewById(R.id.btnSubmitReview);
+        findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
+
+        // Change submit button label based on mode
+        TextView btnSubmitReview = findViewById(R.id.btnSubmitReview);
+        btnSubmitReview.setText(isEditMode
+                ? getString(R.string.save_changes)
+                : getString(R.string.submit_review));
+
         btnSubmitReview.setOnClickListener(v -> {
-            Intent intent = new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class);
-            startActivity(intent);
-            finish();
+            if (isEditMode) {
+                // Save changes and go back
+                finish();
+            } else {
+                // New review — go to success screen
+                startActivity(new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class));
+                finish();
+            }
         });
 
         Slider hoursSlider = findViewById(R.id.hoursSlider);
         hoursSlider.setLabelFormatter(value -> (int) value + " hours");
 
-        setupDifficultySelection();
+        int initialDifficulty = 3;
+        if (isEditMode) {
+            initialDifficulty = getIntent().getIntExtra("difficulty", 3);
+            hoursSlider.setValue(getIntent().getFloatExtra("hours", 5.0f));
+
+            String reviewText = getIntent().getStringExtra("reviewText");
+            TextView reviewInput = findViewById(R.id.reviewEditText);
+            if (reviewText != null && reviewInput != null) reviewInput.setText(reviewText);
+        }
+
+        setupDifficultySelection(initialDifficulty);
     }
 
-    private void setupDifficultySelection() {
-        TextView[] diffButtons = {
+    private void setupDifficultySelection(int initialDifficulty) {
+        diffButtons = new TextView[]{
                 findViewById(R.id.diff1),
                 findViewById(R.id.diff2),
                 findViewById(R.id.diff3),
@@ -41,22 +65,22 @@ public class CourseReviewActivity extends AppCompatActivity {
         };
 
         for (int i = 0; i < diffButtons.length; i++) {
-            final int index = i;
-            diffButtons[i].setOnClickListener(v -> {
-                for (int j = 0; j < diffButtons.length; j++) {
-                    if (j == index) {
-                        diffButtons[j].setSelected(true);
-                        diffButtons[j].setTextColor(ContextCompat.getColor(this, android.R.color.white));
-                    } else {
-                        diffButtons[j].setSelected(false);
-                        diffButtons[j].setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-                    }
-                }
-            });
+            final int difficulty = i + 1;
+            diffButtons[i].setOnClickListener(v -> selectDifficulty(difficulty));
         }
-        
-        // Initial state
-        diffButtons[2].setSelected(true);
-        diffButtons[2].setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
+        selectDifficulty(initialDifficulty);
+    }
+
+    private void selectDifficulty(int difficulty) {
+        for (int i = 0; i < diffButtons.length; i++) {
+            if (i + 1 == difficulty) {
+                diffButtons[i].setBackgroundResource(R.drawable.circle_pink);
+                diffButtons[i].setTextColor(ContextCompat.getColor(this, android.R.color.white));
+            } else {
+                diffButtons[i].setBackgroundResource(R.drawable.difficulty_circle_selector);
+                diffButtons[i].setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+            }
+        }
     }
 }
