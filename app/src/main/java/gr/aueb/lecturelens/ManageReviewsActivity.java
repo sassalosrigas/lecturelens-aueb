@@ -73,7 +73,7 @@ public class ManageReviewsActivity extends AppCompatActivity {
                 child.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(ManageReviewsActivity.this, EditReviewActivity.class);
+                        Intent intent = new Intent(ManageReviewsActivity.this, CourseReviewActivity.class);
                         startActivity(intent);
                     }
                 });

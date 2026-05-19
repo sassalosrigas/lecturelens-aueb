@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
-    tools:context=".ProfileActivity">
+    android:background="@color/background_light">
 
     <!-- Alert Box -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,8 +14,8 @@
         android:layout_marginTop="55dp"
         android:background="@drawable/alert_success_background"
         android:elevation="8dp"
-        android:visibility="gone"
         android:translationZ="10dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,7 +33,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@android:drawable/checkbox_on_background"
+            android:src="@drawable/success_tick"
             app:layout_constraintBottom_toBottomOf="@id/alertIconFrame"
             app:layout_constraintEnd_toEndOf="@id/alertIconFrame"
             app:layout_constraintStart_toStartOf="@id/alertIconFrame"
@@ -51,12 +49,13 @@
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.3"
             app:layout_constraintStart_toEndOf="@id/alertIconFrame"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_bias="0.3" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Title -->
     <TextView
         android:id="@+id/profileTitle"
         android:layout_width="wrap_content"
@@ -92,6 +91,7 @@
                 android:id="@+id/profileImage"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
+                android:contentDescription="@null"
                 android:src="@drawable/profile"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -103,7 +103,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_semibold"
-                android:text="@string/giorgos_papadopoulos"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -115,7 +114,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
-                android:text="@string/student_email_demo"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -125,7 +123,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Info Boxes -->
+    <!-- Info Boxes — labels and values set in Java -->
     <LinearLayout
         android:id="@+id/infoLayout"
         android:layout_width="0dp"
@@ -152,18 +150,18 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/infoValue1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
-                    android:text="3"
                     android:textColor="@color/pink_primary"
                     android:textSize="32sp" />
 
                 <TextView
+                    android:id="@+id/infoLabel1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_semibold"
-                    android:text="@string/years_member"
                     android:textColor="@android:color/black"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -184,27 +182,27 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/infoValue2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
-                    android:text="5"
                     android:textColor="@color/pink_primary"
                     android:textSize="32sp" />
 
                 <TextView
+                    android:id="@+id/infoLabel2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_semibold"
-                    android:text="@string/reviews_count"
                     android:textColor="@android:color/black"
                     android:textSize="14sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
-    <!-- Actions -->
+    <!-- Primary Action (text set in Java) -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/manageReviewsAction"
+        android:id="@+id/primaryAction"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginHorizontal="32dp"
@@ -221,20 +219,21 @@
             android:paddingHorizontal="16dp">
 
             <ImageView
-                android:id="@+id/icEdit"
+                android:id="@+id/icPrimaryAction"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_edit"
+                android:contentDescription="@null"
+                android:src="@drawable/edit"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/text_primary" />
 
             <TextView
+                android:id="@+id/primaryActionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_semibold"
-                android:text="@string/manage_my_reviews"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -254,6 +253,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Change Password (same for both) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/changePasswordAction"
         android:layout_width="0dp"
@@ -264,7 +264,7 @@
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manageReviewsAction">
+        app:layout_constraintTop_toBottomOf="@id/primaryAction">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -272,10 +272,10 @@
             android:paddingHorizontal="16dp">
 
             <ImageView
-                android:id="@+id/icLock"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_lock_lock"
+                android:contentDescription="@null"
+                android:src="@drawable/lock"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -305,7 +305,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Logout Button -->
+    <!-- Logout -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logoutButton"
         style="@style/Widget.Material3.Button.OutlinedButton"
@@ -344,8 +344,8 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical">
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
 
                 <View
                     android:id="@+id/navHomeBg"
@@ -359,18 +359,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:contentDescription="@null"
                     android:padding="12dp"
                     android:src="@drawable/home"
-                    android:contentDescription="@null"
                     app:tint="@color/text_secondary" />
-
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical">
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
 
                 <View
                     android:id="@+id/navSearchBg"
@@ -384,18 +383,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:contentDescription="@null"
                     android:padding="12dp"
                     android:src="@drawable/search"
-                    android:contentDescription="@null"
                     app:tint="@color/text_secondary" />
-
             </FrameLayout>
 
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical">
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
 
                 <View
                     android:id="@+id/navProfileBg"
@@ -409,13 +407,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:contentDescription="@null"
                     android:padding="12dp"
                     android:src="@drawable/profile"
-                    android:contentDescription="@null"
                     app:tint="@color/text_secondary" />
-
             </FrameLayout>
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

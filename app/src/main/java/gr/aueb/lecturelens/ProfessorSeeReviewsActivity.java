@@ -47,7 +47,7 @@ public class ProfessorSeeReviewsActivity extends AppCompatActivity {
         navProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfessorSeeReviewsActivity.this, ProfessorProfileActivity.class);
+                Intent intent = new Intent(ProfessorSeeReviewsActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 finish();
             }

@@ -101,4 +101,5 @@
     <string name="edit_review">Edit Review</string>
     <string name="delete_review_title">Delete Review?</string>
     <string name="delete_review_message">Are you sure? This action cannot be undone.</string>
+    <string name="professor_email_demo">professoremail@aueb.gr</string>
 </resources>
