@@ -7,4 +7,17 @@
     </style>
 
     <style name="Theme.LectureLensAueb" parent="Base.Theme.LectureLensAueb" />
+
+    <style name="CustomSliderLabelStyle" parent="Widget.MaterialComponents.Tooltip">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">@color/pink_primary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="shapeAppearanceOverlay">@style/SliderLabelShapeOverlay</item>
+    </style>
+
+    <style name="SliderLabelShapeOverlay">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
 </resources>
