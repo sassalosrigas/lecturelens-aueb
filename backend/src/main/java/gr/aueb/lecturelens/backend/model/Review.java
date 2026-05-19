@@ -1,5 +1,7 @@
 package gr.aueb.lecturelens.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,6 +17,7 @@ public class Review {
     private int difficulty;      // 1 to 5 from your button selection
     private float studyHours;    // From your Material Slider
     private String reviewText;   // From your EditText
+    @JsonProperty("isAnonymous")
     private boolean isAnonymous;
     @CreatedDate
     private Instant createdAt; // Automatically managed timestamp field
