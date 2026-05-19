@@ -88,14 +88,16 @@ public class MainActivity extends AppCompatActivity implements CourseAdapter.OnC
 
     @Override
     public void onCourseClick(Course course) {
-        // Enforce state transition by attaching clicked metadata context to tracking intent context
         Intent intent = new Intent(MainActivity.this, CourseDetailsActivity.class);
-        intent.putExtra("COURSE_ID", course.getId());
-        intent.putExtra("COURSE_TITLE", course.getTitle());
-        intent.putExtra("COURSE_CODE", course.getCode());
+
+        // Pass the whole course object at once
+        intent.putExtra("CHOSEN_COURSE", course);
+
+        // If you still need to pass user roles or sessions:
+        // intent.putExtra("isProfessor", isProfessor);
+
         startActivity(intent);
     }
-
     private void fetchCoursesFromBackend() {
         new Thread(() -> {
             try {

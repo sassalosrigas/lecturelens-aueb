@@ -1,6 +1,8 @@
 package gr.aueb.lecturelens.java;
 
-public class Course {
+import java.io.Serializable;
+
+public class Course implements Serializable {
     private String id;
     private String code;
     private String title;
