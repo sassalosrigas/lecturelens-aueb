@@ -14,7 +14,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         findViewById(R.id.btnSaveChanges).setOnClickListener(v -> {
-            // Password save logic here
             setResult(RESULT_OK);
             finish();
         });

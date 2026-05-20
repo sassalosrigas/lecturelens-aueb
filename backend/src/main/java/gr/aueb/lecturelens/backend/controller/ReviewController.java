@@ -38,7 +38,10 @@ public class ReviewController {
         }
     }
 
-
+    @GetMapping("/user/{username}")
+    public List<Review> getReviewsByUsername(@PathVariable String username) {
+        return reviewRepository.findByUsername(username);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<Review> updateReview(@PathVariable String id, @RequestBody Review updated) {
         return doUpdate(id, updated);
@@ -63,6 +66,17 @@ public class ReviewController {
             return ResponseEntity.notFound().build();
         });
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReview(@PathVariable String id) {
+        System.out.println("DELETE called with id: " + id);
+        if (reviewRepository.existsById(id)) {
+            reviewRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     // This is likely your existing working endpoint
     @PostMapping
     public Review createReview(@RequestBody Review review) {

@@ -5,27 +5,54 @@ import java.io.Serializable;
 public class Review implements Serializable {
     private String id;
     private String courseId;
-    private String professorId; // ADDED
+
+    private String courseTitle;
     private String username;
     private int difficulty;
     private float studyHours;
     private String reviewText;
     private boolean isAnonymous;
-    private boolean isCourse; // ADDED
-    private String createdAt;
-    private float rating;
+    private String createdAt; // Received from MongoDB as an ISO-8601 String timestamp
+    private float rating; // Standard rating for professors
 
+    // Empty constructor required for reflection mapping frameworks
     public Review() {}
 
+    public Review(String id, String courseId, String username,String courseTitle, int difficulty, float studyHours, String reviewText, boolean isAnonymous, String createdAt) {
+        this.id = id;
+        this.courseId = courseId;
+        this.username = username;
+        this.courseTitle = courseTitle;
+        this.difficulty = difficulty;
+        this.studyHours = studyHours;
+        this.reviewText = reviewText;
+        this.isAnonymous = isAnonymous;
+        this.createdAt = createdAt;
+    }
+
+    // New constructor including rating
+    public Review(String id, String courseId, String username, int difficulty, float studyHours, float rating, String reviewText, boolean isAnonymous, String createdAt) {
+        this.id = id;
+        this.courseId = courseId;
+        this.username = username;
+        this.difficulty = difficulty;
+        this.studyHours = studyHours;
+        this.rating = rating;
+        this.reviewText = reviewText;
+        this.isAnonymous = isAnonymous;
+        this.createdAt = createdAt;
+    }
+
     // Getters and Setters
+    public float getRating() { return rating; }
+    public void setRating(float rating) { this.rating = rating; }
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
+    public String getCourseTitle() { return courseTitle; }
+    public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
-
-    public String getProfessorId() { return professorId; }
-    public void setProfessorId(String professorId) { this.professorId = professorId; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -36,18 +63,15 @@ public class Review implements Serializable {
     public float getStudyHours() { return studyHours; }
     public void setStudyHours(float studyHours) { this.studyHours = studyHours; }
 
-    public float getRating() { return rating; }
-    public void setRating(float rating) { this.rating = rating; }
-
     public String getReviewText() { return reviewText; }
     public void setReviewText(String reviewText) { this.reviewText = reviewText; }
 
     public boolean isAnonymous() { return isAnonymous; }
     public void setAnonymous(boolean anonymous) { isAnonymous = anonymous; }
 
-    public boolean isCourse() { return isCourse; }
-    public void setCourse(boolean course) { isCourse = course; }
-
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public void setProfessorId(String targetProfessorId) {
+    }
 }
