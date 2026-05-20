@@ -38,7 +38,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList;
 
-    private EditText btnWriteReview;
+    private TextView btnWriteReview;
 
     private boolean userHasReview = false;
 
@@ -116,10 +116,10 @@ public class CourseDetailsActivity extends AppCompatActivity {
         reviewCount.setText("0 Reviews");
 
         if (difficulty != null) {
-            difficulty.setText(course.getDifficulty());
+            difficulty.setText(String.valueOf(course.getDifficulty()));
         }
         if (hours != null) {
-            hours.setText(course.getHours());
+            hours.setText(String.valueOf(course.getHours()));
         }
     }
 

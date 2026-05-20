@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Review implements Serializable {
     private String id;
     private String courseId;
+    private String professorId;
 
     private String courseTitle;
     private String username;
@@ -54,6 +55,9 @@ public class Review implements Serializable {
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
 
+    public String getProfessorId() { return professorId; }
+    public void setProfessorId(String professorId) { this.professorId = professorId; }
+
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
@@ -72,6 +76,5 @@ public class Review implements Serializable {
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
-    public void setProfessorId(String targetProfessorId) {
-    }
+
 }

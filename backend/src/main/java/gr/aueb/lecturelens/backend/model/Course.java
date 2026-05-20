@@ -1,28 +1,29 @@
 package gr.aueb.lecturelens.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Document(collection = "courses")
 public class Course {
+
     @Id
+    @JsonProperty("id")
     private String id;
+
     private String code;
     private String title;
     private int semester;
     private int ects;
-    private List<Integer> professorIds; // Matches the mapping array we discussed
+    private String professorName;   // ← replace professorIds with this
+    private double rating;
+    private double difficulty;
+    private double hours;
+    private String description;     // ← add this
 
     public Course() {}
-
-    public Course(String code, String title, int semester, int ects, List<Integer> professorIds) {
-        this.code = code;
-        this.title = title;
-        this.semester = semester;
-        this.ects = ects;
-        this.professorIds = professorIds;
-    }
 
     // Getters and Setters
     public String getId() { return id; }
@@ -40,6 +41,18 @@ public class Course {
     public int getEcts() { return ects; }
     public void setEcts(int ects) { this.ects = ects; }
 
-    public List<Integer> getProfessorIds() { return professorIds; }
-    public void setProfessorIds(List<Integer> professorIds) { this.professorIds = professorIds; }
+    public String getProfessorName() { return professorName; }
+    public void setProfessorName(String professorName) { this.professorName = professorName; }
+
+    public double getRating() { return rating; }
+    public void setRating(double rating) { this.rating = rating; }
+
+    public double getDifficulty() { return difficulty; }
+    public void setDifficulty(double difficulty) { this.difficulty = difficulty; }
+
+    public double getHours() { return hours; }
+    public void setHours(double hours) { this.hours = hours; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

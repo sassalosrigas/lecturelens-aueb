@@ -216,8 +216,8 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
                             json.optInt("ects", 0),
                             json.optString("professorName"),
                             json.optDouble("rating", 0.0),
-                            json.optString("difficulty"),
-                            json.optString("hours"),
+                            json.optDouble("difficulty"),
+                            json.optDouble("hours"),
                             json.optString("description")
                     );
 

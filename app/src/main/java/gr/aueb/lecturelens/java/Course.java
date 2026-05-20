@@ -10,12 +10,12 @@ public class Course implements Serializable {
     private int ects;
     private String professorName;
     private double rating;
-    private String difficulty;
-    private String hours;
+    private double difficulty;  // ← changed
+    private double hours;       // ← changed
     private String description;
 
     public Course(String id, String code, String title, int semester, int ects,
-                  String professorName, double rating, String difficulty, String hours, String description) {
+                  String professorName, double rating, double difficulty, double hours, String description) {
         this.id = id;
         this.code = code;
         this.title = title;
@@ -28,7 +28,6 @@ public class Course implements Serializable {
         this.description = description;
     }
 
-    // Getters
     public String getId() { return id; }
     public String getCode() { return code; }
     public String getTitle() { return title; }
@@ -36,7 +35,10 @@ public class Course implements Serializable {
     public int getEcts() { return ects; }
     public String getProfessorName() { return professorName; }
     public double getRating() { return rating; }
-    public String getDifficulty() { return difficulty; }
-    public String getHours() { return hours; }
+    public void setRating(double rating) { this.rating = rating; }
+    public double getDifficulty() { return difficulty; }
+    public void setDifficulty(double difficulty) { this.difficulty = difficulty; }
+    public double getHours() { return hours; }
+    public void setHours(double hours) { this.hours = hours; }
     public String getDescription() { return description; }
 }
