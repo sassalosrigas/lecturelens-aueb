@@ -14,6 +14,8 @@ public class Review {
     private String id;
     private String courseId;     // Links the review to a specific course
     private String username;     // Tracks who left the review
+
+    private float rating;
     private int difficulty;      // 1 to 5 from your button selection
     private float studyHours;    // From your Material Slider
     private String reviewText;   // From your EditText
@@ -32,7 +34,6 @@ public class Review {
         this.isAnonymous = isAnonymous;
     }
 
-    // Getters and Setters
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public boolean isAnonymous() { return isAnonymous; }
@@ -54,4 +55,6 @@ public class Review {
 
     public String getReviewText() { return reviewText; }
     public void setReviewText(String reviewText) { this.reviewText = reviewText; }
+    public float getRating() { return rating; }
+    public void setRating(float rating) { this.rating = rating; }
 }

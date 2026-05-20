@@ -20,6 +20,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.2'
 }
 
+tasks.withType(JavaExec).configureEach {
+    systemProperty "jdk.tls.client.protocols", "TLSv1.2"
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

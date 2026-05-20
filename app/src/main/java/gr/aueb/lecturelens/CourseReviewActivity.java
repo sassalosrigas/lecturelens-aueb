@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,11 +17,15 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.slider.Slider;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import gr.aueb.lecturelens.java.Course;
+import gr.aueb.lecturelens.java.Review;
 import gr.aueb.lecturelens.model.UserSession;
 
 public class CourseReviewActivity extends AppCompatActivity {
@@ -34,19 +39,22 @@ public class CourseReviewActivity extends AppCompatActivity {
     private String currentUsername;
     private SwitchCompat isAnonymous;
 
+    private RatingBar ratingBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_review);
 
-        // 1. Recover Session User and target Course Context
         UserSession session = new UserSession(this);
         currentUsername = session.getUsername();
         currentCourse = (Course) getIntent().getSerializableExtra("CHOSEN_COURSE");
 
+
         isEditMode = getIntent().getBooleanExtra("isEditMode", false);
 
         // Bind layout views
+        ratingBar = findViewById(R.id.ratingBar);
         hoursSlider = findViewById(R.id.hoursSlider);
         reviewInput = findViewById(R.id.reviewEditText);
         isAnonymous = findViewById(R.id.anonSwitch);
@@ -63,7 +71,7 @@ public class CourseReviewActivity extends AppCompatActivity {
         if (isEditMode) {
             initialDifficulty = getIntent().getIntExtra("difficulty", 3);
             hoursSlider.setValue(getIntent().getFloatExtra("hours", 5.0f));
-
+            ratingBar.setRating(getIntent().getFloatExtra("rating", 4.0f));
             String reviewText = getIntent().getStringExtra("reviewText");
             if (reviewText != null && reviewInput != null) reviewInput.setText(reviewText);
         }
@@ -71,15 +79,7 @@ public class CourseReviewActivity extends AppCompatActivity {
         selectedDifficulty = initialDifficulty;
         setupDifficultySelection(initialDifficulty);
 
-        // Click execution pipeline
-        btnSubmitReview.setOnClickListener(v -> {
-            if (isEditMode) {
-                // Handle your update/save logic later if needed
-                finish();
-            } else {
-                executeReviewSubmission();
-            }
-        });
+        btnSubmitReview.setOnClickListener(v -> executeReviewSubmission());
     }
 
     private void setupDifficultySelection(int initialDifficulty) {
@@ -121,11 +121,20 @@ public class CourseReviewActivity extends AppCompatActivity {
             Toast.makeText(this, "Error: Missing target course ID reference", Toast.LENGTH_SHORT).show();
             return;
         }
+        String reviewId = getIntent().getStringExtra("reviewId");
+        if (isEditMode && (reviewId == null || reviewId.isEmpty())) {
+            Toast.makeText(this, "Error: Missing review ID for update", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        // ↓ ADD THIS before the thread too
+        String endpoint = isEditMode
+                ? "http://10.0.2.2:8081/api/reviews/" + reviewId + "/update"
+                : "http://10.0.2.2:8081/api/reviews";
         // Fire off network thread
         new Thread(() -> {
             try {
-                URL url = new URL("http://10.0.2.2:8081/api/reviews");
+                URL url = new URL(endpoint);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -137,6 +146,7 @@ public class CourseReviewActivity extends AppCompatActivity {
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("courseId", courseId);
                 jsonParam.put("username", currentUsername != null ? currentUsername : "Anonymous");
+                jsonParam.put("rating", ratingBar.getRating());
                 jsonParam.put("difficulty", selectedDifficulty);
                 jsonParam.put("studyHours", studyHours);
                 jsonParam.put("reviewText", reviewText);
@@ -172,4 +182,6 @@ public class CourseReviewActivity extends AppCompatActivity {
                 Toast.makeText(CourseReviewActivity.this, msg, Toast.LENGTH_SHORT).show()
         );
     }
+
+
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.Review;
 import gr.aueb.lecturelens.java.ReviewAdapter;
+import gr.aueb.lecturelens.model.UserSession;
 
 public class CourseDetailsActivity extends AppCompatActivity {
 
@@ -75,9 +76,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
             btnWriteReview.setVisibility(View.GONE);
         } else {
             btnWriteReview.setOnClickListener(v -> {
-                Intent intent = new Intent(CourseDetailsActivity.this, CourseReviewActivity.class);
-                intent.putExtra("CHOSEN_COURSE", course);
-                startActivity(intent);
+                checkExistingReview(course);
             });
         }
 
@@ -151,12 +150,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
                             Review review = new Review();
                             review.setId(jsonObject.optString("id"));
                             review.setCourseId(targetCourseId);
+                            review.setRating((float) jsonObject.optDouble("rating", 0.0));
                             review.setUsername(jsonObject.optString("username"));
                             review.setDifficulty(jsonObject.optInt("difficulty"));
                             review.setStudyHours((float) jsonObject.optDouble("studyHours"));
                             review.setReviewText(jsonObject.optString("reviewText"));
                             review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
                             review.setCreatedAt(jsonObject.optString("createdAt"));
+
 
                             parsedReviews.add(review);
                         }
@@ -168,7 +169,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                         reviewList.addAll(parsedReviews);
                         reviewAdapter.notifyDataSetChanged();
 
-                        // Live sync text metrics based on query output results
                         reviewCount.setText(reviewList.size() + (reviewList.size() == 1 ? " Review" : " Reviews"));
                     });
 
@@ -180,5 +180,72 @@ public class CourseDetailsActivity extends AppCompatActivity {
                 Log.e("LectureLensDebug", "Error inside fetch stream runtime", e);
             }
         }).start();
+    }
+
+    private void checkExistingReview(Course course) {
+        String username = new UserSession(this).getUsername();
+
+        new Thread(() -> {
+            try {
+                String endpoint = "http://10.0.2.2:8081/api/reviews/check"
+                        + "?courseId=" + course.getId()
+                        + "&username=" + username;
+
+                HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Review exists — parse it and open in edit mode
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) response.append(line);
+                    in.close();
+
+                    JSONObject existing = new JSONObject(response.toString());
+
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        Intent intent = new Intent(this, CourseReviewActivity.class);
+                        intent.putExtra("CHOSEN_COURSE", course);
+                        intent.putExtra("isEditMode", true);
+                        intent.putExtra("rating", (float) existing.optDouble("rating", 4.0));
+                        intent.putExtra("difficulty", existing.optInt("difficulty", 3));
+                        intent.putExtra("hours", (float) existing.optDouble("studyHours", 5.0));
+                        intent.putExtra("reviewText", existing.optString("reviewText", ""));
+                        String parsedId = existing.has("id") ? existing.optString("id") : existing.optString("_id");
+                        Log.e("LectureLensDebug", "Parsed reviewId: " + parsedId);
+                        intent.putExtra("reviewId", parsedId);
+                        startActivity(intent);
+                    });
+
+                } else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                    // No existing review — open fresh
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        Intent intent = new Intent(this, CourseReviewActivity.class);
+                        intent.putExtra("CHOSEN_COURSE", course);
+                        startActivity(intent);
+                    });
+
+                } else {
+                    Log.e("LectureLensDebug", "Check review failed: " + responseCode);
+                    showToastOnUi("Could not check for existing review.");
+                }
+
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error checking existing review", e);
+                showToastOnUi("Network error. Try again.");
+            }
+        }).start();
+    }
+
+    private void showToastOnUi(String msg) {
+        new Handler(Looper.getMainLooper()).post(() ->
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        );
     }
 }

@@ -13,6 +13,7 @@ public class Review implements Serializable {
     private String createdAt; // Received from MongoDB as an ISO-8601 String timestamp
     private float rating; // Standard rating for professors
 
+    // Empty constructor required for reflection mapping frameworks
     public Review() {}
 
     public Review(String id, String courseId, String username, int difficulty, float studyHours, String reviewText, boolean isAnonymous, String createdAt) {
