@@ -23,9 +23,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import gr.aueb.lecturelens.adapter.ReviewAdapter;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.Review;
+import gr.aueb.lecturelens.java.ReviewAdapter;
 
 public class CourseDetailsActivity extends AppCompatActivity {
 
@@ -51,7 +51,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
         // Bind the new RecyclerView from your updated XML file
         reviewsRecyclerView = findViewById(R.id.reviewsRecyclerView);
         reviewList = new ArrayList<>();
-        reviewAdapter = new ReviewAdapter(reviewList);
+        reviewAdapter = new ReviewAdapter(reviewList, true);
 
         // Connect the layout settings and dynamic adapter
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));

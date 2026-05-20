@@ -114,8 +114,7 @@ public class SearchActivity extends AppCompatActivity implements
     @Override
     public void onProfClick(Professor prof) {
         Intent intent = new Intent(SearchActivity.this, ProfessorDetailsActivity.class);
-        intent.putExtra("PROFESSOR_ID", prof.getId());
-        intent.putExtra("PROFESSOR_NAME", prof.getFullName());
+        intent.putExtra("CHOSEN_PROFESSOR", prof);
         startActivity(intent);
     }
 
@@ -196,7 +195,8 @@ public class SearchActivity extends AppCompatActivity implements
                                 obj.optString("id", obj.optString("_id")),
                                 obj.optString("firstName", ""),
                                 obj.optString("lastName", ""),
-                                obj.optString("title", "Faculty")
+                                obj.optString("title", "Faculty"),
+                                obj.optDouble("rating", 0.0)
                         ));
                     }
                     cache.cachedProfessors.clear();
