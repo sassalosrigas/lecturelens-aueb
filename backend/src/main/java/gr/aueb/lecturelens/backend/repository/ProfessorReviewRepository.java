@@ -5,5 +5,4 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface ProfessorReviewRepository extends MongoRepository<Review, String> {
-    List<Review> findByProfessorId(String professorId);
-}
+    List<Review> findByProfessorId(String professorId);}

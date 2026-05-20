@@ -114,7 +114,7 @@ public class SearchActivity extends AppCompatActivity implements
     @Override
     public void onProfClick(Professor prof) {
         Intent intent = new Intent(SearchActivity.this, ProfessorDetailsActivity.class);
-        intent.putExtra("CHOSEN_PROFESSOR", prof);
+        intent.putExtra("PROFESSOR_ID", String.valueOf(prof.getId()));
         startActivity(intent);
     }
 

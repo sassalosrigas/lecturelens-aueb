@@ -44,9 +44,18 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_professor_details);
 
-        if (getIntent() != null && getIntent().hasExtra("PROFESSOR_ID")) {
-            professorId = getIntent().getStringExtra("PROFESSOR_ID");
+        professorId = getIntent().getStringExtra("PROFESSOR_ID");
+
+        // 2. Fallback: If null, try to get it from the serialized Professor object
+        if (professorId == null || professorId.isEmpty()) {
+            Professor prof = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
+            if (prof != null) {
+                professorId = String.valueOf(prof.getId());
+                Log.d("LectureLensDebug", "Recovered ID from Object: " + professorId);
+            }
         }
+
+        Log.d("LectureLensDebug", "Final professorId to use: " + professorId);
 
         profName = findViewById(R.id.profName);
         profDept = findViewById(R.id.profDept);
@@ -89,7 +98,10 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
 
         setupBottomNavigation(isProfessor);
 
-        if (!professorId.isEmpty()) fetchProfessorDetails(professorId);
+        if (!professorId.isEmpty()) {
+            fetchProfessorDetails(professorId);
+            fetchProfessorCourses(professorId); // ADD THIS LINE to fetch the courses!
+        }
     }
 
     private void setupBottomNavigation(boolean isProfessor) {
@@ -130,23 +142,25 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
 
 
     private void fetchProfessorDetails(String professorId) {
+        Log.d("LectureLensDebug", "Entering fetchProfessorDetails for ID: " + professorId);
         new Thread(() -> {
             try {
-                URL url = new URL("http://10.0.2.2:8081/api/professor-reviews");
+                // FIXED URL: Targets the specific professor instead of fetching ALL reviews
+                URL url = new URL("http://10.0.2.2:8081/api/professor-reviews/" + professorId);
+                Log.d("LectureLensDebug", "Attempting connection to: " + url);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setConnectTimeout(5000);
 
                 int responseCode = conn.getResponseCode();
+                Log.d("LectureLensDebug", "Response Code received: " + responseCode);
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String inputLine;
 
-                    while ((inputLine = in.readLine()) != null) {
-                        response.append(inputLine);
-                    }
+                    while ((inputLine = in.readLine()) != null) response.append(inputLine);
                     in.close();
 
                     JSONArray jsonArray = new JSONArray(response.toString());
@@ -154,38 +168,88 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String targetProfId = jsonObject.optString("professorId");
 
-                        // Check if this item belongs to our current active course
-                        if (targetProfId.equals(professorId)) {
-                            Review review = new Review();
-                            review.setId(jsonObject.optString("id"));
-                            review.setProfessorId(targetProfId);
-                            review.setUsername(jsonObject.optString("username"));
-                            review.setReviewText(jsonObject.optString("reviewText"));
-                            review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
-                            review.setCreatedAt(jsonObject.optString("createdAt"));
+                        Review review = new Review();
+                        review.setId(jsonObject.optString("id"));
+                        review.setProfessorId(jsonObject.optString("professorId"));
+                        review.setUsername(jsonObject.optString("username"));
+                        review.setReviewText(jsonObject.optString("reviewText"));
+                        review.setRating((float) jsonObject.optDouble("rating", 0.0));
+                        review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
+                        review.setCourse(jsonObject.optBoolean("isCourse"));
+                        review.setCreatedAt(jsonObject.optString("createdAt"));
 
-                            parsedReviews.add(review);
-                        }
+                        parsedReviews.add(review);
                     }
 
-                    // Safely dispatch list view rendering onto your application main thread
                     new Handler(Looper.getMainLooper()).post(() -> {
                         reviewList.clear();
                         reviewList.addAll(parsedReviews);
                         reviewAdapter.notifyDataSetChanged();
-
-                        // Live sync text metrics based on query output results
                         reviewCount.setText(reviewList.size() + (reviewList.size() == 1 ? " Review" : " Reviews"));
                     });
-
                 } else {
-                    Log.e("LectureLensDebug", "Failed fetching backend reviews: " + responseCode);
+                    Log.e("LectureLensDebug", "HTTP Error: " + responseCode);
+                    // Read error stream for more detail
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    Log.e("LectureLensDebug", "Error Body: " + errorReader.readLine());
                 }
                 conn.disconnect();
             } catch (Exception e) {
-                Log.e("LectureLensDebug", "Error inside fetch stream runtime", e);
+                Log.e("LectureLensDebug", "Error fetching reviews", e);
+            }
+        }).start();
+    }
+
+    private void fetchProfessorCourses(String professorId) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/professors/" + professorId + "/details");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String inputLine;
+
+                    while ((inputLine = in.readLine()) != null) response.append(inputLine);
+                    in.close();
+
+                    JSONObject jsonResponse = new JSONObject(response.toString());
+                    JSONArray coursesArray = jsonResponse.optJSONArray("matchingCourses");
+
+                    List<Course> parsedCourses = new ArrayList<>();
+                    if (coursesArray != null) {
+                        for (int i = 0; i < coursesArray.length(); i++) {
+                            JSONObject cObj = coursesArray.getJSONObject(i);
+                            Course course = new Course(
+                                    cObj.optString("id"),
+                                    cObj.optString("code"),
+                                    cObj.optString("title"),
+                                    cObj.optInt("semester"),
+                                    cObj.optInt("ects"),
+                                    cObj.optString("professorName"),
+                                    cObj.optDouble("rating", 0.0),
+                                    cObj.optString("difficulty"),
+                                    cObj.optString("hours"),
+                                    cObj.optString("description")
+                            );
+                            parsedCourses.add(course);
+                        }
+                    }
+
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        courseList.clear();
+                        courseList.addAll(parsedCourses);
+                        courseChipAdapter.notifyDataSetChanged();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error fetching courses", e);
             }
         }).start();
     }
