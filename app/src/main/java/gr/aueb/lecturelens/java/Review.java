@@ -6,11 +6,12 @@ public class Review implements Serializable {
     private String id;
     private String courseId;
     private String username;
+    private float rating;
     private int difficulty;
     private float studyHours;
     private String reviewText;
     private boolean isAnonymous;
-    private String createdAt; // Received from MongoDB as an ISO-8601 String timestamp
+    private String createdAt;
 
     // Empty constructor required for reflection mapping frameworks
     public Review() {}
@@ -50,4 +51,7 @@ public class Review implements Serializable {
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public float getRating() { return rating; }
+    public void setRating(float rating) { this.rating = rating; }
 }
