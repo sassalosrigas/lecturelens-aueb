@@ -15,6 +15,7 @@ public class Review {
     private String courseId;     // Links the review to a specific course
     private String username;     // Tracks who left the review
 
+    private String courseTitle;
     private float rating;
     private int difficulty;      // 1 to 5 from your button selection
     private float studyHours;    // From your Material Slider
@@ -25,9 +26,10 @@ public class Review {
     private Instant createdAt; // Automatically managed timestamp field
     public Review() {}
 
-    public Review(String courseId, String username, int difficulty, float studyHours, String reviewText, boolean isAnonymous) {
+    public Review(String courseId, String username, String courseTitle, int difficulty, float studyHours, String reviewText, boolean isAnonymous) {
         this.courseId = courseId;
         this.username = username;
+        this.courseTitle = courseTitle;
         this.difficulty = difficulty;
         this.studyHours = studyHours;
         this.reviewText = reviewText;
@@ -44,6 +46,13 @@ public class Review {
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
 
+    public String getCourseTitle(){
+        return this.courseTitle;
+    }
+
+    public void setCourseTitle(String title){
+        this.courseTitle = title;
+    }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 

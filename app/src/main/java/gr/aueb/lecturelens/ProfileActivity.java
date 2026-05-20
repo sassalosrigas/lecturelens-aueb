@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import gr.aueb.lecturelens.model.UserSession;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_CHANGE_PASSWORD = 1001;
@@ -18,6 +20,8 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         ImageView navHome = findViewById(R.id.navHome);
+        UserSession session = new UserSession(this);
+        String username = session.getUsername();
         navHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

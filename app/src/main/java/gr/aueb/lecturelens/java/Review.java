@@ -5,6 +5,8 @@ import java.io.Serializable;
 public class Review implements Serializable {
     private String id;
     private String courseId;
+
+    private String courseTitle;
     private String username;
     private float rating;
     private int difficulty;
@@ -16,10 +18,11 @@ public class Review implements Serializable {
     // Empty constructor required for reflection mapping frameworks
     public Review() {}
 
-    public Review(String id, String courseId, String username, int difficulty, float studyHours, String reviewText, boolean isAnonymous, String createdAt) {
+    public Review(String id, String courseId, String username,String courseTitle, int difficulty, float studyHours, String reviewText, boolean isAnonymous, String createdAt) {
         this.id = id;
         this.courseId = courseId;
         this.username = username;
+        this.courseTitle = courseTitle;
         this.difficulty = difficulty;
         this.studyHours = studyHours;
         this.reviewText = reviewText;
@@ -31,6 +34,8 @@ public class Review implements Serializable {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
+    public String getCourseTitle() { return courseTitle; }
+    public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
 

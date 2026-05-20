@@ -93,9 +93,6 @@ public class MainActivity extends AppCompatActivity implements CourseAdapter.OnC
         // Pass the whole course object at once
         intent.putExtra("CHOSEN_COURSE", course);
 
-        // If you still need to pass user roles or sessions:
-        // intent.putExtra("isProfessor", isProfessor);
-
         startActivity(intent);
     }
     private void fetchCoursesFromBackend() {

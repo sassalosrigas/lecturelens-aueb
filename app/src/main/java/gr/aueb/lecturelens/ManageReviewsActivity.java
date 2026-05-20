@@ -5,115 +5,251 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Window;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class ManageReviewsActivity extends AppCompatActivity {
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import gr.aueb.lecturelens.java.Course;
+import gr.aueb.lecturelens.java.ReviewAdapter;
+import gr.aueb.lecturelens.java.Review;
+import gr.aueb.lecturelens.model.UserSession;
+
+public class ManageReviewsActivity extends AppCompatActivity implements ReviewAdapter.OnReviewActionListener {
+
+    private String currentUsername;
+    private List<Review> userReviewsList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private ReviewAdapter reviewsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_reviews);
 
+        // 1. Grab current logged-in user from your session manager
+        UserSession session = new UserSession(getApplicationContext());
+        currentUsername = session.getUsername();
+
+        // 2. Setup Back button action
         TextView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
+        btnBack.setOnClickListener(v -> finish());
+
+        // 3. Bind the new RecyclerView layout you just modified
+        recyclerView = findViewById(R.id.reviewsRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // 4. Initialize the adapter passing 'this' so it runs in Manage Mode
+        reviewsAdapter = new ReviewAdapter(userReviewsList, this);
+        recyclerView.setAdapter(reviewsAdapter);
+
+        findViewById(R.id.navHome).setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+        findViewById(R.id.navSearch).setOnClickListener(v -> {
+            startActivity(new Intent(this, SearchActivity.class));
+            finish();
+        });
+        findViewById(R.id.navProfile).setOnClickListener(v -> {
+            startActivity(new Intent(this, ProfileActivity.class));
+            finish();
         });
 
-        setupActionButtons();
-
-        ImageView navHome = findViewById(R.id.navHome);
-        navHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ManageReviewsActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        ImageView navSearch = findViewById(R.id.navSearch);
-        navSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ManageReviewsActivity.this, SearchActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        ImageView navProfile = findViewById(R.id.navProfile);
-        navProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ManageReviewsActivity.this, ProfileActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-    }
-
-    private void setupActionButtons() {
-        ViewGroup list = findViewById(android.R.id.content);
-        findAndSetActionListeners(list);
-    }
-
-    private void findAndSetActionListeners(ViewGroup parent) {
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View child = parent.getChildAt(i);
-            if (child.getId() == R.id.btnEdit) {
-                child.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(ManageReviewsActivity.this, CourseReviewActivity.class);
-                        startActivity(intent);
-                    }
-                });
-            } else if (child.getId() == R.id.btnDelete) {
-                child.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showDeleteConfirmationDialog();
-                    }
-                });
-            } else if (child instanceof ViewGroup) {
-                findAndSetActionListeners((ViewGroup) child);
-            }
+        // 5. Fire off the API call if we have a valid user session
+        if (currentUsername != null && !currentUsername.isEmpty()) {
+            fetchUserReviews();
+        } else {
+            Toast.makeText(this, "Session invalid. Please log in again.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showDeleteConfirmationDialog() {
+    private void fetchUserReviews() {
+        new Thread(() -> {
+            try {
+                // Adjust this URL match your local server port config if needed (10.0.2.2 points to host localhost)
+                URL url = new URL("http://10.0.2.2:8081/api/reviews/user/" + currentUsername);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line.trim());
+                    }
+                    in.close();
+
+                    JSONArray jsonArray = new JSONArray(response.toString());
+                    userReviewsList.clear();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        Review review = new Review();
+                        review.setId(jsonObject.optString("id"));
+                        review.setCourseId(jsonObject.optString("courseId"));
+                        review.setCourseTitle(jsonObject.optString("courseTitle"));
+                        review.setUsername(jsonObject.optString("username"));
+                        review.setDifficulty(jsonObject.optInt("difficulty"));
+                        review.setStudyHours((float) jsonObject.optDouble("studyHours"));
+                        review.setReviewText(jsonObject.optString("reviewText"));
+                        review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
+                        review.setCreatedAt(jsonObject.optString("createdAt"));
+
+                        userReviewsList.add(review);
+                    }
+
+                    // Push dataset changes smoothly into the UI thread loop
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        reviewsAdapter.notifyDataSetChanged();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error downloading user reviews data", e);
+            }
+        }).start();
+    }
+
+
+    @Override
+    public void onEditItem(Review review) {
+        fetchCourseById(review.getCourseId(), review);
+    }
+
+    @Override
+    public void onDeleteItem(Review review, int position) {
+        Log.e("LectureLensDebug", "Deleting reviewId: " + review.getId()); // ← add this
+        showDeleteConfirmationDialog(review.getId(), position);
+    }
+
+    private void showDeleteConfirmationDialog(String reviewId, int position) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_delete_confirmation_dialog);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        View btnCancel = dialog.findViewById(R.id.btnCancel);
-        View btnDelete = dialog.findViewById(R.id.btnDelete);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle deletion here
-                dialog.dismiss();
-            }
+        dialog.findViewById(R.id.btnCancel).setOnClickListener(v -> dialog.dismiss());
+        dialog.findViewById(R.id.btnDelete).setOnClickListener(v -> {
+            deleteReviewFromServer(reviewId, position);
+            dialog.dismiss();
         });
 
         dialog.show();
     }
+
+    private void deleteReviewFromServer(String reviewId, int position) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/reviews/" + reviewId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("DELETE");
+                conn.setConnectTimeout(5000);
+
+                int responseCode = conn.getResponseCode();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                        // Success: Remove item locally from dataset list array and animate away nicely
+                        userReviewsList.remove(position);
+                        reviewsAdapter.notifyItemRemoved(position);
+                        Toast.makeText(this, "Review deleted successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Failed to delete review", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Delete request crash", e);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(this, "Network error during deletion", Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
+    }
+
+    private void fetchCourseById(String courseId, Review review) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/courses/" + courseId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) response.append(line);
+                    in.close();
+
+                    JSONObject json = new JSONObject(response.toString());
+
+                    Course course = new Course(
+                            json.optString("id"),
+                            json.optString("code"),
+                            json.optString("title"),
+                            json.optInt("semester", 0),
+                            json.optInt("ects", 0),
+                            json.optString("professorName"),
+                            json.optDouble("rating", 0.0),
+                            json.optString("difficulty"),
+                            json.optString("hours"),
+                            json.optString("description")
+                    );
+
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        Intent intent = new Intent(this, CourseReviewActivity.class);
+                        intent.putExtra("CHOSEN_COURSE", course);
+                        intent.putExtra("isEditMode", true);
+                        intent.putExtra("reviewId", review.getId());
+                        intent.putExtra("rating", review.getRating());
+                        intent.putExtra("difficulty", review.getDifficulty());
+                        intent.putExtra("hours", review.getStudyHours());
+                        intent.putExtra("reviewText", review.getReviewText());
+                        intent.putExtra("isAnonymousSaved", review.isAnonymous());
+                        startActivity(intent);
+                    });
+
+                } else {
+                    Log.e("LectureLensDebug", "Failed fetching course: " + responseCode);
+                    showToastOnUi("Could not load course data.");
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error fetching course by id", e);
+                showToastOnUi("Network error loading course.");
+            }
+        }).start();
+    }
+
+    private void showToastOnUi(String msg) {
+        new Handler(Looper.getMainLooper()).post(() ->
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        );
+    }
+
 }

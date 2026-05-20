@@ -146,6 +146,7 @@ public class CourseReviewActivity extends AppCompatActivity {
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("courseId", courseId);
                 jsonParam.put("username", currentUsername != null ? currentUsername : "Anonymous");
+                jsonParam.put("courseTitle", currentCourse.getTitle());
                 jsonParam.put("rating", ratingBar.getRating());
                 jsonParam.put("difficulty", selectedDifficulty);
                 jsonParam.put("studyHours", studyHours);

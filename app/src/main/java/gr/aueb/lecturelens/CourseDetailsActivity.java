@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import gr.aueb.lecturelens.adapter.ReviewAdapter;
+import gr.aueb.lecturelens.java.ReviewAdapter;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.Review;
 import gr.aueb.lecturelens.model.UserSession;
@@ -36,6 +36,8 @@ public class CourseDetailsActivity extends AppCompatActivity {
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList;
+
+    private boolean userHasReview = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,10 @@ public class CourseDetailsActivity extends AppCompatActivity {
 
         if (course != null) {
             populateUiElements(course);
-            fetchCourseReviews(course.getId()); // Triggers the backend check matching this course ID
+            fetchCourseReviews(course.getId());
+            if (!isProfessor) {
+                checkExistingReview(course);
+            }
         } else {
             Toast.makeText(this, "Error: Could not display course data.", Toast.LENGTH_SHORT).show();
         }
@@ -150,6 +155,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
                             Review review = new Review();
                             review.setId(jsonObject.optString("id"));
                             review.setCourseId(targetCourseId);
+                            review.setCourseTitle("courseTitle");
                             review.setRating((float) jsonObject.optDouble("rating", 0.0));
                             review.setUsername(jsonObject.optString("username"));
                             review.setDifficulty(jsonObject.optInt("difficulty"));
@@ -184,6 +190,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
 
     private void checkExistingReview(Course course) {
         String username = new UserSession(this).getUsername();
+        TextView btnWriteReview = findViewById(R.id.btnWriteReview); // ← get reference
 
         new Thread(() -> {
             try {
@@ -199,7 +206,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                 int responseCode = conn.getResponseCode();
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    // Review exists — parse it and open in edit mode
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -207,27 +213,40 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     in.close();
 
                     JSONObject existing = new JSONObject(response.toString());
+                    userHasReview = true;
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        Intent intent = new Intent(this, CourseReviewActivity.class);
-                        intent.putExtra("CHOSEN_COURSE", course);
-                        intent.putExtra("isEditMode", true);
-                        intent.putExtra("rating", (float) existing.optDouble("rating", 4.0));
-                        intent.putExtra("difficulty", existing.optInt("difficulty", 3));
-                        intent.putExtra("hours", (float) existing.optDouble("studyHours", 5.0));
-                        intent.putExtra("reviewText", existing.optString("reviewText", ""));
-                        String parsedId = existing.has("id") ? existing.optString("id") : existing.optString("_id");
-                        Log.e("LectureLensDebug", "Parsed reviewId: " + parsedId);
-                        intent.putExtra("reviewId", parsedId);
-                        startActivity(intent);
+                        // ← update button text on load
+                        btnWriteReview.setText("Edit Review");
+
+                        // on click, open in edit mode
+                        btnWriteReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, CourseReviewActivity.class);
+                            intent.putExtra("CHOSEN_COURSE", course);
+                            intent.putExtra("isEditMode", true);
+                            intent.putExtra("rating", (float) existing.optDouble("rating", 4.0));
+                            intent.putExtra("difficulty", existing.optInt("difficulty", 3));
+                            intent.putExtra("hours", (float) existing.optDouble("studyHours", 5.0));
+                            intent.putExtra("reviewText", existing.optString("reviewText", ""));
+                            String parsedId = existing.has("id") ? existing.optString("id") : existing.optString("_id");
+                            Log.e("LectureLensDebug", "Parsed reviewId: " + parsedId);
+                            intent.putExtra("reviewId", parsedId);
+                            startActivity(intent);
+                        });
                     });
 
                 } else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
-                    // No existing review — open fresh
+                    userHasReview = false;
+
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        Intent intent = new Intent(this, CourseReviewActivity.class);
-                        intent.putExtra("CHOSEN_COURSE", course);
-                        startActivity(intent);
+                        // ← reset button text and open in create mode
+                        btnWriteReview.setText("Write Review");
+
+                        btnWriteReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, CourseReviewActivity.class);
+                            intent.putExtra("CHOSEN_COURSE", course);
+                            startActivity(intent);
+                        });
                     });
 
                 } else {
