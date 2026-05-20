@@ -200,6 +200,7 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         }).start();
     }
 
+    /*
     private void fetchProfessorCourses(String professorId) {
         new Thread(() -> {
             try {
@@ -252,4 +253,56 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
             }
         }).start();
     }
+
+     */
+    private void fetchProfessorCourses(String professorId) {
+        new Thread(() -> {
+            try {
+                // New simpler endpoint — no mapping table involved
+                URL url = new URL("http://10.0.2.2:8081/api/professors/" + professorId + "/courses");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) response.append(inputLine);
+                    in.close();
+
+                    JSONArray coursesArray = new JSONArray(response.toString());
+                    List<Course> parsedCourses = new ArrayList<>();
+
+                    for (int i = 0; i < coursesArray.length(); i++) {
+                        JSONObject cObj = coursesArray.getJSONObject(i);
+                        parsedCourses.add(new Course(
+                                cObj.optString("id", cObj.optString("_id")),
+                                cObj.optString("code"),
+                                cObj.optString("title"),
+                                cObj.optInt("semester"),
+                                cObj.optInt("ects"),
+                                cObj.optString("professorName"),
+                                cObj.optDouble("rating", 0.0),
+                                cObj.optString("difficulty"),
+                                cObj.optString("hours"),
+                                cObj.optString("description")
+                        ));
+                    }
+
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        courseList.clear();
+                        courseList.addAll(parsedCourses);
+                        courseChipAdapter.notifyDataSetChanged();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error fetching courses", e);
+            }
+        }).start();
+    }
 }
+
+

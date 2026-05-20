@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.List;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "courses")
 public class Course {
@@ -23,21 +23,24 @@ public class Course {
     private double hours;
     private String description;     // ← add this
 
-    public Course() {}
+    @Field("professorName")
+    @JsonProperty("professorName")
+    private String professorName;   // matches the actual DB field
+
+    private double rating;
+    private int difficulty;
+    private double hours;
+    private String description;
 
     // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
-
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-
     public int getSemester() { return semester; }
     public void setSemester(int semester) { this.semester = semester; }
-
     public int getEcts() { return ects; }
     public void setEcts(int ects) { this.ects = ects; }
 

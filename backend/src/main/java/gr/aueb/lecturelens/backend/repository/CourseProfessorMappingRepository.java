@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CourseProfessorMappingRepository extends MongoRepository<CourseProfessorMapping, String> {
-    List<CourseProfessorMapping> findByProfessorId(String professorId);
+    // Uses int to match the numeric "professor_id" field stored in MongoDB
+    List<CourseProfessorMapping> findByProfessorId(int professorId);
 }
