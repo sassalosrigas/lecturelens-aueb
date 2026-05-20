@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import gr.aueb.lecturelens.adapter.ReviewAdapter;
+import gr.aueb.lecturelens.java.ReviewAdapter;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.Review;
 import gr.aueb.lecturelens.model.UserSession;
@@ -36,6 +37,8 @@ public class CourseDetailsActivity extends AppCompatActivity {
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList;
+
+    private EditText btnWriteReview;
 
     private boolean userHasReview = false;
 
@@ -76,7 +79,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
         TextView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        View btnWriteReview = findViewById(R.id.btnWriteReview);
+        btnWriteReview = findViewById(R.id.btnWriteReview);
         if (isProfessor) {
             btnWriteReview.setVisibility(View.GONE);
         } else {
@@ -214,10 +217,8 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     JSONObject existing = new JSONObject(response.toString());
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        // ← update button text on load
                         btnWriteReview.setText("Edit Review");
 
-                        // on click, open in edit mode
                         btnWriteReview.setOnClickListener(v -> {
                             Intent intent = new Intent(this, CourseReviewActivity.class);
                             intent.putExtra("CHOSEN_COURSE", course);
@@ -237,7 +238,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     userHasReview = false;
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        // ← reset button text and open in create mode
                         btnWriteReview.setText("Write Review");
 
                         btnWriteReview.setOnClickListener(v -> {
