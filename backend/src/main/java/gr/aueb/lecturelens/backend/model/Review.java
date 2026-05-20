@@ -13,12 +13,13 @@ public class Review {
     @Id
     private String id;
     private String courseId;     // Links the review to a specific course
+    private String professorId;  // Links the review to a specific professor
     private String username;     // Tracks who left the review
 
     private String courseTitle;
-    private float rating;
+    private double rating;
     private int difficulty;      // 1 to 5 from your button selection
-    private float studyHours;    // From your Material Slider
+    private double studyHours;    // From your Material Slider
     private String reviewText;   // From your EditText
     @JsonProperty("isAnonymous")
     private boolean isAnonymous;
@@ -46,6 +47,9 @@ public class Review {
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
 
+    public String getProfessorId() { return professorId; }
+    public void setProfessorId(String professorId) { this.professorId = professorId; }
+
     public String getCourseTitle(){
         return this.courseTitle;
     }
@@ -59,11 +63,11 @@ public class Review {
     public int getDifficulty() { return difficulty; }
     public void setDifficulty(int difficulty) { this.difficulty = difficulty; }
 
-    public float getStudyHours() { return studyHours; }
-    public void setStudyHours(float studyHours) { this.studyHours = studyHours; }
+    public double getStudyHours() { return studyHours; }
+    public void setStudyHours(double studyHours) { this.studyHours = studyHours; }
 
     public String getReviewText() { return reviewText; }
     public void setReviewText(String reviewText) { this.reviewText = reviewText; }
-    public float getRating() { return rating; }
-    public void setRating(float rating) { this.rating = rating; }
+    public double getRating() { return rating; }
+    public void setRating(double rating) { this.rating = rating; }
 }

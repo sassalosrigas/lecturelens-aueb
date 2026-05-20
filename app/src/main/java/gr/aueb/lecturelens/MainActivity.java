@@ -127,8 +127,8 @@ public class MainActivity extends AppCompatActivity implements CourseAdapter.OnC
                         // Fields matching your item_course_card requirements
                         String profName = obj.optString("professorName", "Staff");
                         double rating = obj.optDouble("rating", 0.0);
-                        String difficulty = obj.optString("difficulty", "Medium");
-                        String hours = obj.optString("studyHours", "4-6");
+                        double difficulty = obj.optDouble("difficulty", 0.0);
+                        double hours = obj.optDouble("hours", 0.0);
                         String description = obj.optString("description", "No description provided.");
 
                         courseList.add(new Course(id, code, title, semester, ects, profName, rating, difficulty, hours, description));

@@ -5,7 +5,8 @@ import java.io.Serializable;
 public class Review implements Serializable {
     private String id;
     private String courseId;
-    private String professorId;   // FIX: was missing — empty setter did nothing before
+    private String professorId;
+
     private String courseTitle;
     private String username;
     private int difficulty;
@@ -82,4 +83,6 @@ public class Review implements Serializable {
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+
 }

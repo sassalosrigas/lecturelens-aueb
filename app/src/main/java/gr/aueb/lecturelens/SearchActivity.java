@@ -155,8 +155,8 @@ public class SearchActivity extends AppCompatActivity implements
                                 obj.optInt("ects", 6),
                                 obj.optString("professorName", "Staff"),
                                 obj.optDouble("rating", 0.0),
-                                obj.optString("difficulty", "Medium"),
-                                obj.optString("studyHours", "4"),
+                                obj.optDouble("difficulty", 0.0),
+                                obj.optDouble("studyHours", 0.0),
                                 obj.optString("description", "")
                         ));
                     }
