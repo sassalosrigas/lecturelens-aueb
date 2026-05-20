@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements CourseAdapter.OnC
     public void onCourseClick(Course course) {
         Intent intent = new Intent(MainActivity.this, CourseDetailsActivity.class);
 
-        // Pass the whole course object at once
         intent.putExtra("CHOSEN_COURSE", course);
 
         startActivity(intent);
@@ -112,23 +111,8 @@ public class MainActivity extends AppCompatActivity implements CourseAdapter.OnC
                     }
                     in.close();
 
-                    // Parse JSON payload schema directly matching MongoDB records mapping structures
                     JSONArray jsonArray = new JSONArray(response.toString());
                     courseList.clear();
-                    /*
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        courseList.add(new Course(
-                                obj.optString("id", obj.optString("_id")),
-                                obj.optString("code", ""),
-                                obj.optString("title", "Unknown Course"),
-                                obj.optInt("semester", 0),
-                                obj.optInt("ects", 0)
-                        ));
-                        Log.d("course debug", obj.toString());
-                    }
-                    */
-
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);

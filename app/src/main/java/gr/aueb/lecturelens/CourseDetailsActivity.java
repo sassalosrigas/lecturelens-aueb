@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import gr.aueb.lecturelens.java.ReviewAdapter;
+import gr.aueb.lecturelens.adapter.ReviewAdapter;
 import gr.aueb.lecturelens.java.Course;
 import gr.aueb.lecturelens.java.Review;
 import gr.aueb.lecturelens.model.UserSession;
@@ -54,7 +54,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
         // Bind the new RecyclerView from your updated XML file
         reviewsRecyclerView = findViewById(R.id.reviewsRecyclerView);
         reviewList = new ArrayList<>();
-        reviewAdapter = new ReviewAdapter(reviewList);
+        reviewAdapter = new ReviewAdapter(reviewList, true);
 
         // Connect the layout settings and dynamic adapter
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -155,7 +155,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                             Review review = new Review();
                             review.setId(jsonObject.optString("id"));
                             review.setCourseId(targetCourseId);
-                            review.setCourseTitle("courseTitle");
                             review.setRating((float) jsonObject.optDouble("rating", 0.0));
                             review.setUsername(jsonObject.optString("username"));
                             review.setDifficulty(jsonObject.optInt("difficulty"));
@@ -190,7 +189,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
 
     private void checkExistingReview(Course course) {
         String username = new UserSession(this).getUsername();
-        TextView btnWriteReview = findViewById(R.id.btnWriteReview); // ← get reference
 
         new Thread(() -> {
             try {
@@ -206,6 +204,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
                 int responseCode = conn.getResponseCode();
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Review exists — parse it and open in edit mode
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -213,7 +212,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     in.close();
 
                     JSONObject existing = new JSONObject(response.toString());
-                    userHasReview = true;
 
                     new Handler(Looper.getMainLooper()).post(() -> {
                         // ← update button text on load
