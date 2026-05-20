@@ -3,7 +3,7 @@ package gr.aueb.lecturelens.backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "course_professor_mappings")
+@Document(collection = "courses-professors")
 public class CourseProfessorMapping {
     @Id
     private String id;
@@ -11,11 +11,6 @@ public class CourseProfessorMapping {
     private String professorId;
 
     public CourseProfessorMapping() {}
-
-    public CourseProfessorMapping(String courseId, String professorId) {
-        this.courseId = courseId;
-        this.professorId = professorId;
-    }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
