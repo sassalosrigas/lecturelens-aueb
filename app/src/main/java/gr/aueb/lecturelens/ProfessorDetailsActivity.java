@@ -176,7 +176,6 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                         review.setReviewText(jsonObject.optString("reviewText"));
                         review.setRating((float) jsonObject.optDouble("rating", 0.0));
                         review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
-                        review.setCourse(jsonObject.optBoolean("isCourse"));
                         review.setCreatedAt(jsonObject.optString("createdAt"));
 
                         parsedReviews.add(review);
@@ -233,8 +232,8 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                                     cObj.optInt("ects"),
                                     cObj.optString("professorName"),
                                     cObj.optDouble("rating", 0.0),
-                                    cObj.optString("difficulty"),
-                                    cObj.optString("hours"),
+                                    cObj.optDouble("difficulty"),
+                                    cObj.optDouble("hours"),
                                     cObj.optString("description")
                             );
                             parsedCourses.add(course);
