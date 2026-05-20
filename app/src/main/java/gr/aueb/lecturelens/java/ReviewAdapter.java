@@ -27,19 +27,16 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         void onDeleteItem(Review review, int position);
     }
 
-    // Constructor for public student course review display
     public ReviewAdapter(List<Review> reviewList) {
         this.reviewList = reviewList;
         this.isProfessorView = false;
     }
 
-    // Constructor for professor view
     public ReviewAdapter(List<Review> reviewList, boolean isProfessorView) {
         this.reviewList = reviewList;
         this.isProfessorView = isProfessorView;
     }
 
-    // Constructor for manage reviews screen
     public ReviewAdapter(List<Review> reviewList, OnReviewActionListener actionListener) {
         this.reviewList = reviewList;
         this.actionListener = actionListener;
@@ -58,7 +55,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviewList.get(position);
 
-        // Public layout shows username, manage layout shows course name
+        // Username or course name display
         if (holder.userName != null) {
             if (review.isAnonymous() && !isProfessorView) {
                 holder.userName.setText(holder.itemView.getContext().getString(R.string.anonymous_user));
@@ -69,27 +66,33 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             holder.courseName.setText(review.getCourseTitle() != null ? review.getCourseTitle() : "Course Review");
         }
 
-        holder.reviewRating.setText("⭐ " + review.getDifficulty() + ".0");
+        // FIX: Professor reviews have a "rating" field (1-5 stars).
+        //      Course reviews use "difficulty" for the score display.
+        if (isProfessorView) {
+            holder.reviewRating.setText("⭐ " + String.format(Locale.US, "%.1f", review.getRating()));
+        } else {
+            holder.reviewRating.setText("⭐ " + review.getDifficulty() + ".0");
+        }
+
         holder.reviewDate.setText(convertIsoToReadableDate(review.getCreatedAt()));
 
+        // FIX: Professor reviews have no study hours — don't show that subtext
         String mainText = review.getReviewText() != null ? review.getReviewText() : "";
-        String studyHoursSubtext = "\nEstimated Weekly Study: " + (int) review.getStudyHours() + " hours";
-        holder.reviewText.setText(mainText + "\n" + studyHoursSubtext);
+        if (!isProfessorView && review.getStudyHours() > 0) {
+            String studyHoursSubtext = "\nEstimated Weekly Study: " + (int) review.getStudyHours() + " hours";
+            holder.reviewText.setText(mainText + studyHoursSubtext);
+        } else {
+            holder.reviewText.setText(mainText);
+        }
 
+        // Action buttons
         if (actionListener != null && !isProfessorView) {
-            // Management mode: edit + delete buttons
-            if (holder.btnEdit != null) {
-                holder.btnEdit.setOnClickListener(v -> actionListener.onEditItem(review));
-            }
-            if (holder.btnDelete != null) {
-                holder.btnDelete.setOnClickListener(v -> actionListener.onDeleteItem(review, position));
-            }
+            if (holder.btnEdit != null) holder.btnEdit.setOnClickListener(v -> actionListener.onEditItem(review));
+            if (holder.btnDelete != null) holder.btnDelete.setOnClickListener(v -> actionListener.onDeleteItem(review, position));
         } else if (!isProfessorView) {
-            // Student public view: report button only
             if (holder.reportButton != null) {
                 holder.reportButton.setOnClickListener(v ->
-                        Toast.makeText(v.getContext(), "Review content reported.", Toast.LENGTH_SHORT).show()
-                );
+                        Toast.makeText(v.getContext(), "Review content reported.", Toast.LENGTH_SHORT).show());
             }
         } else {
             // Professor view: hide all action buttons
