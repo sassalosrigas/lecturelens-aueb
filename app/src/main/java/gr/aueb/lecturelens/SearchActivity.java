@@ -153,13 +153,15 @@ public class SearchActivity extends AppCompatActivity implements
         Intent intent = new Intent(SearchActivity.this, CourseDetailsActivity.class);
         intent.putExtra("COURSE_ID", course.getId());
         intent.putExtra("COURSE_TITLE", course.getTitle());
+        intent.putExtra("CHOSEN_COURSE", course);
         startActivity(intent);
     }
 
     @Override
     public void onProfClick(Professor prof) {
         Intent intent = new Intent(SearchActivity.this, ProfessorDetailsActivity.class);
-        intent.putExtra("PROFESSOR_ID", String.valueOf(prof.getId()));
+        intent.putExtra("PROFESSOR_ID", prof.getId());
+        intent.putExtra("CHOSEN_PROFESSOR", prof);
         startActivity(intent);
     }
 

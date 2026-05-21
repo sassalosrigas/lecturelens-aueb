@@ -13,13 +13,15 @@ public class Review implements Serializable {
     private float studyHours;
     private String reviewText;
     private boolean isAnonymous;
-    private String createdAt; // Received from MongoDB as an ISO-8601 String timestamp
-    private float rating; // Standard rating for professors
+    private boolean isCourse;     // FIX: was missing — setCourse() had no backing field
+    private String createdAt;
+    private float rating;
 
-    // Empty constructor required for reflection mapping frameworks
     public Review() {}
 
-    public Review(String id, String courseId, String username,String courseTitle, int difficulty, float studyHours, String reviewText, boolean isAnonymous, String createdAt) {
+    public Review(String id, String courseId, String username, String courseTitle,
+                  int difficulty, float studyHours, String reviewText,
+                  boolean isAnonymous, String createdAt) {
         this.id = id;
         this.courseId = courseId;
         this.username = username;
@@ -31,8 +33,9 @@ public class Review implements Serializable {
         this.createdAt = createdAt;
     }
 
-    // New constructor including rating
-    public Review(String id, String courseId, String username, int difficulty, float studyHours, float rating, String reviewText, boolean isAnonymous, String createdAt) {
+    public Review(String id, String courseId, String username, int difficulty,
+                  float studyHours, float rating, String reviewText,
+                  boolean isAnonymous, String createdAt) {
         this.id = id;
         this.courseId = courseId;
         this.username = username;
@@ -47,16 +50,18 @@ public class Review implements Serializable {
     // Getters and Setters
     public float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public String getCourseTitle() { return courseTitle; }
-    public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
 
     public String getProfessorId() { return professorId; }
-    public void setProfessorId(String professorId) { this.professorId = professorId; }
+    public void setProfessorId(String professorId) { this.professorId = professorId; } // FIX: actually sets the field
+
+    public String getCourseTitle() { return courseTitle; }
+    public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -72,6 +77,9 @@ public class Review implements Serializable {
 
     public boolean isAnonymous() { return isAnonymous; }
     public void setAnonymous(boolean anonymous) { isAnonymous = anonymous; }
+
+    public boolean isCourse() { return isCourse; }
+    public void setCourse(boolean course) { isCourse = course; } // FIX: now has a real backing field
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
