@@ -195,7 +195,10 @@ public class CourseReviewActivity extends AppCompatActivity {
                     // Navigate to success state on UI Thread loop
                     new Handler(Looper.getMainLooper()).post(() -> {
                         triggerHapticFeedback();
-                        startActivity(new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class));
+                        Intent intent = new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class);
+                        intent.putExtra("CHOSEN_COURSE", currentCourse);
+                        intent.putExtra("isProfessorReview", false);
+                        startActivity(intent);
                         finish();
                     });
                 } else {

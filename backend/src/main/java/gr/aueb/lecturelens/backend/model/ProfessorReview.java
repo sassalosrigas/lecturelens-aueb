@@ -1,6 +1,8 @@
 package gr.aueb.lecturelens.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,8 +14,8 @@ public class ProfessorReview {
     @Id
     private String id;
 
-    private String reviewId;       // e.g. "rev_001" — the extra identifier in your DB docs
-    private String professorId;    // MongoDB ObjectId string, e.g. "6a0cc5faf87324f52c2fd5d9"
+    private String reviewId;
+    private String professorId;
     private String username;
     private String reviewText;
     private float rating;
@@ -21,6 +23,7 @@ public class ProfessorReview {
     @JsonProperty("isAnonymous")
     private boolean isAnonymous;
 
+    @CreatedDate
     private Instant createdAt;
 
     public ProfessorReview() {}

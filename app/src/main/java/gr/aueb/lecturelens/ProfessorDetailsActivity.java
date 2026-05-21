@@ -60,14 +60,15 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         coursesRecyclerView.setAdapter(courseChipAdapter);
 
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        reviewAdapter = new ReviewAdapter(reviewList, false);
+        reviewAdapter = new ReviewAdapter(reviewList, true);
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
         boolean isProfessor = getIntent().getBooleanExtra("isProfessor", false);
         Professor professor = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
-
+        Log.d("Professor details", String.valueOf(professor.getRating()));
         if (professor != null) {
             populateUiElements(professor);
+            fetchProfessorRating(professor.getId()); // ← fetches fresh rating from DB
             fetchProfessorReviews(professor.getId());
             fetchProfessorCourses(professor.getId());
             if (!isProfessor) {
@@ -159,7 +160,6 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                         review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
                         review.setCreatedAt(jsonObject.optString("createdAt"));
 
-
                         parsedReviews.add(review);
                     }
 
@@ -239,14 +239,52 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
 
                 } else {
                     Log.e("LectureLensDebug", "Check review failed: " + responseCode);
+                    showToastOnUi("Could not check for existing review.");
                 }
 
                 conn.disconnect();
             } catch (Exception e) {
                 Log.e("LectureLensDebug", "Error checking existing review", e);
+                showToastOnUi("Network error. Try again.");
             }
         }).start();
     }
+
+    private void fetchProfessorRating(String professorId) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/professors/" + professorId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) response.append(line);
+                    in.close();
+
+                    JSONObject json = new JSONObject(response.toString());
+                    double freshRating = json.optDouble("rating", 0.0);
+
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            largeRating.setText(freshRating == 0.0 ? "N/A" : String.format("%.1f", freshRating))
+                    );
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error fetching professor rating", e);
+            }
+        }).start();
+    }
+    private void showToastOnUi(String msg) {
+        new Handler(Looper.getMainLooper()).post(() ->
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        );
+    }
+
 
     private void fetchProfessorCourses(String professorId) {
         new Thread(() -> {

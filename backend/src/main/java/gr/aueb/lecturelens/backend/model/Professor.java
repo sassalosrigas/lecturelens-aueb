@@ -28,9 +28,10 @@ public class Professor {
 
     public Professor() {}
 
-    public Professor(String firstName, String lastName, String title) {
+    public Professor(String firstName, String lastName,double rating, String title) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.rating = rating;
         this.title = title;
     }
 
@@ -47,6 +48,11 @@ public class Professor {
         return firstName + " " + lastName;
     }
 
-    public void setRating(double finalRating) {
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public double getRating(){
+        return this.rating;
     }
 }

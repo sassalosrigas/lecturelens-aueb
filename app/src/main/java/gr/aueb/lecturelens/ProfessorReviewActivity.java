@@ -148,7 +148,10 @@ public class ProfessorReviewActivity extends AppCompatActivity {
                 if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                     new Handler(Looper.getMainLooper()).post(() -> {
                         triggerHapticFeedback();
-                        startActivity(new Intent(ProfessorReviewActivity.this, SubmissionSuccessActivity.class));
+                        Intent intent = new Intent(ProfessorReviewActivity.this, SubmissionSuccessActivity.class);
+                        intent.putExtra("CHOSEN_PROFESSOR", currentProfessor);
+                        intent.putExtra("isProfessorReview", true);
+                        startActivity(intent);
                         finish();
                     });
                 } else {

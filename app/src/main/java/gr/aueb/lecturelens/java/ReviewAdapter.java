@@ -66,8 +66,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             holder.courseName.setText(review.getCourseTitle() != null ? review.getCourseTitle() : "Course Review");
         }
 
-        // FIX: Professor reviews have a "rating" field (1-5 stars).
-        //      Course reviews use "difficulty" for the score display.
         if (isProfessorView) {
             holder.reviewRating.setText("⭐ " + String.format(Locale.US, "%.1f", review.getRating()));
         } else {
