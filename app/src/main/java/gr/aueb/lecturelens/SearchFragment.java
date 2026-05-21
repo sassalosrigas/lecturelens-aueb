@@ -137,7 +137,6 @@ public class SearchFragment extends Fragment implements
             }
         });
 
-        populateRecentSearches(view);
 
         LinearLayout filtersLayout = view.findViewById(R.id.filtersLayout);
         if (filtersLayout != null) {
@@ -475,26 +474,6 @@ public class SearchFragment extends Fragment implements
         }
         if (searchEditText.getText().toString().trim().isEmpty()) {
             recommendationsScrollView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void populateRecentSearches(View rootView) {
-        LinearLayout list = rootView.findViewById(R.id.recentSearchesList);
-        if (list == null || !isAdded()) return;
-
-        String[] demoSearches = {
-                getString(R.string.search_demo_1),
-                getString(R.string.search_demo_2),
-                getString(R.string.search_demo_3),
-                getString(R.string.search_demo_4)
-        };
-
-        for (int i = 0; i < list.getChildCount() && i < demoSearches.length; i++) {
-            View item = list.getChildAt(i);
-            TextView text = item.findViewById(R.id.searchText);
-            if (text != null) {
-                text.setText(demoSearches[i]);
-            }
         }
     }
 }
