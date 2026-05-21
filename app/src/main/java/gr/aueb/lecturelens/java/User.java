@@ -1,22 +1,13 @@
-package gr.aueb.lecturelens.backend.model;
+package gr.aueb.lecturelens.java;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.Instant;
-
-@Document(collection = "users")
 public class User {
-    @Id
-    private String id;
-    @CreatedDate
-    private Instant createdAt; // Automatically managed timestamp field!
+
     private String username;
     private String email;
     private String passwordHash;
     private String role; // 'student' or 'admin'
 
+    private String createdAt;
     // Default Constructor
     public User() {}
 
@@ -27,12 +18,12 @@ public class User {
         this.role = role;
     }
 
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    // Getters and Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-
+    public String getCreatedAt(){
+        return this.createdAt;
+    }
+    public void setCreatedAt(String creationDate){
+        this.createdAt = createdAt;
+    }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

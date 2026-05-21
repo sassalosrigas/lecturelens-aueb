@@ -1,6 +1,7 @@
 package gr.aueb.lecturelens;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,13 +19,17 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 
 import gr.aueb.lecturelens.model.UserSession;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_CHANGE_PASSWORD = 1001;
-    private TextView infoValue2;
+    private TextView infoValue1, infoValue2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,9 @@ public class ProfileActivity extends AppCompatActivity {
         ImageView navHome = findViewById(R.id.navHome);
         UserSession session = new UserSession(this);
         String username = session.getUsername();
+        String email = session.getEmail();
+        String role = session.getRole();
+        String date = session.getCreationDate();
         navHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,15 +93,23 @@ public class ProfileActivity extends AppCompatActivity {
         if (isProfessor) {
             profileName.setText(getString(R.string.professor_name));
             profileEmail.setText(getString(R.string.professor_email_demo));
-            infoValue1.setText("3");
+            if (date != null && !date.isEmpty()) {
+                infoValue1.setText(calculateActiveDuration(date));
+            } else {
+                infoValue1.setText("0 mos"); // Fallback if no date is found
+            }
             infoLabel1.setText(getString(R.string.courses_count));
             infoValue2.setText("3.5/5");
             infoLabel2.setText(getString(R.string.rating_label));
             primaryActionLabel.setText(getString(R.string.see_my_reviews));
         } else {
             profileName.setText(username);
-            profileEmail.setText(getString(R.string.student_email_demo));
-            infoValue1.setText("3");
+            profileEmail.setText(email);
+            if (date != null && !date.isEmpty()) {
+                infoValue1.setText(calculateActiveDuration(date));
+            } else {
+                infoValue1.setText("0 mos"); // Fallback if no date is found
+            }
             infoLabel1.setText(getString(R.string.years_member));
             infoValue2.setText("-");
             infoLabel2.setText(getString(R.string.reviews_count));
@@ -112,6 +128,53 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+
+    private String calculateActiveDuration(String isoDateString) {
+        try {
+            // 1. Parse the server ISO timestamp (e.g., "2026-05-18T14:30:00Z") into a Local Date
+            java.time.Instant creationInstant = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                creationInstant = Instant.parse(isoDateString);
+            }
+            java.time.LocalDate creationDate = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                creationDate = creationInstant.atZone(ZoneId.systemDefault()).toLocalDate();
+            }
+
+            // 2. Get today's local date
+            java.time.LocalDate today = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                today = LocalDate.now();
+            }
+
+            // 3. Calculate the absolute period gap between registration and today
+            java.time.Period period = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                period = Period.between(creationDate, today);
+            }
+            int years = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                years = period.getYears();
+            }
+            int months = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                months = period.getMonths();
+            }
+
+            // 4. Return a compact, clean string that fits beautifully in your layout
+            if (years > 0) {
+                return years + " yr, " + months + " mo";
+            } else {
+                // If they registered less than a year ago, just show the months
+                return months + " mo";
+            }
+
+        } catch (Exception e) {
+            android.util.Log.e("LectureLensDebug", "Error parsing account creation date string", e);
+            return "New User"; // Clean safe fallback UI presentation
+        }
     }
 
     private void fetchAndCalculateUserReviewCount(String username) {

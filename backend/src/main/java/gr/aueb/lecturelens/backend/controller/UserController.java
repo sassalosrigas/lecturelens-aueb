@@ -52,11 +52,4 @@ public class UserController {
 
         return ResponseEntity.ok(existingUser);
     }
-
-    @PostMapping("/test")
-    public String postTestData() {
-        User testUser = new User("test@aueb.gr", "hashed_password", "student");
-        userRepository.save(testUser);
-        return "Test user data posted successfully!";
-    }
 }

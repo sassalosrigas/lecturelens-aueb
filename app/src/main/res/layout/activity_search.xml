@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://tools.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
@@ -64,68 +64,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Recent Searches Section (hidden by default) -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/recentSearchesLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/background_light"
-        android:elevation="4dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
-
-        <TextView
-            android:id="@+id/recentSearchesTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_semibold"
-            android:text="@string/recent_searches"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/cancelSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:fontFamily="@font/roboto_semibold"
-            android:text="@string/cancel"
-            android:textColor="@color/pink_primary"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@id/recentSearchesTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/recentSearchesTitle" />
-
-        <LinearLayout
-            android:id="@+id/recentSearchesList"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recentSearchesTitle">
-
-            <include layout="@layout/item_recent_search" />
-
-            <include layout="@layout/item_recent_search" />
-
-            <include layout="@layout/item_recent_search" />
-
-            <include layout="@layout/item_recent_search" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <!-- Filters -->
     <LinearLayout
         android:id="@+id/filtersLayout"
@@ -181,66 +119,195 @@
 
     </LinearLayout>
 
-            <ScrollView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="24dp"
+    <!-- Search Results Container (Now constrained correctly below filters) -->
+    <ScrollView
+        android:id="@+id/searchResultsContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/filtersLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/background_light"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:id="@+id/searchResultsCoursesLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Courses"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:visibility="gone"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/searchResultsCourses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingBottom="100dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/filtersLayout">
+                android:paddingHorizontal="24dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <TextView
+                android:id="@+id/searchResultsProfessorsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Professors"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:visibility="gone"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:text="@string/recommended_courses"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/searchResultsProfessors"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recommendedCoursesRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:clipToPadding="false"
-                        android:paddingHorizontal="24dp"
-                        android:orientation="horizontal"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_course_chip" />
+        </LinearLayout>
+    </ScrollView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="24dp"
-                        android:layout_marginTop="32dp"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:text="@string/recommended_professors"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp" />
+    <!-- Default Recommendations Section -->
+    <ScrollView
+        android:id="@+id/recommendationsScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filtersLayout">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recommendedProfessorsRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:nestedScrollingEnabled="false"
-                        android:paddingHorizontal="24dp"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_professor_chip" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-                </LinearLayout>
-            </ScrollView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="@string/recommended_courses"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp" />
 
-    <!-- Navigation Bar -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recommendedCoursesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="24dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_course_chip" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="32dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="@string/recommended_professors"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recommendedProfessorsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                android:paddingHorizontal="24dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_professor_chip" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Recent Searches Overlay Section -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/recentSearchesLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/background_light"
+        android:elevation="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
+
+        <TextView
+            android:id="@+id/recentSearchesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/recent_searches"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/cancelSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:fontFamily="@font/roboto_semibold"
+            android:text="@string/cancel"
+            android:textColor="@color/pink_primary"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/recentSearchesTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/recentSearchesTitle" />
+
+        <LinearLayout
+            android:id="@+id/recentSearchesList"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recentSearchesTitle">
+
+            <include layout="@layout/item_recent_search" />
+            <include layout="@layout/item_recent_search" />
+            <include layout="@layout/item_recent_search" />
+            <include layout="@layout/item_recent_search" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Bottom Navigation Bar -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="68dp"

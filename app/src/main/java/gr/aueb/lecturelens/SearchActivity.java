@@ -51,6 +51,17 @@ public class SearchActivity extends AppCompatActivity implements
     private float[] selectedHours = {1f, 9f};
     private float selectedRating = 4f;
 
+    private View recommendationsScrollView;
+    private View searchResultsContainer;
+    private View searchResultsCoursesLabel;
+    private View searchResultsProfessorsLabel;
+    private RecyclerView searchResultsCourses;
+    private RecyclerView searchResultsProfessors;
+    private CourseChipAdapter searchCourseAdapter;
+    private ProfessorAdapter searchProfessorAdapter;
+    private final List<Course> searchCourseResults = new ArrayList<>();
+    private final List<Professor> searchProfessorResults = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +74,7 @@ public class SearchActivity extends AppCompatActivity implements
 
         recommendedCoursesRecycler = findViewById(R.id.recommendedCoursesRecyclerView);
         recommendedProfessorsRecycler = findViewById(R.id.recommendedProfessorsRecyclerView);
-
+        recommendationsScrollView = findViewById(R.id.recommendationsScrollView);
         recommendedCoursesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         courseChipAdapter = new CourseChipAdapter(randomCourseList, this);
         recommendedCoursesRecycler.setAdapter(courseChipAdapter);
@@ -72,6 +83,21 @@ public class SearchActivity extends AppCompatActivity implements
         professorAdapter = new ProfessorAdapter(randomProfessorList, this);
         recommendedProfessorsRecycler.setAdapter(professorAdapter);
 
+
+        searchResultsContainer = findViewById(R.id.searchResultsContainer);
+        searchResultsCoursesLabel = findViewById(R.id.searchResultsCoursesLabel);
+        searchResultsProfessorsLabel = findViewById(R.id.searchResultsProfessorsLabel);
+
+        searchResultsCourses = findViewById(R.id.searchResultsCourses);
+        searchResultsCourses.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        searchCourseAdapter = new CourseChipAdapter(searchCourseResults, this);
+        searchResultsCourses.setAdapter(searchCourseAdapter);
+
+        searchResultsProfessors = findViewById(R.id.searchResultsProfessors);
+        searchResultsProfessors.setLayoutManager(new LinearLayoutManager(this));
+        searchProfessorAdapter = new ProfessorAdapter(searchProfessorResults, this);
+        searchResultsProfessors.setAdapter(searchProfessorAdapter);
+
         searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) showRecentSearches();
         });
@@ -79,13 +105,32 @@ public class SearchActivity extends AppCompatActivity implements
         searchEditText.setOnClickListener(v -> showRecentSearches());
         cancelSearch.setOnClickListener(v -> hideRecentSearches());
 
+        Handler searchHandler = new Handler(Looper.getMainLooper());
+        Runnable[] searchRunnable = {null};
+
+        searchEditText.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(android.text.Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable[0] != null) searchHandler.removeCallbacks(searchRunnable[0]);
+                String query = s.toString().trim();
+                if (query.isEmpty()) {
+                    hideSearchDropdown();
+                    return;
+                }
+                searchRunnable[0] = () -> performSearch(query);
+                searchHandler.postDelayed(searchRunnable[0], 350);
+            }
+        });
+
         populateRecentSearches();
         setupNavigationListeners();
 
         LinearLayout filtersLayout = findViewById(R.id.filtersLayout);
         filtersLayout.setOnClickListener(v -> showFilterBottomSheet());
 
-        // Trigger dynamic aggregation requests
         fetchRecommendationsFromDatabase();
     }
 
@@ -249,9 +294,179 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     private void performSearch(String query) {
-        // Filters calculation workflow
+        hideRecentSearches();
+        if (query == null || query.trim().isEmpty()) return;
+        String encoded;
+        try {
+            encoded = java.net.URLEncoder.encode(query.trim(), "UTF-8");
+        } catch (Exception e) {
+            Log.e("SEARCH", "Encoding error", e);
+            return;
+        }
+
+        // 1. SEARCH COURSES (Displays course details + embedded professor text labels)
+        new Thread(() -> {
+            try {
+                String fullUrl = "http://10.0.2.2:8081/api/courses/search?q=" + encoded;
+                HttpURLConnection conn = (HttpURLConnection) new URL(fullUrl).openConnection();
+                conn.setConnectTimeout(3000);
+                int code = conn.getResponseCode();
+
+                if (code == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder res = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) res.append(line);
+                    in.close();
+
+                    JSONArray array = new JSONArray(res.toString());
+                    List<Course> results = new ArrayList<>();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+
+                        // Extracts professorName automatically to show who teaches it inside the card layout
+                        String profName = obj.optString("professorName", "Staff");
+
+                        results.add(new Course(
+                                obj.optString("id", obj.optString("_id")),
+                                obj.optString("code", ""),
+                                obj.optString("title", ""),
+                                obj.optInt("semester", 1),
+                                obj.optInt("ects", 6),
+                                profName,
+                                obj.optDouble("rating", 0.0),
+                                obj.optDouble("difficulty", 0.0),
+                                obj.optDouble("studyHours", 0.0),
+                                obj.optString("description", "")
+                        ));
+                    }
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        searchCourseResults.clear();
+                        searchCourseResults.addAll(results);
+                        searchCourseAdapter.notifyDataSetChanged();
+
+                        int vis = results.isEmpty() ? View.GONE : View.VISIBLE;
+                        searchResultsCoursesLabel.setVisibility(vis);
+                        searchResultsCourses.setVisibility(vis);
+                        showSearchResults();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("SEARCH", "Course search execution error", e);
+            }
+        }).start();
+
+        // 2. SEARCH PROFESSORS (Pulls professor + lists their taught courses)
+        new Thread(() -> {
+            try {
+                String fullUrl = "http://10.0.2.2:8081/api/professors/search?q=" + encoded;
+                HttpURLConnection conn = (HttpURLConnection) new URL(fullUrl).openConnection();
+                conn.setConnectTimeout(3000);
+                int code = conn.getResponseCode();
+
+                if (code == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder res = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) res.append(line);
+                    in.close();
+
+                    JSONArray array = new JSONArray(res.toString());
+                    List<Professor> profResults = new ArrayList<>();
+                    List<Course> linkedCoursesResults = new ArrayList<>();
+
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+
+                        // Pull the structural profile details
+                        JSONObject profObj = obj.has("professor") ? obj.getJSONObject("professor") : obj;
+
+                        Professor professor = new Professor(
+                                profObj.optString("id", profObj.optString("_id")),
+                                profObj.optString("firstName", ""),
+                                profObj.optString("lastName", ""),
+                                profObj.optString("title", "Faculty"),
+                                profObj.optDouble("rating", 0.0)
+                        );
+                        profResults.add(professor);
+
+                        // If your backend payload attaches a "courses" list inside this professor node:
+                        if (obj.has("courses")) {
+                            JSONArray coursesArray = obj.getJSONArray("courses");
+                            for (int j = 0; j < coursesArray.length(); j++) {
+                                JSONObject cObj = coursesArray.getJSONObject(j);
+                                linkedCoursesResults.add(new Course(
+                                        cObj.optString("id", cObj.optString("_id")),
+                                        cObj.optString("code", ""),
+                                        cObj.optString("title", ""),
+                                        cObj.optInt("semester", 1),
+                                        cObj.optInt("ects", 6),
+                                        professor.getFullName(),
+                                        cObj.optDouble("rating", 0.0),
+                                        cObj.optDouble("difficulty", 0.0),
+                                        cObj.optDouble("studyHours", 0.0),
+                                        cObj.optString("description", "")
+                                ));
+                            }
+                        }
+                    }
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        searchProfessorResults.clear();
+                        searchProfessorResults.addAll(profResults);
+                        searchProfessorAdapter.notifyDataSetChanged();
+
+                        // If a professor search reveals taught courses, append them to the course horizontal row
+                        if (!linkedCoursesResults.isEmpty()) {
+                            // Blend them cleanly without duplicates
+                            for (Course c : linkedCoursesResults) {
+                                if (!containsCourse(searchCourseResults, c.getId())) {
+                                    searchCourseResults.add(c);
+                                }
+                            }
+                            searchCourseAdapter.notifyDataSetChanged();
+                            searchResultsCoursesLabel.setVisibility(View.VISIBLE);
+                            searchResultsCourses.setVisibility(View.VISIBLE);
+                        }
+
+                        int vis = profResults.isEmpty() ? View.GONE : View.VISIBLE;
+                        searchResultsProfessorsLabel.setVisibility(vis);
+                        searchResultsProfessors.setVisibility(vis);
+                        showSearchResults();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("SEARCH", "Professor search execution error", e);
+            }
+        }).start();
     }
 
+    // Quick helper check utility to prevent duplicate cards filling the list rows
+    private boolean containsCourse(List<Course> list, String id) {
+        for (Course c : list) {
+            if (c.getId().equals(id)) return true;
+        }
+        return false;
+    }
+    private void showSearchResults() {
+        recentSearchesLayout.setVisibility(View.GONE);
+        recommendationsScrollView.setVisibility(View.GONE);
+        searchResultsContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSearchDropdown() {
+        searchResultsContainer.setVisibility(View.GONE);
+        recommendationsScrollView.setVisibility(View.VISIBLE);
+        searchCourseResults.clear();
+        searchProfessorResults.clear();
+        searchCourseAdapter.notifyDataSetChanged();
+        searchProfessorAdapter.notifyDataSetChanged();
+        searchResultsCoursesLabel.setVisibility(View.GONE);
+        searchResultsProfessorsLabel.setVisibility(View.GONE);
+        searchResultsCourses.setVisibility(View.GONE);
+        searchResultsProfessors.setVisibility(View.GONE);
+    }
     private void showRecentSearches() {
         recentSearchesLayout.setVisibility(View.VISIBLE);
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
@@ -268,6 +483,9 @@ public class SearchActivity extends AppCompatActivity implements
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
+        }
+        if (searchEditText.getText().toString().trim().isEmpty()) {
+            recommendationsScrollView.setVisibility(View.VISIBLE);
         }
     }
 

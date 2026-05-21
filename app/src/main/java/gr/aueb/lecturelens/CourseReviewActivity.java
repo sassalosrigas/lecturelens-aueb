@@ -1,5 +1,6 @@
 package gr.aueb.lecturelens;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -163,6 +164,7 @@ public class CourseReviewActivity extends AppCompatActivity {
                 if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                     // Navigate to success state on UI Thread loop
                     new Handler(Looper.getMainLooper()).post(() -> {
+                        triggerHapticFeedback();
                         startActivity(new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class));
                         finish();
                     });
@@ -176,6 +178,34 @@ public class CourseReviewActivity extends AppCompatActivity {
                 showToastOnUi("Network error writing review payload.");
             }
         }).start();
+    }
+
+    private void triggerHapticFeedback() {
+        android.util.Log.d("LectureLensDebug", "HAPTIC TRIGGERED: Vibrate command sent to system!");
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                // Modern API 31+ approach using VibratorManager
+                android.os.VibratorManager vibratorManager = (android.os.VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+                if (vibratorManager != null) {
+                    // A quick doublet-tap pattern (Predefined Success effect)
+                    vibratorManager.getDefaultVibrator().vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_CLICK));
+                }
+            } else {
+                // Legacy fallback approach for older API levels
+                android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                if (vibrator != null && vibrator.hasVibrator()) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        // API 26 to 30: Vibrate for 150ms at standard amplitude strength
+                        vibrator.vibrate(android.os.VibrationEffect.createOneShot(150, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        // Ancient API fallback
+                        vibrator.vibrate(150);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("LectureLensDebug", "Failed to perform haptic feedback rumble", e);
+        }
     }
 
     private void showToastOnUi(String msg) {
