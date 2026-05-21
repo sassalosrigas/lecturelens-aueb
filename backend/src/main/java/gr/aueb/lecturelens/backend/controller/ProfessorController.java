@@ -21,8 +21,6 @@ public class ProfessorController {
     @Autowired
     private CourseRepository courseRepository;
     @Autowired
-    private CourseProfessorMappingRepository mappingRepository;
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     @GetMapping
@@ -45,43 +43,5 @@ public class ProfessorController {
         return courseRepository.findByProfessorName(fullName);
     }
 
-    @GetMapping("/{id}/details")
-    public ProfessorDetails getProfessorDetails(@PathVariable String id) {
-        // 1. Find professor by MongoDB ObjectId
-        Professor prof = professorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Professor not found: " + id));
 
-        // 2. The mapping table uses a numeric "professor_id" field (e.g. 1, 2).
-        //    Your Professor document has a separate numeric "id" field alongside the MongoDB "_id".
-        //    We query the mapping collection using that numeric value.
-        //    Use MongoTemplate to query the raw "id" field on Professor documents.
-        Query profQuery = new Query(Criteria.where("_id").is(id));
-        org.bson.Document rawProf = mongoTemplate.findOne(profQuery, org.bson.Document.class, "professors");
-
-        List<Course> matchingCourses = List.of(); // default empty
-
-        if (rawProf != null && rawProf.containsKey("id")) {
-            int numericProfId = rawProf.getInteger("id");
-
-            // 3. Find all mapping entries for this numeric professor id
-            List<Integer> mappedCourseIds = mappingRepository.findByProfessorId(numericProfId)
-                    .stream()
-                    .map(CourseProfessorMapping::getCourseId)
-                    .collect(Collectors.toList());
-
-            System.out.println("DEBUG: numericProfId=" + numericProfId + ", mappedCourseIds=" + mappedCourseIds);
-
-            // 4. Fetch courses whose numeric "id" field matches
-            //    (Course documents also have a numeric "id" separate from "_id")
-            if (!mappedCourseIds.isEmpty()) {
-                Query courseQuery = new Query(Criteria.where("id").in(mappedCourseIds));
-                matchingCourses = mongoTemplate.find(courseQuery, Course.class, "courses");
-            }
-        }
-
-        double avgRating = matchingCourses.isEmpty() ? 0.0 : 4.8;
-        int totalReviews = matchingCourses.size() * 5;
-
-        return new ProfessorDetails(prof, matchingCourses, avgRating, totalReviews);
-    }
 }

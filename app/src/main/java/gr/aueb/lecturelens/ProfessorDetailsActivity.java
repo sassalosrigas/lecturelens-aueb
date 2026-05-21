@@ -92,6 +92,7 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
             btnWriteReview.setOnClickListener(v -> {
                 Intent intent = new Intent(ProfessorDetailsActivity.this, ProfessorReviewActivity.class);
                 intent.putExtra("PROFESSOR_ID", professorId);
+                intent.putExtra("CHOSEN_PROFESSOR", prof);
                 startActivity(intent);
             });
         }
@@ -285,8 +286,8 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                                 cObj.optInt("ects"),
                                 cObj.optString("professorName"),
                                 cObj.optDouble("rating", 0.0),
-                                cObj.optString("difficulty"),
-                                cObj.optString("hours"),
+                                cObj.optDouble("difficulty"),
+                                cObj.optDouble("hours"),
                                 cObj.optString("description")
                         ));
                     }

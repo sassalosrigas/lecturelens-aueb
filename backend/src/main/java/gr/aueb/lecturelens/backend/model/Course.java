@@ -17,15 +17,9 @@ public class Course {
     private String title;
     private int semester;
     private int ects;
-    private String professorName;   // ← replace professorIds with this
-    private double rating;
-    private double difficulty;
-    private double hours;
-    private String description;     // ← add this
-
     @Field("professorName")
     @JsonProperty("professorName")
-    private String professorName;   // matches the actual DB field
+    private String professorName;
 
     private double rating;
     private int difficulty;
@@ -51,7 +45,7 @@ public class Course {
     public void setRating(double rating) { this.rating = rating; }
 
     public double getDifficulty() { return difficulty; }
-    public void setDifficulty(double difficulty) { this.difficulty = difficulty; }
+    public void setDifficulty(int difficulty) { this.difficulty = difficulty; }
 
     public double getHours() { return hours; }
     public void setHours(double hours) { this.hours = hours; }

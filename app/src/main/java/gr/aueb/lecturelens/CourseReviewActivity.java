@@ -58,6 +58,7 @@ public class CourseReviewActivity extends AppCompatActivity {
         hoursSlider = findViewById(R.id.hoursSlider);
         reviewInput = findViewById(R.id.reviewEditText);
         isAnonymous = findViewById(R.id.anonSwitch);
+        View btnDelete = findViewById(R.id.btnDelete);
         TextView btnSubmitReview = findViewById(R.id.btnSubmitReview);
 
         findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
@@ -73,11 +74,46 @@ public class CourseReviewActivity extends AppCompatActivity {
             hoursSlider.setValue(getIntent().getFloatExtra("hours", 5.0f));
             ratingBar.setRating(getIntent().getFloatExtra("rating", 4.0f));
             String reviewText = getIntent().getStringExtra("reviewText");
+            btnDelete.setVisibility(View.VISIBLE);
             if (reviewText != null && reviewInput != null) reviewInput.setText(reviewText);
+        } else {
+            btnDelete.setVisibility(View.GONE);
         }
 
         selectedDifficulty = initialDifficulty;
         setupDifficultySelection(initialDifficulty);
+
+        btnDelete.setOnClickListener(v -> {
+            String reviewId = getIntent().getStringExtra("reviewId");
+            if (reviewId == null || reviewId.isEmpty()) return;
+
+            new Thread(() -> {
+                try {
+                    URL url = new URL("http://10.0.2.2:8081/api/reviews/" + reviewId);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("DELETE");
+                    conn.setConnectTimeout(5000);
+
+                    int responseCode = conn.getResponseCode();
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                            /*userReviewsList.remove(position);
+                            reviewsAdapter.notifyItemRemoved(position);*/
+                            Toast.makeText(this, "Review deleted successfully", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Failed to delete review", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    conn.disconnect();
+                } catch (Exception e) {
+                    Log.e("LectureLensDebug", "Delete request crash", e);
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            Toast.makeText(this, "Network error during deletion", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }).start();
+        });
 
         btnSubmitReview.setOnClickListener(v -> executeReviewSubmission());
     }
@@ -127,7 +163,6 @@ public class CourseReviewActivity extends AppCompatActivity {
             return;
         }
 
-        // ↓ ADD THIS before the thread too
         String endpoint = isEditMode
                 ? "http://10.0.2.2:8081/api/reviews/" + reviewId + "/update"
                 : "http://10.0.2.2:8081/api/reviews";

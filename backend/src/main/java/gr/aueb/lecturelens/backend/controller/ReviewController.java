@@ -24,54 +24,12 @@ public class ReviewController {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    // 1. ADD THIS GET ENDPOINT TO FIX THE 405 ERROR
+
     @GetMapping
     public List<Review> getAllReviews() {
-        return reviewRepository.findAll(); // Fetches everything from MongoDB
+        return reviewRepository.findAll();
     }
 
-    /*
-    private void recalculateCourseStats(String courseId) {
-        System.out.println("=== recalculateCourseStats ===");
-        System.out.println("courseId: " + courseId);
-
-        List<Review> reviews = reviewRepository.findByCourseId(courseId);
-        System.out.println("Reviews found: " + reviews.size());
-
-        for (Review r : reviews) {
-            System.out.println("  -> id: " + r.getId()
-                    + " | rating: " + r.getRating()
-                    + " | difficulty: " + r.getDifficulty()
-                    + " | studyHours: " + r.getStudyHours());
-        }
-
-        if (reviews.isEmpty()) return;
-
-        final double avgRating = Math.round(
-                reviews.stream().mapToDouble(Review::getRating).average().orElse(0.0) * 10.0) / 10.0;
-        final double avgDifficulty = Math.round(
-                reviews.stream().mapToDouble(Review::getDifficulty).average().orElse(0.0) * 10.0) / 10.0;
-        final double avgHours = Math.round(
-                reviews.stream().mapToDouble(Review::getStudyHours).average().orElse(0.0) * 10.0) / 10.0;
-
-        System.out.println("Computed avgRating: " + avgRating);
-        System.out.println("Computed avgDifficulty: " + avgDifficulty);
-        System.out.println("Computed avgHours: " + avgHours);
-
-        courseRepository.findById(courseId).ifPresent(course -> {
-            System.out.println("Updating course: " + course.getTitle());
-            course.setRating(avgRating);
-            course.setDifficulty(avgDifficulty);
-            course.setHours(avgHours);
-            courseRepository.save(course);
-            System.out.println("Course saved successfully.");
-        });
-
-        if (!courseRepository.existsById(courseId)) {
-            System.out.println("WARNING: No course found for id: " + courseId);
-        }
-    }
-     */
     private void recalculateCourseStats(String courseId) {
         System.out.println("=== recalculateCourseStats ===");
         System.out.println("courseId: " + courseId);
@@ -83,7 +41,6 @@ public class ReviewController {
         double avgDifficulty = 0.0;
         double avgHours = 0.0;
 
-        // Only calculate averages if there are actual reviews left in the database
         if (!reviews.isEmpty()) {
             avgRating = Math.round(
                     reviews.stream().mapToDouble(Review::getRating).average().orElse(0.0) * 10.0) / 10.0;
@@ -106,7 +63,7 @@ public class ReviewController {
         courseRepository.findById(courseId).ifPresent(course -> {
             System.out.println("Updating course: " + course.getTitle());
             course.setRating(finalRating);
-            course.setDifficulty(finalDifficulty);
+            course.setDifficulty((int) finalDifficulty);
             course.setHours(finalHours);
             courseRepository.save(course);
             System.out.println("Course statistics saved successfully.");
@@ -173,7 +130,6 @@ public class ReviewController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // This is likely your existing working endpoint
     @PostMapping
     public Review createReview(@RequestBody Review review) {
         Review saved = reviewRepository.save(review);

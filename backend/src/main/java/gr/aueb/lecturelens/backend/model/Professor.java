@@ -22,6 +22,10 @@ public class Professor {
     @JsonProperty("title")
     private String title;
 
+    @Field("rating")
+    @JsonProperty("rating")
+    private double rating;
+
     public Professor() {}
 
     public Professor(String firstName, String lastName, String title) {
@@ -41,5 +45,8 @@ public class Professor {
 
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public void setRating(double finalRating) {
     }
 }
