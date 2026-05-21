@@ -54,6 +54,7 @@
             android:background="@android:color/transparent"
             android:fontFamily="@font/roboto_semibold"
             android:hint="@string/search_bar_hint"
+            android:imeOptions="actionSearch"
             android:inputType="text"
             android:paddingHorizontal="12dp"
             android:textColor="@color/text_primary"
