@@ -125,7 +125,6 @@ public class SearchActivity extends AppCompatActivity implements
             }
         });
 
-        populateRecentSearches();
         setupNavigationListeners();
 
         LinearLayout filtersLayout = findViewById(R.id.filtersLayout);
@@ -452,7 +451,6 @@ public class SearchActivity extends AppCompatActivity implements
         return false;
     }
     private void showSearchResults() {
-        recentSearchesLayout.setVisibility(View.GONE);
         recommendationsScrollView.setVisibility(View.GONE);
         searchResultsContainer.setVisibility(View.VISIBLE);
     }
@@ -470,7 +468,6 @@ public class SearchActivity extends AppCompatActivity implements
         searchResultsProfessors.setVisibility(View.GONE);
     }
     private void showRecentSearches() {
-        recentSearchesLayout.setVisibility(View.VISIBLE);
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
     }
 
@@ -479,7 +476,6 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     private void hideRecentSearches() {
-        recentSearchesLayout.setVisibility(View.GONE);
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_background);
         viewClearFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -491,21 +487,5 @@ public class SearchActivity extends AppCompatActivity implements
         }
     }
 
-    private void populateRecentSearches() {
-        LinearLayout list = findViewById(R.id.recentSearchesList);
-        String[] demoSearches = {
-                getString(R.string.search_demo_1),
-                getString(R.string.search_demo_2),
-                getString(R.string.search_demo_3),
-                getString(R.string.search_demo_4)
-        };
 
-        for (int i = 0; i < list.getChildCount() && i < demoSearches.length; i++) {
-            View item = list.getChildAt(i);
-            TextView text = item.findViewById(R.id.searchText);
-            if (text != null) {
-                text.setText(demoSearches[i]);
-            }
-        }
-    }
 }
