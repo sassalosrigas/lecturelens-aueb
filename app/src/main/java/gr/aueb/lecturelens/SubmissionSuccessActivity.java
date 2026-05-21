@@ -24,8 +24,7 @@ public class SubmissionSuccessActivity extends AppCompatActivity {
 
         View btnViewReview = findViewById(R.id.btnViewReview);
         btnViewReview.setOnClickListener(v -> {
-            // For now, just go home as we don't have a "my reviews" list yet
-            Intent intent = new Intent(SubmissionSuccessActivity.this, MainActivity.class);
+            Intent intent = new Intent(SubmissionSuccessActivity.this, ManageReviewsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
