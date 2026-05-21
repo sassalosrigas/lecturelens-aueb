@@ -1,5 +1,6 @@
 package gr.aueb.lecturelens.java;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +35,15 @@ public class ProfessorAdapter extends RecyclerView.Adapter<ProfessorAdapter.Prof
     @Override
     public void onBindViewHolder(@NonNull ProfViewHolder holder, int position) {
         Professor prof = professorList.get(position);
-
+        Log.d("Professor details", String.valueOf(prof.getRating()));
         if (holder.txtName != null) {
             holder.txtName.setText(prof.getFullName());
         }
         if (holder.txtTitle != null) {
             holder.txtTitle.setText(prof.getTitle());
         }
+
+
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onProfClick(prof);

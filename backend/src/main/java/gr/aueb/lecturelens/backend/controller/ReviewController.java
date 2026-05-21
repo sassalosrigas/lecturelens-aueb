@@ -83,7 +83,6 @@ public class ReviewController {
         if (existingReview.isPresent()) {
             return ResponseEntity.ok(existingReview.get());
         } else {
-            // Not found. Send back a 204 No Content status so Android knows it's a new review
             return ResponseEntity.noContent().build();
         }
     }

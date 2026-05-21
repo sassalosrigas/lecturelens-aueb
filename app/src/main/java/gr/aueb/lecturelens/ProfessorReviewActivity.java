@@ -1,12 +1,12 @@
 package gr.aueb.lecturelens;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -17,6 +17,8 @@ import androidx.appcompat.widget.SwitchCompat;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -30,9 +32,10 @@ public class ProfessorReviewActivity extends AppCompatActivity {
     private EditText reviewInput;
     private RatingBar ratingBar;
     private SwitchCompat isAnonymous;
-    private boolean isEditMode = false;
+    private boolean isEditMode;
     private Professor currentProfessor;
     private String currentUsername;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +45,16 @@ public class ProfessorReviewActivity extends AppCompatActivity {
         UserSession session = new UserSession(this);
         currentUsername = session.getUsername();
         currentProfessor = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
+
+        isEditMode = getIntent().getBooleanExtra("isEditMode", false);
+
         ratingBar = findViewById(R.id.ratingBar);
         reviewInput = findViewById(R.id.reviewEditText);
         isAnonymous = findViewById(R.id.anonSwitch);
         TextView btnCancel = findViewById(R.id.btnCancel);
-        TextView btnSubmitReview = findViewById(R.id.btnSubmitReview);
         View btnDelete = findViewById(R.id.btnDelete);
+        TextView btnSubmitReview = findViewById(R.id.btnSubmitReview);
+
         findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
 
         btnSubmitReview.setText(isEditMode ? getString(R.string.save_changes) : getString(R.string.submit_review));
@@ -140,7 +147,11 @@ public class ProfessorReviewActivity extends AppCompatActivity {
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        startActivity(new Intent(ProfessorReviewActivity.this, SubmissionSuccessActivity.class));
+                        triggerHapticFeedback();
+                        Intent intent = new Intent(ProfessorReviewActivity.this, SubmissionSuccessActivity.class);
+                        intent.putExtra("CHOSEN_PROFESSOR", currentProfessor);
+                        intent.putExtra("isProfessorReview", true);
+                        startActivity(intent);
                         finish();
                     });
                 } else {
@@ -151,5 +162,36 @@ public class ProfessorReviewActivity extends AppCompatActivity {
                 Log.e("LectureLensDebug", "Network connection execution exception thrown", e);
             }
         }).start();
+
+
     }
+
+    private void triggerHapticFeedback() {
+        android.util.Log.d("LectureLensDebug", "HAPTIC TRIGGERED: Vibrate command sent to system!");
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                // Modern API 31+ approach using VibratorManager
+                android.os.VibratorManager vibratorManager = (android.os.VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+                if (vibratorManager != null) {
+                    // A quick doublet-tap pattern (Predefined Success effect)
+                    vibratorManager.getDefaultVibrator().vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_CLICK));
+                }
+            } else {
+                // Legacy fallback approach for older API levels
+                android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                if (vibrator != null && vibrator.hasVibrator()) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        // API 26 to 30: Vibrate for 150ms at standard amplitude strength
+                        vibrator.vibrate(android.os.VibrationEffect.createOneShot(150, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        // Ancient API fallback
+                        vibrator.vibrate(150);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("LectureLensDebug", "Failed to perform haptic feedback rumble", e);
+        }
+    }
+
 }

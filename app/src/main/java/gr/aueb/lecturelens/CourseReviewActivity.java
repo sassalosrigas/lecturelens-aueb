@@ -39,7 +39,6 @@ public class CourseReviewActivity extends AppCompatActivity {
     private Course currentCourse;
     private String currentUsername;
     private SwitchCompat isAnonymous;
-
     private RatingBar ratingBar;
 
     @Override
@@ -50,7 +49,6 @@ public class CourseReviewActivity extends AppCompatActivity {
         UserSession session = new UserSession(this);
         currentUsername = session.getUsername();
         currentCourse = (Course) getIntent().getSerializableExtra("CHOSEN_COURSE");
-
 
         isEditMode = getIntent().getBooleanExtra("isEditMode", false);
 
@@ -167,7 +165,6 @@ public class CourseReviewActivity extends AppCompatActivity {
         String endpoint = isEditMode
                 ? "http://10.0.2.2:8081/api/reviews/" + reviewId + "/update"
                 : "http://10.0.2.2:8081/api/reviews";
-        // Fire off network thread
         new Thread(() -> {
             try {
                 URL url = new URL(endpoint);
@@ -178,7 +175,6 @@ public class CourseReviewActivity extends AppCompatActivity {
                 conn.setDoOutput(true);
                 conn.setConnectTimeout(5000);
 
-                // Build Request JSON payload body
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("courseId", courseId);
                 jsonParam.put("username", currentUsername != null ? currentUsername : "Anonymous");
@@ -189,7 +185,6 @@ public class CourseReviewActivity extends AppCompatActivity {
                 jsonParam.put("reviewText", reviewText);
                 jsonParam.put("isAnonymous", anonymousChecked);
 
-                // Write string output data stream
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonParam.toString().getBytes("utf-8");
                     os.write(input, 0, input.length);
@@ -200,7 +195,10 @@ public class CourseReviewActivity extends AppCompatActivity {
                     // Navigate to success state on UI Thread loop
                     new Handler(Looper.getMainLooper()).post(() -> {
                         triggerHapticFeedback();
-                        startActivity(new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class));
+                        Intent intent = new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class);
+                        intent.putExtra("CHOSEN_COURSE", currentCourse);
+                        intent.putExtra("isProfessorReview", false);
+                        startActivity(intent);
                         finish();
                     });
                 } else {

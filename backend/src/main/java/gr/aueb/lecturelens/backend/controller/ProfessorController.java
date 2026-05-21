@@ -65,4 +65,10 @@ public class ProfessorController {
             return new ProfessorSearchResult(prof, courses);
         }).collect(Collectors.toList());
     }
+
+    @GetMapping("/{id}")
+    public Professor getProfessorById(@PathVariable String id) {
+        return professorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Professor not found: " + id));
+    }
 }
