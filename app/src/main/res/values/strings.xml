@@ -86,7 +86,7 @@
     <string name="thank_you">Thank you!</string>
     <string name="submission_success">Your review has been successfully submitted!</string>
     <string name="return_to_home">return to home</string>
-    <string name="view_my_review">view my review</string>
+    <string name="view_my_review">view my reviews</string>
     <string name="hci_rating_summary">3.5</string>
     <string name="hci_review_text_demo">Very helpful professor and very invested in the courses.</string>
     <string name="change_password">Change Password</string>
@@ -112,4 +112,5 @@
     <string name="pending_reports_count">12</string>
     <string name="deleted_reviews_count">45</string>
     <string name="metadata">Semester 8 | 6 ECTS</string>
+    <string name="return_review_page">return to review page</string>
 </resources>
