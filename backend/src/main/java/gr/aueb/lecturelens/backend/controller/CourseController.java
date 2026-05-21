@@ -5,6 +5,8 @@ import gr.aueb.lecturelens.backend.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,17 @@ public class CourseController {
     @GetMapping
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
+    }
+
+    @GetMapping("/search")
+    public List<Course> searchCourses(@RequestParam String q) {
+        String regex = ".*" + q + ".*";
+        Query query = new Query();
+        query.addCriteria(new Criteria().orOperator(
+                Criteria.where("code").regex(regex, "i"),
+                Criteria.where("title").regex(regex, "i")
+        ));
+        return mongoTemplate.find(query, Course.class);
     }
 
     @GetMapping("/{id}")

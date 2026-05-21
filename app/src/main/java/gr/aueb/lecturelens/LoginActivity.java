@@ -14,14 +14,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import gr.aueb.lecturelens.java.User;
+
 public class LoginActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        //sendDummyUserToBackend();
 
         MaterialButton loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(v -> {
@@ -44,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void loginUser(String email, String password) {
         new Thread(() -> {
@@ -81,15 +83,16 @@ public class LoginActivity extends AppCompatActivity {
                 if (responseCode == 200) {
                     android.util.Log.d("LectureLensDebug", "Raw Server Response: " + response.toString());
 
-                    // 2. Parse the JSON
                     JSONObject responseJson = new JSONObject(response.toString());
 
-                    // CRITICAL CHECK: Make sure your backend json uses the exact key "username"
                     final String username = responseJson.optString("username", "User");
+                    final String currentEmail = responseJson.optString("email", "aaa@aueb.gr");
+                    final String currentPassword = responseJson.optString("passwordHash", "password");
+                    final String role = responseJson.optString("role", "role");
+                    final String createdAt = responseJson.optString("createdAt", "2026-05-21T14:47:00Z");
 
-                    // 3. Use your custom UserSession class to save the session globally!
                     gr.aueb.lecturelens.model.UserSession session = new gr.aueb.lecturelens.model.UserSession(LoginActivity.this);
-                    session.createLoginSession(username);
+                    session.createLoginSession(username, currentEmail, currentPassword, role, createdAt);
                     runOnUiThread(() -> {
                         Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
