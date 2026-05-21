@@ -32,8 +32,6 @@ import gr.aueb.lecturelens.model.UserSession;
 public class CourseDetailsActivity extends AppCompatActivity {
 
     private TextView courseCode, courseName, largeRating, reviewCount, difficulty, hours;
-
-    // Dynamic review list infrastructure variables
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList;
@@ -54,12 +52,10 @@ public class CourseDetailsActivity extends AppCompatActivity {
         difficulty = findViewById(R.id.difficulty);
         hours = findViewById(R.id.hours);
 
-        // Bind the new RecyclerView from your updated XML file
         reviewsRecyclerView = findViewById(R.id.reviewsRecyclerView);
         reviewList = new ArrayList<>();
         reviewAdapter = new ReviewAdapter(reviewList, true);
 
-        // Connect the layout settings and dynamic adapter
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
@@ -123,9 +119,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Downloads and filters course reviews out of your Spring Boot endpoints
-     */
     private void fetchCourseReviews(String courseId) {
         new Thread(() -> {
             try {
@@ -217,7 +210,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     JSONObject existing = new JSONObject(response.toString());
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        btnWriteReview.setText("Edit Review");
+                        btnWriteReview.setText(getString(R.string.edit_review));
 
                         btnWriteReview.setOnClickListener(v -> {
                             Intent intent = new Intent(this, CourseReviewActivity.class);
@@ -238,7 +231,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     userHasReview = false;
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        btnWriteReview.setText("Write Review");
+                        btnWriteReview.setText(getString(R.string.write_a_review));
 
                         btnWriteReview.setOnClickListener(v -> {
                             Intent intent = new Intent(this, CourseReviewActivity.class);

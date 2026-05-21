@@ -27,6 +27,7 @@ import gr.aueb.lecturelens.java.CourseChipAdapter;
 import gr.aueb.lecturelens.java.Professor;
 import gr.aueb.lecturelens.java.Review;
 import gr.aueb.lecturelens.java.ReviewAdapter;
+import gr.aueb.lecturelens.model.UserSession;
 
 public class ProfessorDetailsActivity extends AppCompatActivity implements CourseChipAdapter.OnCourseChipClickListener {
 
@@ -34,28 +35,17 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
     private RecyclerView coursesRecyclerView, reviewsRecyclerView;
     private CourseChipAdapter courseChipAdapter;
     private ReviewAdapter reviewAdapter;
-
     private final List<Course> courseList = new ArrayList<>();
     private final List<Review> reviewList = new ArrayList<>();
-    private String professorId = "";
+    private TextView btnWriteReview;
+    private boolean userHasReview = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_professor_details);
-
-        professorId = getIntent().getStringExtra("PROFESSOR_ID");
-
-        // 2. Fallback: If null, try to get it from the serialized Professor object
-        if (professorId == null || professorId.isEmpty()) {
-            Professor prof = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
-            if (prof != null) {
-                professorId = String.valueOf(prof.getId());
-                Log.d("LectureLensDebug", "Recovered ID from Object: " + professorId);
-            }
-        }
-
-        Log.d("LectureLensDebug", "Final professorId to use: " + professorId);
 
         profName = findViewById(R.id.profName);
         profDept = findViewById(R.id.profDept);
@@ -74,38 +64,31 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
         boolean isProfessor = getIntent().getBooleanExtra("isProfessor", false);
-        Professor prof = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
+        Professor professor = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
 
-        if (prof != null) {
-            populateUiElements(prof);
-            fetchProfessorDetails(professorId);
+        if (professor != null) {
+            populateUiElements(professor);
+            fetchProfessorReviews(professor.getId());
+            fetchProfessorCourses(professor.getId());
+            if (!isProfessor) {
+                checkExistingReview(professor);
+            }
         } else {
             Toast.makeText(this, "Error: Could not display professor data.", Toast.LENGTH_SHORT).show();
         }
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        TextView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
-        View btnWriteReview = findViewById(R.id.btnWriteReview);
+        btnWriteReview = findViewById(R.id.btnWriteReview);
         if (isProfessor) {
             btnWriteReview.setVisibility(View.GONE);
         } else {
             btnWriteReview.setOnClickListener(v -> {
-                Intent intent = new Intent(ProfessorDetailsActivity.this, ProfessorReviewActivity.class);
-                intent.putExtra("PROFESSOR_ID", professorId);
-                intent.putExtra("CHOSEN_PROFESSOR", prof);
-                startActivity(intent);
+                checkExistingReview(professor);
             });
         }
 
-        setupBottomNavigation(isProfessor);
-
-        if (!professorId.isEmpty()) {
-            fetchProfessorDetails(professorId);
-            fetchProfessorCourses(professorId); // ADD THIS LINE to fetch the courses!
-        }
-    }
-
-    private void setupBottomNavigation(boolean isProfessor) {
         findViewById(R.id.navHome).setOnClickListener(v -> {
             Intent intent = new Intent(ProfessorDetailsActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -126,23 +109,20 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         });
     }
 
+    private void populateUiElements(Professor professor) {
+        profName.setText(professor.getFullName());
+        profDept.setText(professor.getTitle() + " • Informatics Department");
+        largeRating.setText(professor.getRating() == 0.0 ? "N/A" : String.format("%.1f", professor.getRating()));
+        reviewCount.setText(String.format("(%d reviews)", reviewList.size()));
+    }
     @Override
     public void onCourseChipClick(Course course) {
         Intent intent = new Intent(ProfessorDetailsActivity.this, CourseDetailsActivity.class);
-        intent.putExtra("COURSE_ID", course.getId());
-        intent.putExtra("COURSE_TITLE", course.getTitle());
+        intent.putExtra("CHOSEN_COURSE", course);
         startActivity(intent);
     }
 
-    private void populateUiElements(Professor prof) {
-        profName.setText(prof.getFullName());
-        profDept.setText(prof.getTitle() + " • Informatics Department");
-        largeRating.setText(prof.getRating() == 0.0 ? "N/A" : String.format("%.1f", prof.getRating()));
-        reviewCount.setText(String.format("(%d reviews)", reviewList.size()));
-    }
-
-
-    private void fetchProfessorDetails(String professorId) {
+    private void fetchProfessorReviews(String professorId) {
         Log.d("LectureLensDebug", "Entering fetchProfessorDetails for ID: " + professorId);
         new Thread(() -> {
             try {
@@ -179,6 +159,7 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                         review.setAnonymous(jsonObject.optBoolean("isAnonymous"));
                         review.setCreatedAt(jsonObject.optString("createdAt"));
 
+
                         parsedReviews.add(review);
                     }
 
@@ -186,11 +167,11 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                         reviewList.clear();
                         reviewList.addAll(parsedReviews);
                         reviewAdapter.notifyDataSetChanged();
+
                         reviewCount.setText(reviewList.size() + (reviewList.size() == 1 ? " Review" : " Reviews"));
                     });
                 } else {
                     Log.e("LectureLensDebug", "HTTP Error: " + responseCode);
-                    // Read error stream for more detail
                     BufferedReader errorReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
                     Log.e("LectureLensDebug", "Error Body: " + errorReader.readLine());
                 }
@@ -201,61 +182,72 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         }).start();
     }
 
-    /*
-    private void fetchProfessorCourses(String professorId) {
+    private void checkExistingReview(Professor professor) {
+        String username = new UserSession(this).getUsername();
+
         new Thread(() -> {
             try {
-                URL url = new URL("http://10.0.2.2:8081/api/professors/" + professorId + "/details");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                String endpoint = "http://10.0.2.2:8081/api/professor-reviews/check"
+                        + "?professorId=" + professor.getId()
+                        + "&username=" + username;
+
+                HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setConnectTimeout(5000);
 
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Review exists — parse it and open in edit mode
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
-                    String inputLine;
-
-                    while ((inputLine = in.readLine()) != null) response.append(inputLine);
+                    String line;
+                    while ((line = in.readLine()) != null) response.append(line);
                     in.close();
 
-                    JSONObject jsonResponse = new JSONObject(response.toString());
-                    JSONArray coursesArray = jsonResponse.optJSONArray("matchingCourses");
-
-                    List<Course> parsedCourses = new ArrayList<>();
-                    if (coursesArray != null) {
-                        for (int i = 0; i < coursesArray.length(); i++) {
-                            JSONObject cObj = coursesArray.getJSONObject(i);
-                            Course course = new Course(
-                                    cObj.optString("id"),
-                                    cObj.optString("code"),
-                                    cObj.optString("title"),
-                                    cObj.optInt("semester"),
-                                    cObj.optInt("ects"),
-                                    cObj.optString("professorName"),
-                                    cObj.optDouble("rating", 0.0),
-                                    cObj.optDouble("difficulty"),
-                                    cObj.optDouble("hours"),
-                                    cObj.optString("description")
-                            );
-                            parsedCourses.add(course);
-                        }
-                    }
+                    JSONObject existing = new JSONObject(response.toString());
 
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        courseList.clear();
-                        courseList.addAll(parsedCourses);
-                        courseChipAdapter.notifyDataSetChanged();
+                        btnWriteReview.setText(getString(R.string.edit_review));
+
+                        btnWriteReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, ProfessorReviewActivity.class);
+                            intent.putExtra("CHOSEN_PROFESSOR", professor);
+                            intent.putExtra("isEditMode", true);
+                            intent.putExtra("rating", (float) existing.optDouble("rating", 4.0));
+                            intent.putExtra("reviewText", existing.optString("reviewText", ""));
+                            String parsedId = existing.has("id") ? existing.optString("id") : existing.optString("_id");
+                            Log.e("LectureLensDebug", "Parsed reviewId: " + parsedId);
+                            intent.putExtra("reviewId", parsedId);
+                            startActivity(intent);
+                        });
                     });
+
+                } else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                    userHasReview = false;
+
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        btnWriteReview.setText(getString(R.string.write_a_review));
+
+                        btnWriteReview.setOnClickListener(v -> {
+                            Intent intent = new Intent(this, ProfessorReviewActivity.class);
+                            intent.putExtra("CHOSEN_PROFESSOR", professor);
+                            startActivity(intent);
+                        });
+                    });
+
+                } else {
+                    Log.e("LectureLensDebug", "Check review failed: " + responseCode);
                 }
+
                 conn.disconnect();
             } catch (Exception e) {
-                Log.e("LectureLensDebug", "Error fetching courses", e);
+                Log.e("LectureLensDebug", "Error checking existing review", e);
             }
         }).start();
     }
 
-     */
     private void fetchProfessorCourses(String professorId) {
         new Thread(() -> {
             try {

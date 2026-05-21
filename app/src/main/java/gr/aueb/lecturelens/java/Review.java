@@ -6,14 +6,13 @@ public class Review implements Serializable {
     private String id;
     private String courseId;
     private String professorId;
-
     private String courseTitle;
     private String username;
     private int difficulty;
     private float studyHours;
     private String reviewText;
     private boolean isAnonymous;
-    private boolean isCourse;     // FIX: was missing — setCourse() had no backing field
+    private boolean isCourse;
     private String createdAt;
     private float rating;
 
@@ -31,20 +30,20 @@ public class Review implements Serializable {
         this.reviewText = reviewText;
         this.isAnonymous = isAnonymous;
         this.createdAt = createdAt;
+        this.isCourse = true;
     }
 
-    public Review(String id, String courseId, String username, int difficulty,
-                  float studyHours, float rating, String reviewText,
+    public Review(String id, String professorId, String username,
+                  float rating, String reviewText,
                   boolean isAnonymous, String createdAt) {
         this.id = id;
-        this.courseId = courseId;
+        this.professorId = professorId;
         this.username = username;
-        this.difficulty = difficulty;
-        this.studyHours = studyHours;
         this.rating = rating;
         this.reviewText = reviewText;
         this.isAnonymous = isAnonymous;
         this.createdAt = createdAt;
+        this.isCourse = false;
     }
 
     // Getters and Setters
