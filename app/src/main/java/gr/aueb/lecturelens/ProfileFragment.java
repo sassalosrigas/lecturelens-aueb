@@ -58,11 +58,8 @@ public class ProfileFragment extends Fragment {
         TextView profileName = view.findViewById(R.id.profileName);
         TextView profileEmail = view.findViewById(R.id.profileEmail);
 
-        // Read the professor role flag directly from the host Activity context intent bundle mapping configurations
-        boolean isProfessor = false;
-        if (getActivity() != null && getActivity().getIntent() != null) {
-            isProfessor = getActivity().getIntent().getBooleanExtra("isProfessor", false);
-        }
+        // Read the professor role flag directly from the persistent user session configurations
+        boolean isProfessor = "professor".equals(session.getRole());
 
         // 4. Assign layout metrics depending on the active student/professor role rules
         if (isProfessor) {

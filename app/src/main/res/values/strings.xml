@@ -113,4 +113,6 @@
     <string name="deleted_reviews_count">45</string>
     <string name="metadata">Semester 8 | 6 ECTS</string>
     <string name="return_review_page">return to review page</string>
+    <string name="are_you_student">Are you a student?</string>
+    <string name="teacher_text">If you are a professor turn this toggle off!</string>
 </resources>

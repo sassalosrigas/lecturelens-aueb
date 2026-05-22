@@ -63,7 +63,8 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         reviewAdapter = new ReviewAdapter(reviewList, true);
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
-        boolean isProfessor = getIntent().getBooleanExtra("isProfessor", false);
+        UserSession session = new UserSession(this);
+        boolean isProfessor = "professor".equals(session.getRole());
         Professor professor = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
         Log.d("Professor details", String.valueOf(professor.getRating()));
         if (professor != null) {

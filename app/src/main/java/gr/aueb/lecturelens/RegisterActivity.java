@@ -7,6 +7,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+
 import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
@@ -34,17 +36,19 @@ public class RegisterActivity extends AppCompatActivity {
             String username = ((EditText) findViewById(R.id.usernameEditText)).getText().toString().trim();
             String email    = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
             String password = ((EditText) findViewById(R.id.passwordEditText)).getText().toString().trim();
+            boolean isStudent = ((SwitchCompat) findViewById(R.id.studentToggle)).isChecked();
 
             if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            registerUser(username, email, password);
+            String role = isStudent ? "student" : "professor";
+            registerUser(username, email, password, role);
         });
     }
 
-    private void registerUser(String username, String email, String password) {
+    private void registerUser(String username, String email, String password, String role) {
         new Thread(() -> {
             try {
                 URL url = new URL("http://10.0.2.2:8081/api/users");
@@ -59,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                 json.put("username", username);
                 json.put("email", email);
                 json.put("passwordHash", password);
-                json.put("role", "student");
+                json.put("role", role);
 
                 OutputStream os = conn.getOutputStream();
                 os.write(json.toString().getBytes());

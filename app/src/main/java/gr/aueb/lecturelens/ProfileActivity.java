@@ -80,7 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        boolean isProfessor = getIntent().getBooleanExtra("isProfessor", false);
+        boolean isProfessor = "professor".equals(session.getRole());
 
         TextView infoValue1 = findViewById(R.id.infoValue1);
         TextView infoLabel1 = findViewById(R.id.infoLabel1);

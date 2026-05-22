@@ -15,8 +15,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import gr.aueb.lecturelens.java.User;
-
 public class LoginActivity extends AppCompatActivity {
 
 

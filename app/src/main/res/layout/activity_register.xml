@@ -9,10 +9,44 @@
     tools:context=".RegisterActivity">
 
     <TextView
+        android:id="@+id/studentInfoTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_regular"
+        android:text="@string/teacher_text"
+        android:textColor="@color/text_hint"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/studentTextView"
+        app:layout_constraintTop_toBottomOf="@id/studentTextView"
+        android:layout_marginTop="4dp" />
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/studentToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        app:trackTint="@color/pink_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/studentTextView"
+        app:layout_constraintBottom_toBottomOf="@id/studentTextView" />
+
+    <TextView
+        android:id="@+id/studentTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/are_you_student"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordEditText" />
+
+    <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="84dp"
         android:fontFamily="@font/poppins_semibold"
         android:text="@string/create_account"
         android:textColor="@color/text_primary"
@@ -21,24 +55,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/subtitleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/roboto_semibold"
-        android:text="@string/academic_email_hint"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleTextView" />
-
     <EditText
         android:id="@+id/usernameEditText"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="44dp"
         android:autofillHints="username"
         android:background="@drawable/edit_text_background"
         android:elevation="2dp"
@@ -50,6 +71,7 @@
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/subtitleTextView" />
 
@@ -57,7 +79,7 @@
         android:id="@+id/emailEditText"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:autofillHints="emailAddress"
         android:background="@drawable/edit_text_background"
         android:elevation="2dp"
@@ -69,6 +91,7 @@
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/usernameEditText" />
 
@@ -76,7 +99,7 @@
         android:id="@+id/passwordEditText"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:autofillHints="password"
         android:background="@drawable/edit_text_background"
         android:elevation="2dp"
@@ -88,14 +111,28 @@
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailEditText" />
+
+    <TextView
+        android:id="@+id/subtitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/roboto_semibold"
+        android:text="@string/academic_email_hint"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/registerButton"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="88dp"
         android:backgroundTint="@color/pink_primary"
         android:fontFamily="@font/poppins_semibold"
         android:insetTop="0dp"
@@ -107,6 +144,7 @@
         android:textStyle="bold"
         app:cornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/passwordEditText" />
 

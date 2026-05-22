@@ -53,8 +53,14 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
         recyclerView = findViewById(R.id.reviewsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // 4. Initialize the adapter passing 'this' so it runs in Manage Mode
-        reviewsAdapter = new ReviewAdapter(userReviewsList, this);
+        boolean isProfessor = "professor".equals(session.getRole());
+
+        // 4. Initialize the adapter. If student, enable manage mode (edit/delete). If professor, read-only.
+        if (isProfessor) {
+            reviewsAdapter = new ReviewAdapter(userReviewsList, true);
+        } else {
+            reviewsAdapter = new ReviewAdapter(userReviewsList, this);
+        }
         recyclerView.setAdapter(reviewsAdapter);
 
         findViewById(R.id.navHome).setOnClickListener(v -> {

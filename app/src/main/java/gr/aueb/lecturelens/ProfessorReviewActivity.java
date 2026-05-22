@@ -43,6 +43,11 @@ public class ProfessorReviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_professor_review);
 
         UserSession session = new UserSession(this);
+        if ("professor".equals(session.getRole())) {
+            Toast.makeText(this, "Professors cannot submit reviews.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         currentUsername = session.getUsername();
         currentProfessor = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
 
