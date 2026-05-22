@@ -15,8 +15,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import gr.aueb.lecturelens.java.User;
-
 public class LoginActivity extends AppCompatActivity {
 
 
@@ -84,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                     android.util.Log.d("LectureLensDebug", "Raw Server Response: " + response.toString());
 
                     JSONObject responseJson = new JSONObject(response.toString());
-
+                    final String fullName = responseJson.optString("fullName", "Full Name");
                     final String username = responseJson.optString("username", "User");
                     final String currentEmail = responseJson.optString("email", "aaa@aueb.gr");
                     final String currentPassword = responseJson.optString("passwordHash", "password");
@@ -92,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                     final String createdAt = responseJson.optString("createdAt", "2026-05-21T14:47:00Z");
 
                     gr.aueb.lecturelens.model.UserSession session = new gr.aueb.lecturelens.model.UserSession(LoginActivity.this);
-                    session.createLoginSession(username, currentEmail, currentPassword, role, createdAt);
+                    session.createLoginSession(fullName, username, currentEmail, currentPassword, role, createdAt);
                     runOnUiThread(() -> {
                         Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));

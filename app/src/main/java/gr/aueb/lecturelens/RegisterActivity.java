@@ -2,11 +2,12 @@ package gr.aueb.lecturelens;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+
 import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
@@ -31,20 +32,29 @@ public class RegisterActivity extends AppCompatActivity {
 
         MaterialButton registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(v -> {
+            String fullName = ((EditText) findViewById(R.id.fullNameEditText)).getText().toString().trim();
             String username = ((EditText) findViewById(R.id.usernameEditText)).getText().toString().trim();
             String email    = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
             String password = ((EditText) findViewById(R.id.passwordEditText)).getText().toString().trim();
+            boolean isStudent = ((SwitchCompat) findViewById(R.id.studentToggle)).isChecked();
 
-            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            registerUser(username, email, password);
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String role = isStudent ? "student" : "professor";
+            registerButton.setEnabled(false);
+            registerUser(fullName, username, email, password, role);
         });
     }
 
-    private void registerUser(String username, String email, String password) {
+    private void registerUser(String fullName, String username, String email, String password, String role) {
         new Thread(() -> {
             try {
                 URL url = new URL("http://10.0.2.2:8081/api/users");
@@ -56,14 +66,16 @@ public class RegisterActivity extends AppCompatActivity {
                 conn.setReadTimeout(5000);
 
                 JSONObject json = new JSONObject();
+                json.put("fullName", fullName);
                 json.put("username", username);
                 json.put("email", email);
                 json.put("passwordHash", password);
-                json.put("role", "student");
+                json.put("role", role);
 
-                OutputStream os = conn.getOutputStream();
-                os.write(json.toString().getBytes());
-                os.flush();
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(json.toString().getBytes());
+                    os.flush();
+                }
 
                 int responseCode = conn.getResponseCode();
 

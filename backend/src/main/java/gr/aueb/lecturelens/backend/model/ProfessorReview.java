@@ -16,6 +16,7 @@ public class ProfessorReview {
 
     private String reviewId;
     private String professorId;
+    private String professorName;
     private String username;
     private String reviewText;
     private float rating;
@@ -52,4 +53,10 @@ public class ProfessorReview {
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+
+    public String getProfessorName() { return professorName; }
+
+    public void setProfessorName(String fullName) {
+        this.professorName = fullName;
+    }
 }

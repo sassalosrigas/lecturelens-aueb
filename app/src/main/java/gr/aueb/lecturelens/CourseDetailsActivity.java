@@ -60,7 +60,8 @@ public class CourseDetailsActivity extends AppCompatActivity {
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
-        boolean isProfessor = getIntent().getBooleanExtra("isProfessor", false);
+        UserSession session = new UserSession(this);
+        boolean isProfessor = "professor".equals(session.getRole());
         Course course = (Course) getIntent().getSerializableExtra("CHOSEN_COURSE");
 
         if (course != null) {

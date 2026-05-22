@@ -1,5 +1,6 @@
 package gr.aueb.lecturelens;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,27 +35,32 @@ import gr.aueb.lecturelens.model.UserSession;
 public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClickListener {
 
     private RecyclerView coursesRecyclerView;
+    private TextView greeting;
     private CourseAdapter courseAdapter;
     private final List<Course> courseList = new ArrayList<>();
 
+    @SuppressLint("StringFormatInvalid")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the clean fragment_home layout template
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // 1. Merged Team Change: Read user storage configurations straight inside the fragment context
         UserSession session = new UserSession(requireContext());
+        String fullName = session.getFullName();
         String username = session.getUsername();
 
-        Log.d("LectureLensDebug", "HomeFragment view mounted. Saved username is: " + username);
+        Log.d("LectureLensDebug", "HomeFragment view mounted. Saved name is: " + fullName);
         if (username != null) {
             Log.d("LectureLensDebug", "Successfully retrieved username: " + username);
         } else {
-            Log.w("LectureLensDebug", "⚠️ No username found in this session.");
+            Log.w("LectureLensDebug", "No username found in this session.");
         }
 
         // 2. Setup the dynamic RecyclerView list architecture
+        greeting = view.findViewById(R.id.greetingTextView);
+        greeting.setText("Hello, " + fullName);
+
+
         coursesRecyclerView = view.findViewById(R.id.coursesRecyclerView);
         coursesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         courseAdapter = new CourseAdapter(courseList, this);
