@@ -42,15 +42,12 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_reviews);
 
-        // 1. Grab current logged-in user from your session manager
         UserSession session = new UserSession(getApplicationContext());
         currentUsername = session.getUsername();
 
-        // 2. Setup Back button action
         TextView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        // 3. Bind the new RecyclerView layout you just modified
         recyclerView = findViewById(R.id.reviewsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -79,7 +76,6 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
             finish();
         });
 
-        // 5. Fire off the API call if we have a valid user session
         if (currentUsername != null && !currentUsername.isEmpty()) {
             fetchUserReviews();
         } else {
@@ -125,7 +121,6 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
                         userReviewsList.add(review);
                     }
 
-                    // Push dataset changes smoothly into the UI thread loop
                     new Handler(Looper.getMainLooper()).post(() -> {
                         reviewsAdapter.notifyDataSetChanged();
                     });
@@ -160,6 +155,7 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
                         Review review = new Review();
                         review.setId(jsonObject.optString("id"));
                         review.setProfessorId(jsonObject.optString("professorId"));
+                        review.setProfessorName(jsonObject.optString("professorName"));
                         review.setUsername(jsonObject.optString("username"));
                         review.setRating((float) jsonObject.optDouble("rating"));
                         review.setReviewText(jsonObject.optString("reviewText"));

@@ -1,5 +1,6 @@
 package gr.aueb.lecturelens.java;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,26 +56,42 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviewList.get(position);
 
-        // Username or course name display
         if (holder.userName != null) {
             if (review.isAnonymous() && !isProfessorView) {
                 holder.userName.setText(holder.itemView.getContext().getString(R.string.anonymous_user));
             } else {
                 holder.userName.setText(review.getUsername() != null ? review.getUsername() : "User");
             }
-        } else if (holder.courseName != null) {
-            holder.courseName.setText(review.getCourseTitle() != null ? review.getCourseTitle() : "Course Review");
         }
 
-        if (isProfessorView) {
-            holder.reviewRating.setText("⭐ " + String.format(Locale.US, "%.1f", review.getRating()));
+        boolean isCourseReview = review.getCourseId() != null && !review.getCourseId().isEmpty();
+
+        if (isCourseReview) {
+            if (holder.courseName != null) {
+                holder.courseName.setVisibility(View.VISIBLE);
+                holder.courseName.setText(review.getCourseTitle() != null && !review.getCourseTitle().isEmpty() ? review.getCourseTitle() : "Course Review");
+            }
+            if (holder.professorName != null) {
+                holder.professorName.setVisibility(View.GONE);
+            }
         } else {
-            holder.reviewRating.setText("⭐ " + review.getDifficulty() + ".0");
+            if (holder.professorName != null) {
+                holder.professorName.setVisibility(View.VISIBLE);
+                holder.professorName.setText(review.getProfessorName() != null && !review.getProfessorName().isEmpty() ? review.getProfessorName() : "Professor Review");
+
+                if (holder.courseName != null) {
+                    holder.courseName.setVisibility(View.GONE);
+                }
+            } else if (holder.courseName != null) {
+                holder.courseName.setVisibility(View.VISIBLE);
+                holder.courseName.setText(review.getProfessorName() != null && !review.getProfessorName().isEmpty() ? review.getProfessorName() : "Professor Review");
+            }
         }
+
+        holder.reviewRating.setText("⭐ " + String.format(Locale.US, "%.1f", review.getRating()));
 
         holder.reviewDate.setText(convertIsoToReadableDate(review.getCreatedAt()));
 
-        // FIX: Professor reviews have no study hours — don't show that subtext
         String mainText = review.getReviewText() != null ? review.getReviewText() : "";
         if (!isProfessorView && review.getStudyHours() > 0) {
             String studyHoursSubtext = "\nEstimated Weekly Study: " + (int) review.getStudyHours() + " hours";
@@ -122,7 +139,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     }
 
     static class ReviewViewHolder extends RecyclerView.ViewHolder {
-        TextView userName, courseName, reviewRating, reviewDate, reviewText, reportButton;
+        TextView userName, courseName, professorName, reviewRating, reviewDate, reviewText, reportButton;
         View btnEdit, btnDelete;
 
         public ReviewViewHolder(@NonNull View itemView) {
@@ -132,6 +149,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             reviewText = itemView.findViewById(R.id.reviewText);
             userName = itemView.findViewById(R.id.userName);
             courseName = itemView.findViewById(R.id.courseName);
+            professorName = itemView.findViewById(R.id.professorName);
             reportButton = itemView.findViewById(R.id.reportButton);
             btnEdit = itemView.findViewById(R.id.btnEdit);
             btnDelete = itemView.findViewById(R.id.btnDelete);

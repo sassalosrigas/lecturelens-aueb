@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/professor-reviews")
@@ -93,9 +94,25 @@ public class ProfessorReviewController {
     }
 
     @GetMapping("/user/{username}")
-    public List<ProfessorReview> getReviewsByUsername(@PathVariable String username) {
-        return professorReviewRepository.findByUsername(username);
+    public List<ProfessorReview> getReviewsByUser(@PathVariable String username) {
+        // 1. Fetch all raw reviews submitted by this specific user
+        List<ProfessorReview> reviews = professorReviewRepository.findAll().stream()
+                .filter(r -> username.equalsIgnoreCase(r.getUsername()))
+                .collect(Collectors.toList());
+
+        for (ProfessorReview review : reviews) {
+            if (review.getProfessorId() != null) {
+                professorRepository.findById(review.getProfessorId()).ifPresent(prof -> {
+                    String fullName = prof.getFirstName() + " " + prof.getLastName();
+                    review.setReviewText(review.getReviewText());
+
+                    review.setProfessorName(fullName);
+                });
+            }
+        }
+        return reviews;
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProfessorReview> updateReview(@PathVariable String id, @RequestBody ProfessorReview updated) {
         return doUpdate(id, updated);

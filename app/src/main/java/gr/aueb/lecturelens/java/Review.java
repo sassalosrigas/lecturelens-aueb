@@ -7,6 +7,7 @@ public class Review implements Serializable {
     private String courseId;
     private String professorId;
     private String courseTitle;
+    private String professorName;
     private String username;
     private int difficulty;
     private float studyHours;
@@ -34,11 +35,12 @@ public class Review implements Serializable {
         this.isCourse = true;
     }
 
-    public Review(String id, String professorId, String username,
+    public Review(String id, String professorId, String professorName, String username,
                   float rating, String reviewText,
                   boolean isAnonymous, String createdAt) {
         this.id = id;
         this.professorId = professorId;
+        this.professorName = professorName;
         this.username = username;
         this.rating = rating;
         this.reviewText = reviewText;
@@ -57,8 +59,11 @@ public class Review implements Serializable {
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
 
+    public String getProfessorName() { return professorName; }
+    public void setProfessorName(String professorName) { this.professorName = professorName; }
+
     public String getProfessorId() { return professorId; }
-    public void setProfessorId(String professorId) { this.professorId = professorId; } // FIX: actually sets the field
+    public void setProfessorId(String professorId) { this.professorId = professorId; }
 
     public String getCourseTitle() { return courseTitle; }
     public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
@@ -79,10 +84,8 @@ public class Review implements Serializable {
     public void setAnonymous(boolean anonymous) { isAnonymous = anonymous; }
 
     public boolean isCourse() { return isCourse; }
-    public void setCourse(boolean course) { isCourse = course; } // FIX: now has a real backing field
+    public void setCourse(boolean course) { isCourse = course; }
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
-
-
 }
