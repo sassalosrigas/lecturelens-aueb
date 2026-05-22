@@ -55,6 +55,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/profAvgRating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_semibold"
@@ -74,7 +75,8 @@
     </androidx.cardview.widget.CardView>
 
     <!-- Reviews List -->
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/professorReviewsRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
@@ -83,20 +85,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/summaryCard">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include layout="@layout/item_review_with_course" />
-            <include layout="@layout/item_review_with_course" />
-            <include layout="@layout/item_review_with_course" />
-            <include layout="@layout/item_review_with_course" />
-
-        </LinearLayout>
-    </ScrollView>
+        app:layout_constraintTop_toBottomOf="@id/summaryCard"
+        tools:listitem="@layout/item_review_with_course" />
 
     <!-- Navigation Bar -->
     <androidx.cardview.widget.CardView

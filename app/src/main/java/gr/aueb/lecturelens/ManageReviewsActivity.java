@@ -230,7 +230,6 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
                 int responseCode = conn.getResponseCode();
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
-                        // Success: Remove item locally from dataset list array and animate away nicely
                         userReviewsList.remove(position);
                         reviewsAdapter.notifyItemRemoved(position);
                         Toast.makeText(this, "Review deleted successfully", Toast.LENGTH_SHORT).show();

@@ -95,7 +95,6 @@ public class ProfessorReviewController {
 
     @GetMapping("/user/{username}")
     public List<ProfessorReview> getReviewsByUser(@PathVariable String username) {
-        // 1. Fetch all raw reviews submitted by this specific user
         List<ProfessorReview> reviews = professorReviewRepository.findAll().stream()
                 .filter(r -> username.equalsIgnoreCase(r.getUsername()))
                 .collect(Collectors.toList());
@@ -113,6 +112,38 @@ public class ProfessorReviewController {
         return reviews;
     }
 
+    @GetMapping("/by-name")
+    public List<ProfessorReview> getReviewsByProfessorName(@RequestParam String fullName) {
+        try {
+            System.out.println("DEBUG: Fetching reviews for professor name: [" + fullName + "]");
+
+            // 1. Find the professor object using their first and last name combo
+            // Since database storage trims spaces, we filter all professors to find a match
+            List<ProfessorReview> matchedReviews = professorReviewRepository.findAll().stream()
+                    .filter(review -> {
+                        // Pull the professor details from the repository to get the full name
+                        if (review.getProfessorId() == null) return false;
+
+                        return professorRepository.findById(review.getProfessorId())
+                                .map(prof -> {
+                                    String dbFullName = (prof.getFirstName() + " " + prof.getLastName()).trim();
+                                    return dbFullName.equalsIgnoreCase(fullName.trim());
+                                }).orElse(false);
+                    })
+                    .collect(Collectors.toList());
+
+            // 2. Set the transient professorName on the objects before sending them back
+            for (ProfessorReview review : matchedReviews) {
+                review.setProfessorName(fullName.trim());
+            }
+
+            System.out.println("DEBUG: Found " + matchedReviews.size() + " reviews for " + fullName);
+            return matchedReviews;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
     @PutMapping("/{id}")
     public ResponseEntity<ProfessorReview> updateReview(@PathVariable String id, @RequestBody ProfessorReview updated) {
         return doUpdate(id, updated);
