@@ -247,13 +247,13 @@ public class SearchActivity extends AppCompatActivity implements
         View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
-        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.ratingBar);
+        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.courseRatingBar);
         ratingBar.setRating(selectedRating);
 
-        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.difficultySlider);
+        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.courseDifficultySlider);
         difficultySlider.setValues(selectedDifficulty[0], selectedDifficulty[1]);
 
-        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.hoursSlider);
+        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.courseHoursSlider);
         hoursSlider.setValues(selectedHours[0], selectedHours[1]);
 
         TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);

@@ -54,9 +54,11 @@ public class SearchFragment extends Fragment implements
     private final List<Course> randomCourseList = new ArrayList<>();
     private final List<Professor> randomProfessorList = new ArrayList<>();
 
-    private float[] selectedDifficulty = {1f, 5f};
-    private float[] selectedHours = {1f, 9f};
-    private float selectedRating = 4f;
+    private float selectedCourseRating = 0f;
+    private float[] selectedCourseDifficulty = {0f, 5f};
+    private float[] selectedCourseHours = {0f, 20f};
+
+    private float selectedProfRating = 0f;
 
     private View recommendationsScrollView;
     private View searchResultsContainer;
@@ -261,36 +263,91 @@ public class SearchFragment extends Fragment implements
         View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
-        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.ratingBar);
-        ratingBar.setRating(selectedRating);
+        // Course UI Hookups
+        android.widget.RatingBar courseRatingBar = bottomSheetView.findViewById(R.id.courseRatingBar);
+        RangeSlider courseDifficultySlider = bottomSheetView.findViewById(R.id.courseDifficultySlider);
+        RangeSlider courseHoursSlider = bottomSheetView.findViewById(R.id.courseHoursSlider);
 
-        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.difficultySlider);
-        difficultySlider.setValues(selectedDifficulty[0], selectedDifficulty[1]);
+        courseRatingBar.setRating(selectedCourseRating);
+        courseDifficultySlider.setValues(selectedCourseDifficulty[0], selectedCourseDifficulty[1]);
+        courseHoursSlider.setValues(selectedCourseHours[0], selectedCourseHours[1]);
 
-        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.hoursSlider);
-        hoursSlider.setValues(selectedHours[0], selectedHours[1]);
+        // Professor UI Hookups
+        android.widget.RatingBar profRatingBar = bottomSheetView.findViewById(R.id.profRatingBar);
+        profRatingBar.setRating(selectedProfRating);
 
+        // Clear Action Handler
         TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);
         clearAll.setOnClickListener(v -> {
-            ratingBar.setRating(4f);
-            difficultySlider.setValues(1f, 5f);
-            hoursSlider.setValues(1f, 9f);
+            courseRatingBar.setRating(0f);
+            // FIXED: Set minimum bounds explicitly to 0f here so default 0.0 metrics pass through safely
+            courseDifficultySlider.setValues(0f, 5.0f);
+            courseHoursSlider.setValues(0f, 20.0f);
+            profRatingBar.setRating(0f);
         });
 
+        // Apply Action Handler
         View applyButton = bottomSheetView.findViewById(R.id.applyButton);
         applyButton.setOnClickListener(v -> {
-            selectedRating = ratingBar.getRating();
-            selectedDifficulty[0] = difficultySlider.getValues().get(0);
-            selectedDifficulty[1] = difficultySlider.getValues().get(1);
-            selectedHours[0] = hoursSlider.getValues().get(0);
-            selectedHours[1] = hoursSlider.getValues().get(1);
+            // Save state updates
+            selectedCourseRating = courseRatingBar.getRating();
+            selectedCourseDifficulty[0] = courseDifficultySlider.getValues().get(0);
+            selectedCourseDifficulty[1] = courseDifficultySlider.getValues().get(1);
+            selectedCourseHours[0] = courseHoursSlider.getValues().get(0);
+            selectedCourseHours[1] = courseHoursSlider.getValues().get(1);
+
+            selectedProfRating = profRatingBar.getRating();
+
             bottomSheetDialog.dismiss();
 
+            // Apply filters to currently loaded default collections
+            applyFiltersToRecommendations();
+
+            // Re-trigger active endpoint queries if text field contains input strings
             String query = searchEditText.getText().toString().trim();
-            if (!query.isEmpty()) performSearch(query);
+            if (!query.isEmpty()) {
+                performSearch(query);
+            }
         });
 
         bottomSheetDialog.show();
+    }
+
+    private void applyFiltersToRecommendations() {
+        AppCache cache = AppCache.getInstance();
+        if (!cache.loaded) return;
+
+        List<Course> filteredCourses = new ArrayList<>();
+        for (Course c : cache.cachedCourses) {
+
+            // Check if the rating matches
+            boolean matchesRating = c.getRating() >= selectedCourseRating;
+
+            // Matches slider range OR is unconfigured data (0.0)
+            boolean matchesDifficulty = (c.getDifficulty() >= selectedCourseDifficulty[0] && c.getDifficulty() <= selectedCourseDifficulty[1])
+                    || c.getDifficulty() == 0.0;
+
+            boolean matchesHours = (c.getHours() >= selectedCourseHours[0] && c.getHours() <= selectedCourseHours[1])
+                    || c.getHours() == 0.0;
+
+            if (matchesRating && matchesDifficulty && matchesHours) {
+                filteredCourses.add(c);
+            }
+        }
+        randomCourseList.clear();
+        randomCourseList.addAll(filteredCourses);
+        courseChipAdapter.notifyDataSetChanged();
+
+        // Filter recommendation professors
+        List<Professor> filteredProfs = new ArrayList<>();
+        for (Professor p : cache.cachedProfessors) {
+            if (p.getRating() >= selectedProfRating) {
+                filteredProfs.add(p);
+            }
+        }
+        randomProfessorList.clear();
+        randomProfessorList.addAll(filteredProfs);
+        professorAdapter.notifyDataSetChanged();
     }
 
     private void performSearch(String query) {
@@ -344,7 +401,6 @@ public class SearchFragment extends Fragment implements
                         );
                         courseResults.add(course);
 
-                        // Parse its associated professors array
                         if (wrapperObj.has("professors")) {
                             JSONArray profsArray = wrapperObj.getJSONArray("professors");
                             for (int j = 0; j < profsArray.length(); j++) {
@@ -524,7 +580,7 @@ public class SearchFragment extends Fragment implements
             }
         }
 
-        // Hide the cancel text view since the active search state is closing
+
         if (getView() != null) {
             View cancelBtn = getView().findViewById(R.id.cancelSearch);
             if (cancelBtn != null) {

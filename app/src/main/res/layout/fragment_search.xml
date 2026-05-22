@@ -97,49 +97,34 @@
 
     <LinearLayout
         android:id="@+id/filtersLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
         android:layout_marginTop="12dp"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="16dp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/chip_background"
+        android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cancelSearch">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/chip_background"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="center"
-            android:text="Rating"
-            android:textColor="@color/pink_primary"
-            android:textSize="12sp" />
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/ic_filter"
+            android:contentDescription="@null"
+            app:tint="@color/pink_primary" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/chip_background"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="center"
-            android:text="Difficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filters"
+            android:fontFamily="@font/roboto_semibold"
             android:textColor="@color/pink_primary"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
-            android:background="@drawable/chip_background"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="center"
-            android:text="Hours/wk"
-            android:textColor="@color/pink_primary"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 

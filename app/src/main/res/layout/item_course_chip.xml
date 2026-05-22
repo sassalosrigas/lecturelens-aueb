@@ -39,6 +39,19 @@
             android:textSize="13sp" />
 
         <TextView
+            android:id="@+id/courseChipProfessor"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/roboto_regular"
+            android:maxLines="1"
+            android:text="Staff"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp" />
+
+        <TextView
             android:id="@+id/courseChipRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -60,7 +60,6 @@ public class ProfessorAdapter extends RecyclerView.Adapter<ProfessorAdapter.Prof
         public ProfViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            // FIXED: Mapped explicitly to the exact resource layout IDs inside item_professor_chip.xml
             txtName = itemView.findViewById(R.id.professorNameText);
             txtTitle = itemView.findViewById(R.id.professorTitleText);
         }

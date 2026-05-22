@@ -70,7 +70,10 @@ public class CourseReviewActivity extends AppCompatActivity {
         int initialDifficulty = 3;
         if (isEditMode) {
             initialDifficulty = getIntent().getIntExtra("difficulty", 3);
-            hoursSlider.setValue(getIntent().getFloatExtra("hours", 5.0f));
+            float hours = getIntent().getFloatExtra("hours", 5.0f);
+            if (hours < 1.0f) hours = 1.0f;
+            if (hours > 9.0f) hours = 9.0f;
+            hoursSlider.setValue(hours);
             ratingBar.setRating(getIntent().getFloatExtra("rating", 4.0f));
             String reviewText = getIntent().getStringExtra("reviewText");
             btnDelete.setVisibility(View.VISIBLE);
