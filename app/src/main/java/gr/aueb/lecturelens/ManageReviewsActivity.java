@@ -61,18 +61,31 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
         }
         recyclerView.setAdapter(reviewsAdapter);
 
+        // 1. HOME BUTTON: Brings back the warm MainActivity and jumps straight to the Home page
         findViewById(R.id.navHome).setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            // FLAG_ACTIVITY_CLEAR_TOP brings back the active instance instead of recreating it
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("NAVIGATE_TO_PAGE", 0); // Target position index 0 (HomeFragment)
             startActivity(intent);
             finish();
         });
+
+        // 2. SEARCH BUTTON: Brings back MainActivity and slides smoothly over to the Search screen tab
         findViewById(R.id.navSearch).setOnClickListener(v -> {
-            startActivity(new Intent(this, SearchActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("NAVIGATE_TO_PAGE", 1); // Target position index 1 (SearchFragment)
+            startActivity(intent);
             finish();
         });
+
+        // 3. PROFILE BUTTON: Brings back MainActivity and slides directly to the Profile card layout
         findViewById(R.id.navProfile).setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("NAVIGATE_TO_PAGE", 2); // Target position index 2 (ProfileFragment)
+            startActivity(intent);
             finish();
         });
 

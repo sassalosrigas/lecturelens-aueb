@@ -108,6 +108,7 @@ public class SearchActivity extends AppCompatActivity implements
         Handler searchHandler = new Handler(Looper.getMainLooper());
         Runnable[] searchRunnable = {null};
 
+
         searchEditText.addTextChangedListener(new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(android.text.Editable s) {}
