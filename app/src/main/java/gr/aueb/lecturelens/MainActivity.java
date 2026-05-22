@@ -1,5 +1,6 @@
 package gr.aueb.lecturelens;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,21 @@ public class MainActivity extends AppCompatActivity {
 
         setupNavigationListeners();
         setupSwipeListener();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // Bind the new incoming flags arguments safely
+
+        // Check if a deep activity like CourseDetails sent a target page index command
+        if (intent != null && intent.hasExtra("NAVIGATE_TO_PAGE")) {
+            int pageIndex = intent.getIntExtra("NAVIGATE_TO_PAGE", 0);
+            if (viewPager != null) {
+                // Instantly jumps or smooth glides to the targeted fragment area
+                viewPager.setCurrentItem(pageIndex, true);
+            }
+        }
     }
 
     private void setupNavigationListeners() {
