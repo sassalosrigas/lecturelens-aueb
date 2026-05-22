@@ -37,10 +37,12 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         ImageView navHome = findViewById(R.id.navHome);
         UserSession session = new UserSession(this);
+        String fullName = session.getFullName();
         String username = session.getUsername();
         String email = session.getEmail();
         String role = session.getRole();
         String date = session.getCreationDate();
+
         navHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,7 +82,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        boolean isProfessor = "professor".equals(session.getRole());
 
         TextView infoValue1 = findViewById(R.id.infoValue1);
         TextView infoLabel1 = findViewById(R.id.infoLabel1);
@@ -90,25 +91,26 @@ public class ProfileActivity extends AppCompatActivity {
         TextView profileName = findViewById(R.id.profileName);
         TextView profileEmail = findViewById(R.id.profileEmail);
 
+        profileName.setText(fullName);
+        profileEmail.setText(email);
+
+        boolean isProfessor = "professor".equalsIgnoreCase(role);
+
         if (isProfessor) {
-            profileName.setText(getString(R.string.professor_name));
-            profileEmail.setText(getString(R.string.professor_email_demo));
             if (date != null && !date.isEmpty()) {
                 infoValue1.setText(calculateActiveDuration(date));
             } else {
-                infoValue1.setText("0 mos"); // Fallback if no date is found
+                infoValue1.setText("0 mos");
             }
             infoLabel1.setText(getString(R.string.courses_count));
             infoValue2.setText("3.5/5");
             infoLabel2.setText(getString(R.string.rating_label));
             primaryActionLabel.setText(getString(R.string.see_my_reviews));
         } else {
-            profileName.setText(username);
-            profileEmail.setText(email);
             if (date != null && !date.isEmpty()) {
                 infoValue1.setText(calculateActiveDuration(date));
             } else {
-                infoValue1.setText("0 mos"); // Fallback if no date is found
+                infoValue1.setText("0 mos");
             }
             infoLabel1.setText(getString(R.string.years_member));
             infoValue2.setText("-");
@@ -124,7 +126,12 @@ public class ProfileActivity extends AppCompatActivity {
         manageReviewsAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, ManageReviewsActivity.class);
+                Intent intent;
+                if (isProfessor) {
+                    intent = new Intent(ProfileActivity.this, ProfessorSeeReviewsActivity.class);
+                } else {
+                    intent = new Intent(ProfileActivity.this, ManageReviewsActivity.class);
+                }
                 startActivity(intent);
             }
         });

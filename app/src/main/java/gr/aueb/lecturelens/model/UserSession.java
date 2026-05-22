@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 public class UserSession {
     private static final String PREF_NAME = "UserSession";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
+    private static final String KEY_FULLNAME = "fullName";
     private static final String KEY_USERNAME = "username";
     // 1. Add new keys for the extra data
     private static final String KEY_PASSWORD = "password";
@@ -23,8 +24,9 @@ public class UserSession {
         editor = pref.edit();
     }
 
-    public void createLoginSession(String username, String email,String password, String role, String creationDate) {
+    public void createLoginSession(String fullName, String username, String email, String password, String role, String creationDate) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
+        editor.putString(KEY_FULLNAME, fullName);
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASSWORD, password);
@@ -41,7 +43,10 @@ public class UserSession {
         return pref.getString(KEY_USERNAME, null);
     }
 
-    // 3. Add new getters to retrieve email and role when needed
+    public String getFullName() {
+        return pref.getString(KEY_FULLNAME, null);
+    }
+
     public String getEmail() {
         return pref.getString(KEY_EMAIL, null);
     }

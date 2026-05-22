@@ -45,8 +45,10 @@ public class ProfileFragment extends Fragment {
 
         // 2. Read user details dynamically out of the active user session cache layers
         UserSession session = new UserSession(requireContext());
+        String fullName = session.getFullName();
         String username = session.getUsername();
         String email = session.getEmail();
+        String role = session.getRole();
         String date = session.getCreationDate();
 
         // 3. Connect individual text views and data cards
@@ -58,13 +60,12 @@ public class ProfileFragment extends Fragment {
         TextView profileName = view.findViewById(R.id.profileName);
         TextView profileEmail = view.findViewById(R.id.profileEmail);
 
-        // Read the professor role flag directly from the persistent user session configurations
-        boolean isProfessor = "professor".equals(session.getRole());
+        profileName.setText(fullName);
+        profileEmail.setText(email);
 
-        // 4. Assign layout metrics depending on the active student/professor role rules
+        boolean isProfessor = "professor".equalsIgnoreCase(role);
+
         if (isProfessor) {
-            profileName.setText(getString(R.string.professor_name));
-            profileEmail.setText(getString(R.string.professor_email_demo));
             if (date != null && !date.isEmpty()) {
                 infoValue1.setText(calculateActiveDuration(date));
             } else {
@@ -75,8 +76,6 @@ public class ProfileFragment extends Fragment {
             infoLabel2.setText(getString(R.string.rating_label));
             primaryActionLabel.setText(getString(R.string.see_my_reviews));
         } else {
-            profileName.setText(username);
-            profileEmail.setText(email);
             if (date != null && !date.isEmpty()) {
                 infoValue1.setText(calculateActiveDuration(date));
             } else {
@@ -87,7 +86,6 @@ public class ProfileFragment extends Fragment {
             infoLabel2.setText(getString(R.string.reviews_count));
             primaryActionLabel.setText(getString(R.string.manage_my_reviews));
 
-            // Run the review counter routine if the student username is valid
             if (username != null && !username.isEmpty()) {
                 fetchAndCalculateUserReviewCount(username);
             }
@@ -117,7 +115,12 @@ public class ProfileFragment extends Fragment {
         View manageReviewsAction = view.findViewById(R.id.primaryAction);
         if (manageReviewsAction != null) {
             manageReviewsAction.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), ManageReviewsActivity.class);
+                Intent intent;
+                if (isProfessor) {
+                    intent = new Intent(getActivity(), ProfessorSeeReviewsActivity.class);
+                } else {
+                    intent = new Intent(getActivity(), ManageReviewsActivity.class);
+                }
                 startActivity(intent);
             });
         }
