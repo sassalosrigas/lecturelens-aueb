@@ -18,12 +18,13 @@ public class Review implements Serializable {
 
     public Review() {}
 
-    public Review(String id, String courseId, String username, String courseTitle,
+    public Review(String id, String courseId, String username, float rating, String courseTitle,
                   int difficulty, float studyHours, String reviewText,
                   boolean isAnonymous, String createdAt) {
         this.id = id;
         this.courseId = courseId;
         this.username = username;
+        this.rating = rating;
         this.courseTitle = courseTitle;
         this.difficulty = difficulty;
         this.studyHours = studyHours;
