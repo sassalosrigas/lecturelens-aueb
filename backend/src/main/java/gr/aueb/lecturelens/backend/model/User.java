@@ -11,16 +11,17 @@ public class User {
     @Id
     private String id;
     @CreatedDate
-    private Instant createdAt; // Automatically managed timestamp field!
+    private Instant createdAt;
+    private String fullName;
     private String username;
     private String email;
     private String passwordHash;
-    private String role; // 'student' or 'admin'
+    private String role;
 
-    // Default Constructor
     public User() {}
 
-    public User(String username, String email, String passwordHash, String role) {
+    public User(String fullName, String username, String email, String passwordHash, String role) {
+        this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -29,9 +30,11 @@ public class User {
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

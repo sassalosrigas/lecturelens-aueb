@@ -115,4 +115,5 @@
     <string name="return_review_page">return to review page</string>
     <string name="are_you_student">Are you a student?</string>
     <string name="teacher_text">If you are a professor turn this toggle off!</string>
+    <string name="full_name">full name</string>
 </resources>

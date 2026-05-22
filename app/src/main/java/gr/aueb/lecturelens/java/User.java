@@ -2,16 +2,17 @@ package gr.aueb.lecturelens.java;
 
 public class User {
 
+    private String fullName;
     private String username;
     private String email;
     private String passwordHash;
-    private String role; // 'student' or 'admin'
+    private String role;
 
     private String createdAt;
-    // Default Constructor
     public User() {}
 
-    public User(String username, String email, String passwordHash, String role) {
+    public User(String fullName, String username, String email, String passwordHash, String role) {
+        this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -21,9 +22,18 @@ public class User {
     public String getCreatedAt(){
         return this.createdAt;
     }
-    public void setCreatedAt(String creationDate){
+    public void setCreatedAt(String createdAt){
         this.createdAt = createdAt;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
@@ -32,6 +42,10 @@ public class User {
 
     public String getUsername(){
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getRole() { return role; }
