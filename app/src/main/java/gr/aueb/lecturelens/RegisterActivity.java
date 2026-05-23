@@ -90,41 +90,44 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Always re-enable the register button if the user returns or cancels
         if (registerButton != null) {
             registerButton.setEnabled(true);
         }
 
         if (requestCode == REQUEST_CODE_OCR && resultCode == RESULT_OK && data != null) {
-            String scannedName = data.getStringExtra("EXTRACTED_NAME"); // Holds English Name
-            String scannedAM   = data.getStringExtra("EXTRACTED_AM");   // Holds clean AM digits
+            String scannedName = data.getStringExtra("EXTRACTED_NAME"); // From ID card Front
+            String scannedAM   = data.getStringExtra("EXTRACTED_AM");   // From ID card Back
 
-            if (scannedName == null || scannedAM == null || scannedAM.isEmpty()) {
-                Toast.makeText(this, "Failed to capture card data cleanly. Please re-scan.", Toast.LENGTH_LONG).show();
-                return;
+            // 1. Read what the user typed into the form manually
+            String typedFullName = ((EditText) findViewById(R.id.fullNameEditText)).getText().toString().trim();
+            String typedEmail    = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
+
+            // 2. Mathematically calculate what their official email SHOULD be based on the physical card
+            String expectedEmail = "p" + scannedAM + "@aueb.gr";
+
+            // ========================================================
+            // THE SECURITY CROSS-CHECKS
+            // ========================================================
+
+            // Check 1: Does their typed email match the card's actual registration number?
+            if (!typedEmail.equalsIgnoreCase(expectedEmail)) {
+                Toast.makeText(this, "Security Validation Failed: Email doesn't match this Academic ID.", Toast.LENGTH_LONG).show();
+                return; // 🛑 Halt registration entirely
+            }
+
+            // Check 2: Does their typed name match the Latin name printed on the front of the card?
+            // We use .contains() here because typing "John Doe" will still match "DOE JOHN" on the card
+            if (!scannedName.toUpperCase().contains(typedFullName.toUpperCase()) &&
+                    !typedFullName.toUpperCase().contains(scannedName.toUpperCase())) {
+
+                Toast.makeText(this, "Security Validation Failed: Name does not match the Identity Card.", Toast.LENGTH_LONG).show();
+                return; // 🛑 Halt registration entirely
             }
 
             // ========================================================
-            // CRITICAL VERIFICATION: CROSS-CHECK THE GENERATED EMAIL
+            // SUCCESS: Both checks passed! Send the typed inputs to your backend
             // ========================================================
-            // AUEB student accounts use the following structural pattern: p[AM]@aueb.gr
-            String computedStudentEmail = "p" + scannedAM + "@aueb.gr";
-
-            // If you want to check an optional email field value entered by the user:
-            EditText emailInput = findViewById(R.id.emailEditText);
-            if (emailInput != null) {
-                String typedEmail = emailInput.getText().toString().trim();
-                if (!typedEmail.isEmpty() && !typedEmail.equalsIgnoreCase(computedStudentEmail)) {
-                    Toast.makeText(this, "Cross-check failed! Your email does not match this Academic ID code.", Toast.LENGTH_LONG).show();
-                    return; // Prevent registration fraud
-                }
-            }
-
-            // Autofill validation succeeded -> Set the derived values globally
-            cachedEmail = computedStudentEmail;
-
-            // Send the completed account package down to your Spring Boot API
-            sendRegistrationToServer(scannedName, cachedUsername, cachedEmail, cachedPassword, cachedRole, scannedAM);
+            sendRegistrationToServer(typedFullName, cachedUsername, typedEmail, cachedPassword, cachedRole, scannedAM);
 
         } else if (resultCode == RESULT_CANCELED) {
             Toast.makeText(this, "Registration cancelled. ID verification required.", Toast.LENGTH_SHORT).show();
