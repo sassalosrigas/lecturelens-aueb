@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 
@@ -17,6 +19,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class RegisterActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_OCR = 2002;
+    private String cachedUsername = "";
+    private String cachedEmail = "";
+
+    private String cachedPassword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,20 +38,37 @@ public class RegisterActivity extends AppCompatActivity {
 
         MaterialButton registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(v -> {
-            String username = ((EditText) findViewById(R.id.usernameEditText)).getText().toString().trim();
-            String email    = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
-            String password = ((EditText) findViewById(R.id.passwordEditText)).getText().toString().trim();
+            cachedUsername = ((EditText) findViewById(R.id.usernameEditText)).getText().toString().trim();
+            cachedEmail    = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
+            cachedPassword = ((EditText) findViewById(R.id.passwordEditText)).getText().toString().trim();
 
-            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (cachedUsername.isEmpty() || cachedEmail.isEmpty() || cachedPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            registerUser(username, email, password);
+            // Automatically open the CameraX scanner activity instead of submitting immediately
+            Intent intent = new Intent(RegisterActivity.this, OcrScanActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_OCR);
         });
     }
 
-    private void registerUser(String username, String email, String password) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_OCR && resultCode == RESULT_OK && data != null) {
+            String scannedAM = data.getStringExtra("EXTRACTED_AM");
+            if (scannedAM != null && !scannedAM.isEmpty()) {
+                // Camera verification succeeded -> Proceed to server registration with the captured A.M.
+                registerUser(cachedUsername, cachedEmail, cachedPassword, scannedAM);
+            }
+        } else {
+            Toast.makeText(this, "Registration cancelled. ID verification required.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void registerUser(String username, String email, String password, String studentAM) {
         new Thread(() -> {
             try {
                 URL url = new URL("http://10.0.2.2:8081/api/users");
@@ -59,6 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
                 json.put("username", username);
                 json.put("email", email);
                 json.put("passwordHash", password);
+                json.put("studentAM", studentAM);
                 json.put("role", "student");
 
                 OutputStream os = conn.getOutputStream();
