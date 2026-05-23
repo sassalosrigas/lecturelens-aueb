@@ -78,6 +78,7 @@ public class ReportController {
     }
 
     // 5. Endpoint for Admins to delete an offensive review AND its corresponding report tracking entry
+    // 5. Endpoint for Admins to handle offensive review removals (Soft status update for the report)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable String id) {
         return reportRepository.findById(id).map(report -> {
@@ -87,24 +88,27 @@ public class ReportController {
             if (reviewId != null && !reviewId.isEmpty()) {
                 // Look for courseId to distinguish if it's a course review or a professor review
                 if (targetId != null && reviewRepository.existsById(reviewId)) {
-                    // 1. Delete course review document
+                    // 1. Delete course review document from the reviews collection
                     reviewRepository.deleteById(reviewId);
-                    System.out.println("Deleted course review: " + reviewId);
+                    System.out.println("Deleted course review from collection: " + reviewId);
 
                     // 2. Recalculate Course Stats using your exact logic
                     recalculateCourseStats(targetId);
                 } else if (professorReviewRepository.existsById(reviewId)) {
-                    // 1. Delete professor review document
+                    // 1. Delete professor review document from the professor reviews collection
                     professorReviewRepository.deleteById(reviewId);
-                    System.out.println("Deleted professor review: " + reviewId);
+                    System.out.println("Deleted professor review from collection: " + reviewId);
 
                     // 2. Recalculate Professor Stats using your exact logic
                     recalculateProfessorStats(targetId);
                 }
             }
 
-            // Finally, clear out the admin dashboard queue report item entry
-            reportRepository.delete(report);
+            // CHANGE HERE: Instead of dropping the report document, mark its status as DELETED
+            report.setStatus("DELETED");
+            reportRepository.save(report);
+            System.out.println("Report ID " + id + " status flipped to DELETED for tracking metrics.");
+
             return ResponseEntity.noContent().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
