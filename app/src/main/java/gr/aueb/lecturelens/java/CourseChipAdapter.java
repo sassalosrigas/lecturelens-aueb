@@ -37,6 +37,7 @@ public class CourseChipAdapter extends RecyclerView.Adapter<CourseChipAdapter.Ch
         holder.txtTitle.setText(course.getTitle());
         holder.txtCode.setText(course.getCode());
         holder.txtReview.setText(String.format(java.util.Locale.US, "%.1f", course.getRating()));
+        holder.txtProfessor.setText(course.getProfessorName());
         holder.itemView.setOnClickListener(v -> { if (listener != null) listener.onCourseChipClick(course); });
     }
 
@@ -44,12 +45,13 @@ public class CourseChipAdapter extends RecyclerView.Adapter<CourseChipAdapter.Ch
     public int getItemCount() { return courseList.size(); }
 
     static class ChipViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTitle, txtCode, txtReview;
+        TextView txtTitle, txtCode, txtReview, txtProfessor;
         public ChipViewHolder(@NonNull View itemView) {
             super(itemView);
             txtTitle = itemView.findViewById(R.id.courseChipTitle);
             txtCode = itemView.findViewById(R.id.courseChipCode);
             txtReview = itemView.findViewById(R.id.courseChipRating);
+            txtProfessor = itemView.findViewById(R.id.courseChipProfessor);
         }
     }
 }

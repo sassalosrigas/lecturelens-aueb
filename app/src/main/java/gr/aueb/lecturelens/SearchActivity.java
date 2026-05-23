@@ -1,6 +1,5 @@
 package gr.aueb.lecturelens;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,6 +61,8 @@ public class SearchActivity extends AppCompatActivity implements
     private final List<Course> searchCourseResults = new ArrayList<>();
     private final List<Professor> searchProfessorResults = new ArrayList<>();
 
+    private TextView searchButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +72,12 @@ public class SearchActivity extends AppCompatActivity implements
         searchEditText = findViewById(R.id.searchEditText);
         searchBarContainer = findViewById(R.id.searchBarContainer);
         TextView cancelSearch = findViewById(R.id.cancelSearch);
+
+        searchButton = findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(v -> {
+            String query = searchEditText.getText().toString().trim();
+            if (!query.isEmpty()) performSearch(query);
+        });
 
         recommendedCoursesRecycler = findViewById(R.id.recommendedCoursesRecyclerView);
         recommendedProfessorsRecycler = findViewById(R.id.recommendedProfessorsRecyclerView);
@@ -82,7 +89,6 @@ public class SearchActivity extends AppCompatActivity implements
         recommendedProfessorsRecycler.setLayoutManager(new LinearLayoutManager(this));
         professorAdapter = new ProfessorAdapter(randomProfessorList, this);
         recommendedProfessorsRecycler.setAdapter(professorAdapter);
-
 
         searchResultsContainer = findViewById(R.id.searchResultsContainer);
         searchResultsCoursesLabel = findViewById(R.id.searchResultsCoursesLabel);
@@ -99,32 +105,12 @@ public class SearchActivity extends AppCompatActivity implements
         searchResultsProfessors.setAdapter(searchProfessorAdapter);
 
         searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) showRecentSearches();
-        });
-
-        searchEditText.setOnClickListener(v -> showRecentSearches());
-        cancelSearch.setOnClickListener(v -> hideRecentSearches());
-
-        Handler searchHandler = new Handler(Looper.getMainLooper());
-        Runnable[] searchRunnable = {null};
-
-
-        searchEditText.addTextChangedListener(new android.text.TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(android.text.Editable s) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (searchRunnable[0] != null) searchHandler.removeCallbacks(searchRunnable[0]);
-                String query = s.toString().trim();
-                if (query.isEmpty()) {
-                    hideSearchDropdown();
-                    return;
-                }
-                searchRunnable[0] = () -> performSearch(query);
-                searchHandler.postDelayed(searchRunnable[0], 350);
+            if (hasFocus) {
+                searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
             }
         });
+
+        //cancelSearch.setOnClickListener(v -> hideRecentSearches());
 
         setupNavigationListeners();
 
@@ -176,7 +162,6 @@ public class SearchActivity extends AppCompatActivity implements
             return;
         }
 
-        // Courses thread
         new Thread(() -> {
             try {
                 URL url = new URL("http://10.0.2.2:8081/api/courses/random");
@@ -231,10 +216,8 @@ public class SearchActivity extends AppCompatActivity implements
                     randomProfessorList.clear();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
-                        Log.d("ObjectName", obj.toString());
                         String fName = obj.optString("firstName", "");
                         String lName = obj.optString("lastName", "");
-                        Log.d("ProfName", fName + lName);
                         String combinedName = (fName + " " + lName).trim();
                         if (combinedName.isEmpty()) combinedName = "Unknown Professor";
 
@@ -248,7 +231,7 @@ public class SearchActivity extends AppCompatActivity implements
                     }
                     cache.cachedProfessors.clear();
                     cache.cachedProfessors.addAll(randomProfessorList);
-                    cache.loaded = true; // Mark as loaded only after both threads finish
+                    cache.loaded = true;
 
                     new Handler(Looper.getMainLooper()).post(() ->
                             professorAdapter.notifyDataSetChanged()
@@ -264,13 +247,13 @@ public class SearchActivity extends AppCompatActivity implements
         View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
-        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.ratingBar);
+        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.courseRatingBar);
         ratingBar.setRating(selectedRating);
 
-        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.difficultySlider);
+        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.courseDifficultySlider);
         difficultySlider.setValues(selectedDifficulty[0], selectedDifficulty[1]);
 
-        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.hoursSlider);
+        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.courseHoursSlider);
         hoursSlider.setValues(selectedHours[0], selectedHours[1]);
 
         TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);
@@ -287,17 +270,20 @@ public class SearchActivity extends AppCompatActivity implements
             selectedDifficulty[1] = difficultySlider.getValues().get(1);
             selectedHours[0] = hoursSlider.getValues().get(0);
             selectedHours[1] = hoursSlider.getValues().get(1);
-
-            performSearch(searchEditText.getText().toString());
             bottomSheetDialog.dismiss();
+
+            String query = searchEditText.getText().toString().trim();
+            if (!query.isEmpty()) performSearch(query);
         });
 
         bottomSheetDialog.show();
     }
 
     private void performSearch(String query) {
-        hideRecentSearches();
         if (query == null || query.trim().isEmpty()) return;
+
+        //hideRecentSearches();
+
         String encoded;
         try {
             encoded = java.net.URLEncoder.encode(query.trim(), "UTF-8");
@@ -306,7 +292,6 @@ public class SearchActivity extends AppCompatActivity implements
             return;
         }
 
-        // 1. SEARCH COURSES (Displays course details + embedded professor text labels)
         new Thread(() -> {
             try {
                 String fullUrl = "http://10.0.2.2:8081/api/courses/search?q=" + encoded;
@@ -325,10 +310,7 @@ public class SearchActivity extends AppCompatActivity implements
                     List<Course> results = new ArrayList<>();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
-
-                        // Extracts professorName automatically to show who teaches it inside the card layout
                         String profName = obj.optString("professorName", "Staff");
-
                         results.add(new Course(
                                 obj.optString("id", obj.optString("_id")),
                                 obj.optString("code", ""),
@@ -346,7 +328,6 @@ public class SearchActivity extends AppCompatActivity implements
                         searchCourseResults.clear();
                         searchCourseResults.addAll(results);
                         searchCourseAdapter.notifyDataSetChanged();
-
                         int vis = results.isEmpty() ? View.GONE : View.VISIBLE;
                         searchResultsCoursesLabel.setVisibility(vis);
                         searchResultsCourses.setVisibility(vis);
@@ -355,11 +336,10 @@ public class SearchActivity extends AppCompatActivity implements
                 }
                 conn.disconnect();
             } catch (Exception e) {
-                Log.e("SEARCH", "Course search execution error", e);
+                Log.e("SEARCH", "Course search error", e);
             }
         }).start();
 
-        // 2. SEARCH PROFESSORS (Pulls professor + lists their taught courses)
         new Thread(() -> {
             try {
                 String fullUrl = "http://10.0.2.2:8081/api/professors/search?q=" + encoded;
@@ -380,8 +360,6 @@ public class SearchActivity extends AppCompatActivity implements
 
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
-
-                        // Pull the structural profile details
                         JSONObject profObj = obj.has("professor") ? obj.getJSONObject("professor") : obj;
 
                         Professor professor = new Professor(
@@ -393,7 +371,6 @@ public class SearchActivity extends AppCompatActivity implements
                         );
                         profResults.add(professor);
 
-                        // If your backend payload attaches a "courses" list inside this professor node:
                         if (obj.has("courses")) {
                             JSONArray coursesArray = obj.getJSONArray("courses");
                             for (int j = 0; j < coursesArray.length(); j++) {
@@ -418,9 +395,7 @@ public class SearchActivity extends AppCompatActivity implements
                         searchProfessorResults.addAll(profResults);
                         searchProfessorAdapter.notifyDataSetChanged();
 
-                        // If a professor search reveals taught courses, append them to the course horizontal row
                         if (!linkedCoursesResults.isEmpty()) {
-                            // Blend them cleanly without duplicates
                             for (Course c : linkedCoursesResults) {
                                 if (!containsCourse(searchCourseResults, c.getId())) {
                                     searchCourseResults.add(c);
@@ -439,18 +414,18 @@ public class SearchActivity extends AppCompatActivity implements
                 }
                 conn.disconnect();
             } catch (Exception e) {
-                Log.e("SEARCH", "Professor search execution error", e);
+                Log.e("SEARCH", "Professor search error", e);
             }
         }).start();
     }
 
-    // Quick helper check utility to prevent duplicate cards filling the list rows
     private boolean containsCourse(List<Course> list, String id) {
         for (Course c : list) {
             if (c.getId().equals(id)) return true;
         }
         return false;
     }
+
     private void showSearchResults() {
         recommendationsScrollView.setVisibility(View.GONE);
         searchResultsContainer.setVisibility(View.VISIBLE);
@@ -468,6 +443,7 @@ public class SearchActivity extends AppCompatActivity implements
         searchResultsCourses.setVisibility(View.GONE);
         searchResultsProfessors.setVisibility(View.GONE);
     }
+
     private void showRecentSearches() {
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
     }
@@ -487,6 +463,4 @@ public class SearchActivity extends AppCompatActivity implements
             recommendationsScrollView.setVisibility(View.VISIBLE);
         }
     }
-
-
 }

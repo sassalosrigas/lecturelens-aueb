@@ -11,27 +11,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.slider.RangeSlider;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import gr.aueb.lecturelens.java.AppCache;
 import gr.aueb.lecturelens.java.Course;
@@ -54,11 +54,12 @@ public class SearchFragment extends Fragment implements
     private final List<Course> randomCourseList = new ArrayList<>();
     private final List<Professor> randomProfessorList = new ArrayList<>();
 
-    private float[] selectedDifficulty = {1f, 5f};
-    private float[] selectedHours = {1f, 9f};
-    private float selectedRating = 4f;
+    private float selectedCourseRating = 0f;
+    private float[] selectedCourseDifficulty = {0f, 5f};
+    private float[] selectedCourseHours = {0f, 20f};
 
-    // Integrated Team Fields
+    private float selectedProfRating = 0f;
+
     private View recommendationsScrollView;
     private View searchResultsContainer;
     private View searchResultsCoursesLabel;
@@ -70,22 +71,43 @@ public class SearchFragment extends Fragment implements
     private final List<Course> searchCourseResults = new ArrayList<>();
     private final List<Professor> searchProfessorResults = new ArrayList<>();
 
+    private TextView searchButton;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        // Inflate the layout for this fragment (make sure fragment_search matches your XML layout file name)
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        // 1. Map base elements
         recentSearchesLayout = view.findViewById(R.id.recentSearchesLayout);
         searchEditText = view.findViewById(R.id.searchEditText);
         searchBarContainer = view.findViewById(R.id.searchBarContainer);
+        // Find and set up the cancel search button click action
         TextView cancelSearch = view.findViewById(R.id.cancelSearch);
+        if (cancelSearch != null) {
+            cancelSearch.setOnClickListener(v -> {
+                // 1. Clear text input layout state
+                searchEditText.setText("");
+
+                // 2. Clear focus and drop soft keyboard input window
+                hideRecentSearches();
+
+                // 3. Clear results arrays and switch back scroll layout flags
+                hideSearchDropdown();
+            });
+        }
+
+        searchButton = view.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(v -> {
+            String query = searchEditText.getText().toString().trim();
+            if (!query.isEmpty()) performSearch(query);
+        });
 
         recommendedCoursesRecycler = view.findViewById(R.id.recommendedCoursesRecyclerView);
         recommendedProfessorsRecycler = view.findViewById(R.id.recommendedProfessorsRecyclerView);
         recommendationsScrollView = view.findViewById(R.id.recommendationsScrollView);
 
-        // 2. Bind default recommendations lists
         recommendedCoursesRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         courseChipAdapter = new CourseChipAdapter(randomCourseList, this);
         recommendedCoursesRecycler.setAdapter(courseChipAdapter);
@@ -94,7 +116,6 @@ public class SearchFragment extends Fragment implements
         professorAdapter = new ProfessorAdapter(randomProfessorList, this);
         recommendedProfessorsRecycler.setAdapter(professorAdapter);
 
-        // 3. Map new search result containers
         searchResultsContainer = view.findViewById(R.id.searchResultsContainer);
         searchResultsCoursesLabel = view.findViewById(R.id.searchResultsCoursesLabel);
         searchResultsProfessorsLabel = view.findViewById(R.id.searchResultsProfessorsLabel);
@@ -109,39 +130,17 @@ public class SearchFragment extends Fragment implements
         searchProfessorAdapter = new ProfessorAdapter(searchProfessorResults, this);
         searchResultsProfessors.setAdapter(searchProfessorAdapter);
 
-        // 4. Input Focus Controllers
         searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) showRecentSearches();
-        });
-        searchEditText.setOnClickListener(v -> showRecentSearches());
-        cancelSearch.setOnClickListener(v -> hideRecentSearches());
+            searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
 
-        // 5. Setup Live Debounce Search Observers
-        Handler searchHandler = new Handler(Looper.getMainLooper());
-        Runnable[] searchRunnable = {null};
-
-        searchEditText.addTextChangedListener(new android.text.TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(android.text.Editable s) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (searchRunnable[0] != null) searchHandler.removeCallbacks(searchRunnable[0]);
-                String query = s.toString().trim();
-                if (query.isEmpty()) {
-                    hideSearchDropdown();
-                    return;
-                }
-                searchRunnable[0] = () -> performSearch(query);
-                searchHandler.postDelayed(searchRunnable[0], 350);
+            // Show the cancel text cleanly below the bar when typing starts
+            if (cancelSearch != null) {
+                cancelSearch.setVisibility(View.VISIBLE);
             }
         });
 
-
         LinearLayout filtersLayout = view.findViewById(R.id.filtersLayout);
-        if (filtersLayout != null) {
-            filtersLayout.setOnClickListener(v -> showFilterBottomSheet());
-        }
+        filtersLayout.setOnClickListener(v -> showFilterBottomSheet());
 
         fetchRecommendationsFromDatabase();
 
@@ -150,6 +149,7 @@ public class SearchFragment extends Fragment implements
 
     @Override
     public void onCourseChipClick(Course course) {
+        if (getActivity() == null) return;
         Intent intent = new Intent(getActivity(), CourseDetailsActivity.class);
         intent.putExtra("COURSE_ID", course.getId());
         intent.putExtra("COURSE_TITLE", course.getTitle());
@@ -159,7 +159,8 @@ public class SearchFragment extends Fragment implements
 
     @Override
     public void onProfClick(Professor prof) {
-        Intent intent = new Intent(getActivity(), ProfessorDetailsActivity.class); // Keep matching target logic details activity names
+        if (getActivity() == null) return;
+        Intent intent = new Intent(getActivity(), ProfessorDetailsActivity.class);
         intent.putExtra("PROFESSOR_ID", prof.getId());
         intent.putExtra("CHOSEN_PROFESSOR", prof);
         startActivity(intent);
@@ -167,9 +168,8 @@ public class SearchFragment extends Fragment implements
 
     private void fetchRecommendationsFromDatabase() {
         AppCache cache = AppCache.getInstance();
+
         if (cache.loaded) {
-            randomCourseList.clear();
-            randomProfessorList.clear();
             randomCourseList.addAll(cache.cachedCourses);
             randomProfessorList.addAll(cache.cachedProfessors);
             courseChipAdapter.notifyDataSetChanged();
@@ -207,6 +207,7 @@ public class SearchFragment extends Fragment implements
                     }
                     cache.cachedCourses.clear();
                     cache.cachedCourses.addAll(randomCourseList);
+
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded()) courseChipAdapter.notifyDataSetChanged();
                     });
@@ -246,6 +247,7 @@ public class SearchFragment extends Fragment implements
                     cache.cachedProfessors.clear();
                     cache.cachedProfessors.addAll(randomProfessorList);
                     cache.loaded = true;
+
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded()) professorAdapter.notifyDataSetChanged();
                     });
@@ -256,44 +258,101 @@ public class SearchFragment extends Fragment implements
     }
 
     private void showFilterBottomSheet() {
-        if (getActivity() == null) return;
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
+        if (getContext() == null) return;
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
         View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
-        android.widget.RatingBar ratingBar = bottomSheetView.findViewById(R.id.ratingBar);
-        ratingBar.setRating(selectedRating);
+        // Course UI Hookups
+        android.widget.RatingBar courseRatingBar = bottomSheetView.findViewById(R.id.courseRatingBar);
+        RangeSlider courseDifficultySlider = bottomSheetView.findViewById(R.id.courseDifficultySlider);
+        RangeSlider courseHoursSlider = bottomSheetView.findViewById(R.id.courseHoursSlider);
 
-        RangeSlider difficultySlider = bottomSheetView.findViewById(R.id.difficultySlider);
-        difficultySlider.setValues(selectedDifficulty[0], selectedDifficulty[1]);
+        courseRatingBar.setRating(selectedCourseRating);
+        courseDifficultySlider.setValues(selectedCourseDifficulty[0], selectedCourseDifficulty[1]);
+        courseHoursSlider.setValues(selectedCourseHours[0], selectedCourseHours[1]);
 
-        RangeSlider hoursSlider = bottomSheetView.findViewById(R.id.hoursSlider);
-        hoursSlider.setValues(selectedHours[0], selectedHours[1]);
+        // Professor UI Hookups
+        android.widget.RatingBar profRatingBar = bottomSheetView.findViewById(R.id.profRatingBar);
+        profRatingBar.setRating(selectedProfRating);
 
+        // Clear Action Handler
         TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);
         clearAll.setOnClickListener(v -> {
-            ratingBar.setRating(4f);
-            difficultySlider.setValues(1f, 5f);
-            hoursSlider.setValues(1f, 9f);
+            courseRatingBar.setRating(0f);
+            // FIXED: Set minimum bounds explicitly to 0f here so default 0.0 metrics pass through safely
+            courseDifficultySlider.setValues(0f, 5.0f);
+            courseHoursSlider.setValues(0f, 20.0f);
+            profRatingBar.setRating(0f);
         });
 
+        // Apply Action Handler
         View applyButton = bottomSheetView.findViewById(R.id.applyButton);
         applyButton.setOnClickListener(v -> {
-            selectedRating = ratingBar.getRating();
-            selectedDifficulty[0] = difficultySlider.getValues().get(0);
-            selectedDifficulty[1] = difficultySlider.getValues().get(1);
-            selectedHours[0] = hoursSlider.getValues().get(0);
-            selectedHours[1] = hoursSlider.getValues().get(1);
+            // Save state updates
+            selectedCourseRating = courseRatingBar.getRating();
+            selectedCourseDifficulty[0] = courseDifficultySlider.getValues().get(0);
+            selectedCourseDifficulty[1] = courseDifficultySlider.getValues().get(1);
+            selectedCourseHours[0] = courseHoursSlider.getValues().get(0);
+            selectedCourseHours[1] = courseHoursSlider.getValues().get(1);
 
-            performSearch(searchEditText.getText().toString());
+            selectedProfRating = profRatingBar.getRating();
+
             bottomSheetDialog.dismiss();
+
+            // Apply filters to currently loaded default collections
+            applyFiltersToRecommendations();
+
+            // Re-trigger active endpoint queries if text field contains input strings
+            String query = searchEditText.getText().toString().trim();
+            if (!query.isEmpty()) {
+                performSearch(query);
+            }
         });
+
         bottomSheetDialog.show();
     }
 
+    private void applyFiltersToRecommendations() {
+        AppCache cache = AppCache.getInstance();
+        if (!cache.loaded) return;
+
+        List<Course> filteredCourses = new ArrayList<>();
+        for (Course c : cache.cachedCourses) {
+
+            // Check if the rating matches
+            boolean matchesRating = c.getRating() >= selectedCourseRating;
+
+            // Matches slider range OR is unconfigured data (0.0)
+            boolean matchesDifficulty = (c.getDifficulty() >= selectedCourseDifficulty[0] && c.getDifficulty() <= selectedCourseDifficulty[1])
+                    || c.getDifficulty() == 0.0;
+
+            boolean matchesHours = (c.getHours() >= selectedCourseHours[0] && c.getHours() <= selectedCourseHours[1])
+                    || c.getHours() == 0.0;
+
+            if (matchesRating && matchesDifficulty && matchesHours) {
+                filteredCourses.add(c);
+            }
+        }
+        randomCourseList.clear();
+        randomCourseList.addAll(filteredCourses);
+        courseChipAdapter.notifyDataSetChanged();
+
+        // Filter recommendation professors
+        List<Professor> filteredProfs = new ArrayList<>();
+        for (Professor p : cache.cachedProfessors) {
+            if (p.getRating() >= selectedProfRating) {
+                filteredProfs.add(p);
+            }
+        }
+        randomProfessorList.clear();
+        randomProfessorList.addAll(filteredProfs);
+        professorAdapter.notifyDataSetChanged();
+    }
+
     private void performSearch(String query) {
-        hideRecentSearches();
         if (query == null || query.trim().isEmpty()) return;
+
         String encoded;
         try {
             encoded = java.net.URLEncoder.encode(query.trim(), "UTF-8");
@@ -302,13 +361,15 @@ public class SearchFragment extends Fragment implements
             return;
         }
 
-        // 1. SEARCH COURSES
+        // Thread 1: Course Search (Now parses hybrid nested courses and matching professors)
         new Thread(() -> {
             try {
                 String fullUrl = "http://10.0.2.2:8081/api/courses/search?q=" + encoded;
                 HttpURLConnection conn = (HttpURLConnection) new URL(fullUrl).openConnection();
                 conn.setConnectTimeout(3000);
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                int code = conn.getResponseCode();
+
+                if (code == HttpURLConnection.HTTP_OK) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder res = new StringBuilder();
                     String line;
@@ -316,29 +377,65 @@ public class SearchFragment extends Fragment implements
                     in.close();
 
                     JSONArray array = new JSONArray(res.toString());
-                    List<Course> results = new ArrayList<>();
+                    List<Course> courseResults = new ArrayList<>();
+                    List<Professor> linkedProfessorsResults = new ArrayList<>();
+
                     for (int i = 0; i < array.length(); i++) {
-                        JSONObject obj = array.getJSONObject(i);
-                        results.add(new Course(
-                                obj.optString("id", obj.optString("_id")),
-                                obj.optString("code", ""),
-                                obj.optString("title", ""),
-                                obj.optInt("semester", 1),
-                                obj.optInt("ects", 6),
-                                obj.optString("professorName", "Staff"),
-                                obj.optDouble("rating", 0.0),
-                                obj.optDouble("difficulty", 0.0),
-                                obj.optDouble("studyHours", 0.0),
-                                obj.optString("description", "")
-                        ));
+                        JSONObject wrapperObj = array.getJSONObject(i);
+
+                        // Parse the nested course object
+                        JSONObject courseObj = wrapperObj.getJSONObject("course");
+                        String profName = courseObj.optString("professorName", "Staff");
+
+                        Course course = new Course(
+                                courseObj.optString("id", courseObj.optString("_id")),
+                                courseObj.optString("code", ""),
+                                courseObj.optString("title", ""),
+                                courseObj.optInt("semester", 1),
+                                courseObj.optInt("ects", 6),
+                                profName,
+                                courseObj.optDouble("rating", 0.0),
+                                courseObj.optDouble("difficulty", 0.0),
+                                courseObj.optDouble("studyHours", 0.0),
+                                courseObj.optString("description", "")
+                        );
+                        courseResults.add(course);
+
+                        if (wrapperObj.has("professors")) {
+                            JSONArray profsArray = wrapperObj.getJSONArray("professors");
+                            for (int j = 0; j < profsArray.length(); j++) {
+                                JSONObject profObj = profsArray.getJSONObject(j);
+                                linkedProfessorsResults.add(new Professor(
+                                        profObj.optString("id", profObj.optString("_id")),
+                                        profObj.optString("firstName", ""),
+                                        profObj.optString("lastName", ""),
+                                        profObj.optString("title", "Faculty"),
+                                        profObj.optDouble("rating", 0.0)
+                                ));
+                            }
+                        }
                     }
+
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded()) {
+                            // Update core course lists
                             searchCourseResults.clear();
-                            searchCourseResults.addAll(results);
+                            searchCourseResults.addAll(courseResults);
                             searchCourseAdapter.notifyDataSetChanged();
 
-                            int vis = results.isEmpty() ? View.GONE : View.VISIBLE;
+                            // Inject linked professors seamlessly without duplicates
+                            if (!linkedProfessorsResults.isEmpty()) {
+                                for (Professor p : linkedProfessorsResults) {
+                                    if (!containsProfessor(searchProfessorResults, p.getId())) {
+                                        searchProfessorResults.add(p);
+                                    }
+                                }
+                                searchProfessorAdapter.notifyDataSetChanged();
+                                searchResultsProfessorsLabel.setVisibility(View.VISIBLE);
+                                searchResultsProfessors.setVisibility(View.VISIBLE);
+                            }
+
+                            int vis = courseResults.isEmpty() ? View.GONE : View.VISIBLE;
                             searchResultsCoursesLabel.setVisibility(vis);
                             searchResultsCourses.setVisibility(vis);
                             showSearchResults();
@@ -346,16 +443,19 @@ public class SearchFragment extends Fragment implements
                     });
                 }
                 conn.disconnect();
-            } catch (Exception e) { Log.e("SEARCH", "Course loop error", e); }
+            } catch (Exception e) {
+                Log.e("SEARCH", "Course search error", e);
+            }
         }).start();
 
-        // 2. SEARCH PROFESSORS
         new Thread(() -> {
             try {
                 String fullUrl = "http://10.0.2.2:8081/api/professors/search?q=" + encoded;
                 HttpURLConnection conn = (HttpURLConnection) new URL(fullUrl).openConnection();
                 conn.setConnectTimeout(3000);
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                int code = conn.getResponseCode();
+
+                if (code == HttpURLConnection.HTTP_OK) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder res = new StringBuilder();
                     String line;
@@ -423,8 +523,17 @@ public class SearchFragment extends Fragment implements
                     });
                 }
                 conn.disconnect();
-            } catch (Exception e) { Log.e("SEARCH", "Professor thread error", e); }
+            } catch (Exception e) {
+                Log.e("SEARCH", "Professor search error", e);
+            }
         }).start();
+    }
+
+    private boolean containsProfessor(List<Professor> list, String id) {
+        for (Professor p : list) {
+            if (p.getId().equals(id)) return true;
+        }
+        return false;
     }
 
     private boolean containsCourse(List<Course> list, String id) {
@@ -435,7 +544,6 @@ public class SearchFragment extends Fragment implements
     }
 
     private void showSearchResults() {
-        recentSearchesLayout.setVisibility(View.GONE);
         recommendationsScrollView.setVisibility(View.GONE);
         searchResultsContainer.setVisibility(View.VISIBLE);
     }
@@ -454,7 +562,6 @@ public class SearchFragment extends Fragment implements
     }
 
     private void showRecentSearches() {
-        recentSearchesLayout.setVisibility(View.VISIBLE);
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
     }
 
@@ -463,15 +570,24 @@ public class SearchFragment extends Fragment implements
     }
 
     private void hideRecentSearches() {
-        recentSearchesLayout.setVisibility(View.GONE);
         searchBarContainer.setBackgroundResource(R.drawable.search_bar_background);
         viewClearFocus();
+
         if (getActivity() != null) {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
             }
         }
+
+
+        if (getView() != null) {
+            View cancelBtn = getView().findViewById(R.id.cancelSearch);
+            if (cancelBtn != null) {
+                cancelBtn.setVisibility(View.GONE);
+            }
+        }
+
         if (searchEditText.getText().toString().trim().isEmpty()) {
             recommendationsScrollView.setVisibility(View.VISIBLE);
         }

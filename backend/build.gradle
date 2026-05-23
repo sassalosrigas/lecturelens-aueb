@@ -21,7 +21,7 @@ dependencies {
 }
 
 tasks.withType(JavaExec).configureEach {
-    systemProperty "jdk.tls.client.protocols", "TLSv1.2"
+    systemProperty "java.net.preferIPv4Stack", "true"
 }
 
 tasks.named('test') {

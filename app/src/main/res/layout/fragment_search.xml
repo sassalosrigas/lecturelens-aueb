@@ -21,7 +21,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Search Bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/searchBarContainer"
         android:layout_width="0dp"
@@ -54,72 +53,82 @@
             android:background="@android:color/transparent"
             android:fontFamily="@font/roboto_semibold"
             android:hint="@string/search_bar_hint"
+            android:imeOptions="actionSearch"
             android:inputType="text"
             android:paddingHorizontal="12dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_hint"
             android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/searchButton"
+            app:layout_constraintStart_toEndOf="@id/searchIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/searchButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/pink_primary"
+            android:gravity="center"
+            android:text="→"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/searchIcon" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Filters -->
+    <TextView
+        android:id="@+id/cancelSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:padding="4dp"
+        android:fontFamily="@font/roboto_semibold"
+        android:text="Cancel"
+        android:textColor="@color/pink_primary"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchBarContainer" />
+
     <LinearLayout
         android:id="@+id/filtersLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="12dp"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="16dp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/chip_background"
+        android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
+        app:layout_constraintTop_toBottomOf="@id/cancelSearch">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/ic_filter"
+            android:contentDescription="@null"
+            app:tint="@color/pink_primary" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/chip_background"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:text="@string/rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filters"
+            android:fontFamily="@font/roboto_semibold"
             android:textColor="@color/pink_primary"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/chip_background"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:text="@string/difficulty"
-            android:textColor="@color/pink_primary"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
-            android:background="@drawable/chip_background"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:text="@string/hours_wk"
-            android:textColor="@color/pink_primary"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
-    <!-- Search Results Container (Now constrained correctly below filters) -->
+    <!-- Search Results Container -->
     <ScrollView
         android:id="@+id/searchResultsContainer"
         android:layout_width="0dp"
@@ -194,7 +203,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
+        android:paddingBottom="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -275,20 +284,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/cancelSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:fontFamily="@font/roboto_semibold"
-            android:text="@string/cancel"
-            android:textColor="@color/pink_primary"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@id/recentSearchesTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/recentSearchesTitle" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

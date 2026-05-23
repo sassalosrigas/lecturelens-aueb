@@ -31,7 +31,7 @@ import gr.aueb.lecturelens.model.UserSession;
 
 public class CourseDetailsActivity extends AppCompatActivity {
 
-    private TextView courseCode, courseName, largeRating, reviewCount, difficulty, hours;
+    private TextView courseCode, courseName,courseProfessor, largeRating, reviewCount, difficulty, hours;
     private RecyclerView reviewsRecyclerView;
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList;
@@ -47,6 +47,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
 
         courseCode = findViewById(R.id.courseCode);
         courseName = findViewById(R.id.courseName);
+        courseProfessor = findViewById(R.id.courseProfessor);
         largeRating = findViewById(R.id.largeRating);
         reviewCount = findViewById(R.id.reviewCount);
         difficulty = findViewById(R.id.difficulty);
@@ -133,6 +134,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
         courseCode.setText(course.getCode());
         courseName.setText(course.getTitle());
         largeRating.setText(String.valueOf(course.getRating()));
+        courseProfessor.setText(course.getProfessorName());
         reviewCount.setText("0 Reviews");
 
         if (difficulty != null) {
