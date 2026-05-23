@@ -61,6 +61,19 @@ public class CourseDetailsActivity extends AppCompatActivity {
 
         UserSession session = new UserSession(this);
         boolean isProfessor = "professor".equals(session.getRole());
+
+        reviewsRecyclerView = findViewById(R.id.reviewsRecyclerView);
+        reviewList = new ArrayList<>();
+        reviewAdapter = new ReviewAdapter(reviewList, isProfessor);
+
+        // 3. Bind the Report action to our background network thread
+        reviewAdapter.setOnReportListener(review -> {
+            submitReportToDatabase(review, session.getUsername());
+        });
+
+        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        reviewsRecyclerView.setAdapter(reviewAdapter);
+
         Course course = (Course) getIntent().getSerializableExtra("CHOSEN_COURSE");
 
         if (course != null) {
@@ -260,6 +273,47 @@ public class CourseDetailsActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("LectureLensDebug", "Error checking existing review", e);
                 showToastOnUi("Network error. Try again.");
+            }
+        }).start();
+    }
+
+    private void submitReportToDatabase(Review review, String reporterUsername) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/reports"); // Assuming this is your backend endpoint
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+                conn.setDoOutput(true);
+
+                // Build the JSON payload with all required details
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("reviewId", review.getId());
+                jsonParam.put("courseId", review.getCourseId());
+                jsonParam.put("authorUsername", review.getUsername()); // Person who wrote it
+                jsonParam.put("reportedBy", reporterUsername);         // Person reporting it
+                jsonParam.put("reviewText", review.getReviewText());
+                jsonParam.put("status", "PENDING"); // For your admin dashboard
+
+                // Send the JSON to the server
+                conn.getOutputStream().write(jsonParam.toString().getBytes("UTF-8"));
+
+                int responseCode = conn.getResponseCode();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
+                        Toast.makeText(CourseDetailsActivity.this, "Review reported successfully. Admins will review it.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(CourseDetailsActivity.this, "Failed to submit report. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error submitting report", e);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(CourseDetailsActivity.this, "Network error. Report not sent.", Toast.LENGTH_SHORT).show()
+                );
             }
         }).start();
     }

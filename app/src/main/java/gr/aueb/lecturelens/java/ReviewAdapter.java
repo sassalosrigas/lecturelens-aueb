@@ -44,6 +44,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.isProfessorView = false;
     }
 
+    public ReviewAdapter(List<Review> reviewList, OnReportListener reportListener) {
+        this.reviewList = reviewList;
+        this.reportListener = reportListener;
+        this.isProfessorView = false;
+    }
+
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -106,8 +112,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             if (holder.btnDelete != null) holder.btnDelete.setOnClickListener(v -> actionListener.onDeleteItem(review, position));
         } else if (!isProfessorView) {
             if (holder.reportButton != null) {
-                holder.reportButton.setOnClickListener(v ->
-                        Toast.makeText(v.getContext(), "Review content reported.", Toast.LENGTH_SHORT).show());
+                holder.reportButton.setOnClickListener(v -> {
+                    if (reportListener != null) {
+                        reportListener.onReportClick(review);
+                    }
+                });
             }
         } else {
             // Professor view: hide all action buttons
@@ -136,6 +145,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         } catch (Exception e) {
             return isoStringFromServer.length() >= 10 ? isoStringFromServer.substring(0, 10) : isoStringFromServer;
         }
+    }
+
+    public interface OnReportListener {
+        void onReportClick(Review review);
+    }
+    private OnReportListener reportListener;
+
+    public void setOnReportListener(OnReportListener reportListener) {
+        this.reportListener = reportListener;
     }
 
     static class ReviewViewHolder extends RecyclerView.ViewHolder {
