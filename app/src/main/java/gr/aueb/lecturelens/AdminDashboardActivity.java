@@ -74,7 +74,7 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                     JSONArray jsonArray = new JSONArray(response.toString());
 
                     int pendingCounter = 0;
-                    int resolvedCounter = 0;
+                    int resolvedCounter = 0; // This will now aggregate both DISMISSED and DELETED actions
                     final List<ReportResponse> temporaryList = new ArrayList<>();
 
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -84,7 +84,7 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                         if ("PENDING".equalsIgnoreCase(status)) {
                             pendingCounter++;
 
-                            // Map the fields matching the Spring backend schema
+                            // Map fields matching your schema
                             ReportResponse report = new ReportResponse();
                             report.setId(jsonObject.optString("id"));
                             report.setReviewId(jsonObject.optString("reviewId"));
@@ -95,7 +95,8 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                             report.setStatus(status);
 
                             temporaryList.add(report);
-                        } else {
+                        } else if ("DISMISSED".equalsIgnoreCase(status) || "DELETED".equalsIgnoreCase(status)) {
+                            // Increment the resolved metrics counter card whenever a handled action is parsed
                             resolvedCounter++;
                         }
                     }
