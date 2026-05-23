@@ -7,7 +7,6 @@
     android:background="@color/background_light"
     tools:context=".AdminDashboardActivity">
 
-    <!-- Header -->
     <View
         android:id="@+id/headerBg"
         android:layout_width="match_parent"
@@ -42,7 +41,6 @@
         app:layout_constraintTop_toTopOf="@id/headerBg"
         app:tint="@android:color/white" />
 
-    <!-- Summary Stats -->
     <LinearLayout
         android:id="@+id/statsContainer"
         android:layout_width="match_parent"
@@ -76,11 +74,12 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/tvPendingCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
                     android:textStyle="bold"
-                    android:text="@string/pending_reports_count"
+                    android:text="0"
                     android:textColor="@color/report_banner_text"
                     android:textSize="32sp" />
             </LinearLayout>
@@ -109,37 +108,28 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/tvResolvedCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
                     android:textStyle="bold"
-                    android:text="@string/deleted_reviews_count"
+                    android:text="0"
                     android:textColor="@color/text_secondary"
                     android:textSize="32sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
-    <!-- Report List -->
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReports"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
         android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
         android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/statsContainer">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include layout="@layout/item_report" />
-            <include layout="@layout/item_report" />
-            <include layout="@layout/item_report" />
-
-        </LinearLayout>
-    </ScrollView>
+        app:layout_constraintTop_toBottomOf="@id/statsContainer"
+        tools:listitem="@layout/item_report" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
