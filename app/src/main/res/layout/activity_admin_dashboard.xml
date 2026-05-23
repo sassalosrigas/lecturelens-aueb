@@ -71,16 +71,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
-                    android:text="@string/pending_reports"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textStyle="bold"
+                    android:text="@string/pending_reports_count"
+                    android:textColor="@color/report_banner_text"
+                    android:textSize="32sp" />
 
                 <TextView
+                    android:id="@+id/tvPendingCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_semibold"
                     android:textStyle="bold"
-                    android:text="@string/pending_reports_count"
+                    android:text="0"
                     android:textColor="@color/report_banner_text"
                     android:textSize="32sp" />
             </LinearLayout>
@@ -120,7 +122,6 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
-    <!-- Report List -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
