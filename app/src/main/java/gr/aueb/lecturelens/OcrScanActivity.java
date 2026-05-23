@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +62,10 @@ public class OcrScanActivity extends AppCompatActivity {
         findViewById(R.id.btnCancelScan).setOnClickListener(v -> {
             setResult(RESULT_CANCELED); // Inform RegisterActivity that scanning was aborted
             finish(); // Shut down camera window
+        });
+
+        View btnCapture = findViewById(R.id.btnCapture);
+        btnCapture.setOnClickListener(v -> {
         });
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {

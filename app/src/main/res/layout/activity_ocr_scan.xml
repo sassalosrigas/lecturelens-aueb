@@ -33,18 +33,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <FrameLayout
         android:id="@+id/btnCapture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
         android:layout_marginBottom="40dp"
-        android:contentDescription="Capture Photo"
-        app:backgroundTint="@color/pink_primary"
-        app:fabCustomSize="70dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/circle_outline_white" />
+
+        <View
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_pink" />
+
+    </FrameLayout>
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCancelScan"
         android:layout_width="wrap_content"
@@ -56,5 +68,6 @@
         app:layout_constraintBottom_toBottomOf="@id/btnCapture"
         app:layout_constraintTop_toTopOf="@id/btnCapture"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
