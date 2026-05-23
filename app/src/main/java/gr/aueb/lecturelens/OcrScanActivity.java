@@ -5,12 +5,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -36,6 +41,11 @@ public class OcrScanActivity extends AppCompatActivity {
     private TextRecognizer textRecognizer;
     private boolean isIdDetected = false;
 
+    private String extractedName = "";
+    private String extractedAM = "";
+
+    private ImageCapture imageCapture;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +56,11 @@ public class OcrScanActivity extends AppCompatActivity {
 
         // Initialize the local text processor engine
         textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+
+        findViewById(R.id.btnCancelScan).setOnClickListener(v -> {
+            setResult(RESULT_CANCELED); // Inform RegisterActivity that scanning was aborted
+            finish(); // Shut down camera window
+        });
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             startCameraPipeline();
@@ -61,71 +76,147 @@ public class OcrScanActivity extends AppCompatActivity {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
 
-                // 1. Setup Live View Preview Screen
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
 
-                // 2. Setup Real-time Frame Processing Analyzer
-                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                // Instantiate the high-resolution capture configuration block
+                imageCapture = new ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .build();
 
-                // Explicitly Opt-In to access experimental Proxy Graphics buffers safely
-                        imageAnalysis.setAnalyzer(cameraExecutor, imageProxy -> {
-                    android.media.Image mediaImage = imageProxy.getImage();
-                    if (mediaImage != null && !isIdDetected) {
-                        InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
-
-                        textRecognizer.process(image)
-                                .addOnSuccessListener(visionText -> {
-                                    parseExtractedText(visionText.getText());
-                                })
-                                .addOnCompleteListener(task -> imageProxy.close());
-                    } else {
-                        imageProxy.close();
-                    }
-                });
-
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+
                 cameraProvider.unbindAll();
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
+                // Bind both preview and the static image capture engine use-case
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
             } catch (Exception e) {
                 Log.e("OcrScanActivity", "Camera initialization failed", e);
             }
         }, ContextCompat.getMainExecutor(this));
+
+        // 3. Hook up the capture button click listener in your onCreate or right here:
+        findViewById(R.id.btnCapture).setOnClickListener(v -> takePhotoAndProcess());
     }
 
+
+    private void takePhotoAndProcess() {
+        if (imageCapture == null) return;
+
+        imageCapture.takePicture(ContextCompat.getMainExecutor(this), new ImageCapture.OnImageCapturedCallback() {
+            @Override
+            public void onCaptureSuccess(@NonNull ImageProxy image) {
+                @OptIn(markerClass = androidx.camera.core.ExperimentalGetImage.class)
+                android.media.Image mediaImage = image.getImage();
+
+                if (mediaImage != null) {
+                    InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
+
+                    textRecognizer.process(inputImage)
+                            .addOnSuccessListener(visionText -> {
+                                parseExtractedText(visionText.getText());
+                                image.close(); // Crucial: Free memory buffer allocation leak footprint
+                            })
+                            .addOnFailureListener(e -> {
+                                image.close();
+                                Toast.makeText(OcrScanActivity.this, "Failed to read text. Try again.", Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    image.close();
+                }
+            }
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception) {
+                Log.e("OcrScanActivity", "Photo capture failed", exception);
+            }
+        });
+    }
     private void parseExtractedText(String rawText) {
         if (rawText == null || rawText.isEmpty()) return;
 
-        // Clean up accents and force uppercase
+        // 1. Normalize character maps to clear out accent shadow variances
         String cleanText = rawText.toUpperCase()
                 .replaceAll("[ΌΟ]", "O")
                 .replaceAll("[ΆΑ]", "A")
-                .replaceAll("[ΈΕ]", "E");
+                .replaceAll("[ΈΕ]", "E")
+                .replaceAll("[ΉΗ]", "H")
+                .replaceAll("[ΊΙ]", "I")
+                .replaceAll("[ΎΥ]", "Y")
+                .replaceAll("[ΏΩ]", "Ω");
 
-        // Look for common identity keywords printed on all Greek student passes
-        if (cleanText.contains("ΔΗΜΑΙΚΗ") || cleanText.contains("ΤΑΥΤΟΤΗΤΑ") || cleanText.contains("ΙΔΡΥΜΑ")) {
+        // ========================================================
+        // STEP 1: EXTRACT THE ENGLISH (LATIN) NAME FROM THE FRONT
+        // ========================================================
+        if (extractedName.isEmpty()) {
+            if (cleanText.contains("ΑΚΑΔΗΜΑΪΚΗ") || cleanText.contains("ΤΑΥΤΟΤΗΤΑ") || cleanText.contains("ACADEMIC ID")) {
 
-            // Regex seeking isolated 6-7 digits representing standard A.M. records
-            Pattern amPattern = Pattern.compile("\\b\\d{6,7}\\b");
-            Matcher matcher = amPattern.matcher(cleanText);
+                String[] lines = rawText.split("\n");
+                for (int i = 0; i < lines.length; i++) {
+                    String lineUpper = lines[i].toUpperCase();
 
-            if (matcher.find()) {
-                isIdDetected = true; // Freeze frame collection loops
-                String studentAM = matcher.group();
+                    // Look strictly for the student category label line boundary marker
+                    if (lineUpper.contains("UNDERGRADUATE") || lineUpper.contains("STUDENT") || lineUpper.contains("ΦΟΙΤΗΤΗΣ")) {
+                        // The English name sits EXACTLY 1 line above the green banner block
+                        if (i >= 1) {
+                            String structuralLine = lines[i - 1].trim();
 
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "ID Verified! A.M.: " + studentAM, Toast.LENGTH_LONG).show();
+                            // Match Guard: Ensure the line is strictly Latin text letters (A-Z) and spaces
+                            if (structuralLine.toUpperCase().matches("^[A-Z\\s]+$")) {
+                                extractedName = structuralLine; // Successfully holds "NAME SURNAME"
 
-                    // Return the data directly back to your Registration page field inputs
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra("EXTRACTED_AM", studentAM);
-                    setResult(RESULT_OK, returnIntent);
-                    finish();
-                });
+                                runOnUiThread(() -> {
+                                    TextView tvInstructions = findViewById(R.id.tvInstructions);
+                                    if (tvInstructions != null) {
+                                        tvInstructions.setText("Front Scanned! Flip card vertically to scan the Back.");
+                                    }
+                                    Toast.makeText(this, "English Name Verified: " + extractedName, Toast.LENGTH_SHORT).show();
+                                });
+                                break;
+                            }
+                        }
+                    }
+                }
             }
+
+            if (extractedName.isEmpty()) {
+                runOnUiThread(() -> Toast.makeText(this, "English Name not found. Retake front photo.", Toast.LENGTH_SHORT).show());
+            }
+            return;
+        }
+
+        // ========================================================
+        // STEP 2: EXTRACT THE REGISTRATION NUMBER FROM THE BACK
+        // ========================================================
+        if (extractedAM.isEmpty()) {
+            boolean containsBackIdentifiers = cleanText.contains("A.M.") ||
+                    cleanText.contains("Α.Μ.") ||
+                    cleanText.contains("ΕΓΓΡΑΦΗΣ") ||
+                    cleanText.contains("ΣΧΟΛΗΣ") ||
+                    cleanText.contains("/");
+
+            if (containsBackIdentifiers) {
+                Pattern amPattern = Pattern.compile("/\\s*(\\d{6,8})");
+                Matcher matcher = amPattern.matcher(cleanText);
+
+                if (matcher.find()) {
+                    extractedAM = matcher.group(1);
+                    isIdDetected = true;
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "A.M. Extracted: " + extractedAM, Toast.LENGTH_LONG).show();
+
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("EXTRACTED_NAME", extractedName);
+                        returnIntent.putExtra("EXTRACTED_AM", extractedAM);
+                        setResult(RESULT_OK, returnIntent);
+                        finish();
+                    });
+                    return;
+                }
+            }
+
+            runOnUiThread(() -> Toast.makeText(this, "A.M. not found. Clear shadows and retake back photo.", Toast.LENGTH_SHORT).show());
         }
     }
 
