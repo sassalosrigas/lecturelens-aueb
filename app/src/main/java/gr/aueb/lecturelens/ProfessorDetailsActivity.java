@@ -55,21 +55,27 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         coursesRecyclerView = findViewById(R.id.professorCoursesRecyclerView);
         reviewsRecyclerView = findViewById(R.id.professorReviewsRecyclerView);
 
+        UserSession session = new UserSession(this);
+        boolean isProfessor = "professor".equals(session.getRole());
+
         coursesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         courseChipAdapter = new CourseChipAdapter(courseList, this);
         coursesRecyclerView.setAdapter(courseChipAdapter);
 
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        reviewAdapter = new ReviewAdapter(reviewList, true);
+        reviewAdapter = new ReviewAdapter(reviewList, isProfessor);
+
+        reviewAdapter.setOnReportListener(review -> {
+            submitReportToDatabase(review, session.getUsername());
+        });
         reviewsRecyclerView.setAdapter(reviewAdapter);
 
-        UserSession session = new UserSession(this);
-        boolean isProfessor = "professor".equals(session.getRole());
         Professor professor = (Professor) getIntent().getSerializableExtra("CHOSEN_PROFESSOR");
         Log.d("Professor details", String.valueOf(professor.getRating()));
+
         if (professor != null) {
             populateUiElements(professor);
-            fetchProfessorRating(professor.getId()); // ← fetches fresh rating from DB
+            fetchProfessorRating(professor.getId());
             fetchProfessorReviews(professor.getId());
             fetchProfessorCourses(professor.getId());
             if (!isProfessor) {
@@ -342,6 +348,48 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                 conn.disconnect();
             } catch (Exception e) {
                 Log.e("LectureLensDebug", "Error fetching courses", e);
+            }
+        }).start();
+    }
+
+    private void submitReportToDatabase(Review review, String reporterUsername) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/reports");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+                conn.setDoOutput(true);
+
+                // Build the JSON payload
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("reviewId", review.getId());
+                // We use the same 'courseId' field from the Report model to store the professor ID context
+                jsonParam.put("courseId", review.getProfessorId());
+                jsonParam.put("authorUsername", review.getUsername());
+                jsonParam.put("reportedBy", reporterUsername);
+                jsonParam.put("reviewText", review.getReviewText());
+                jsonParam.put("status", "PENDING");
+
+                // Transmit data to backend
+                conn.getOutputStream().write(jsonParam.toString().getBytes("UTF-8"));
+
+                int responseCode = conn.getResponseCode();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
+                        Toast.makeText(ProfessorDetailsActivity.this, "Review reported successfully. Admins will review it.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(ProfessorDetailsActivity.this, "Failed to submit report. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error submitting report", e);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(ProfessorDetailsActivity.this, "Network error. Report not sent.", Toast.LENGTH_SHORT).show()
+                );
             }
         }).start();
     }
