@@ -100,7 +100,17 @@ public class ProfessorSeeReviewsActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.professorReviewsRecyclerView);
         if (recyclerView != null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            ReviewAdapter adapter = new ReviewAdapter(reviews, true);
+
+            // 1. Use the default constructor (isProfessorView = false) so the Report button becomes visible.
+            // Since we aren't passing 'this' for the actionListener, the edit/delete buttons remain safely hidden.
+            ReviewAdapter adapter = new ReviewAdapter(reviews);
+
+            // 2. Bind the Report action to our background network thread
+            UserSession session = new UserSession(this);
+            adapter.setOnReportListener(review -> {
+                submitReportToDatabase(review, session.getUsername());
+            });
+
             recyclerView.setAdapter(adapter);
         }
     }
@@ -155,6 +165,48 @@ public class ProfessorSeeReviewsActivity extends AppCompatActivity {
                 conn.disconnect();
             } catch (Exception e) {
                 Log.e("LectureLensDebug", "Error fetching professor metrics", e);
+            }
+        }).start();
+    }
+
+    private void submitReportToDatabase(Review review, String reporterUsername) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:8081/api/reports");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(5000);
+                conn.setDoOutput(true);
+
+                // Build the JSON payload with the review details
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("reviewId", review.getId());
+                // We map the professorId to the courseId field so the DB schema remains consistent
+                jsonParam.put("courseId", review.getProfessorId());
+                jsonParam.put("authorUsername", review.getUsername());
+                jsonParam.put("reportedBy", reporterUsername);
+                jsonParam.put("reviewText", review.getReviewText());
+                jsonParam.put("status", "PENDING");
+
+                // Transmit data to backend
+                conn.getOutputStream().write(jsonParam.toString().getBytes("UTF-8"));
+
+                int responseCode = conn.getResponseCode();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
+                        Toast.makeText(ProfessorSeeReviewsActivity.this, "Review reported successfully. Admins will review it.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(ProfessorSeeReviewsActivity.this, "Failed to submit report. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("LectureLensDebug", "Error submitting report", e);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(ProfessorSeeReviewsActivity.this, "Network error. Report not sent.", Toast.LENGTH_SHORT).show()
+                );
             }
         }).start();
     }
