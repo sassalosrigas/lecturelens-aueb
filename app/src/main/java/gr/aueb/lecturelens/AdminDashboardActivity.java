@@ -25,7 +25,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             View child = parent.getChildAt(i);
             if (child.getId() == R.id.btnIgnore || child.getId() == R.id.btnDelete) {
                 child.setOnClickListener(v -> {
-                    // Logic for admin actions
                     if (v.getId() == R.id.btnIgnore) {
                         // ignore logic
                     } else if (v.getId() == R.id.btnDelete) {

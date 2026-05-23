@@ -93,7 +93,11 @@ public class LoginActivity extends AppCompatActivity {
                     session.createLoginSession(fullName, username, currentEmail, currentPassword, role, createdAt);
                     runOnUiThread(() -> {
                         Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        if (role.equals("admin")){
+                            startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
+                        }else{
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        }
                         finish();
                     });
                 } else if (responseCode == 401) {
