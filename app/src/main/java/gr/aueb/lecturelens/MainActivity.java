@@ -33,13 +33,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        setIntent(intent); // Bind the new incoming flags arguments safely
+        setIntent(intent);
 
-        // Check if a deep activity like CourseDetails sent a target page index command
         if (intent != null && intent.hasExtra("NAVIGATE_TO_PAGE")) {
             int pageIndex = intent.getIntExtra("NAVIGATE_TO_PAGE", 0);
             if (viewPager != null) {
-                // Instantly jumps or smooth glides to the targeted fragment area
                 viewPager.setCurrentItem(pageIndex, true);
             }
         }

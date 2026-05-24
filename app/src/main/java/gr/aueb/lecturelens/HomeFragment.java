@@ -56,9 +56,12 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
             Log.w("LectureLensDebug", "No username found in this session.");
         }
 
-        // 2. Setup the dynamic RecyclerView list architecture
         greeting = view.findViewById(R.id.greetingTextView);
-        greeting.setText("Hello, " + fullName);
+        if (fullName != null && !fullName.isEmpty()) {
+            greeting.setText("Hello, " + fullName.trim().split("\\s+")[0] + "!");
+        } else {
+            greeting.setText("Hello!");
+        }
 
 
         coursesRecyclerView = view.findViewById(R.id.coursesRecyclerView);
