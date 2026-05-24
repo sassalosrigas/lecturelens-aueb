@@ -40,6 +40,7 @@ public class CourseReviewActivity extends AppCompatActivity {
     private String currentUsername;
     private SwitchCompat isAnonymous;
     private RatingBar ratingBar;
+    private TextView courseName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +59,14 @@ public class CourseReviewActivity extends AppCompatActivity {
         isEditMode = getIntent().getBooleanExtra("isEditMode", false);
 
         // Bind layout views
+        courseName = findViewById(R.id.courseNameBox);
         ratingBar = findViewById(R.id.ratingBar);
         hoursSlider = findViewById(R.id.hoursSlider);
         reviewInput = findViewById(R.id.reviewEditText);
         isAnonymous = findViewById(R.id.anonSwitch);
         View btnDelete = findViewById(R.id.btnDelete);
         TextView btnSubmitReview = findViewById(R.id.btnSubmitReview);
-
+        courseName.setText(currentCourse.getTitle());
         findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
 
         hoursSlider.setLabelFormatter(value -> (int) value + " hours");
