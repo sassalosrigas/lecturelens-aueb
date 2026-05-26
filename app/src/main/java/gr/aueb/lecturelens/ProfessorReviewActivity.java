@@ -35,7 +35,7 @@ public class ProfessorReviewActivity extends AppCompatActivity {
     private boolean isEditMode;
     private Professor currentProfessor;
     private String currentUsername;
-
+    private TextView profName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +53,14 @@ public class ProfessorReviewActivity extends AppCompatActivity {
 
         isEditMode = getIntent().getBooleanExtra("isEditMode", false);
 
+        profName = findViewById(R.id.profNameBox);
         ratingBar = findViewById(R.id.ratingBar);
         reviewInput = findViewById(R.id.reviewEditText);
         isAnonymous = findViewById(R.id.anonSwitch);
         TextView btnCancel = findViewById(R.id.btnCancel);
         View btnDelete = findViewById(R.id.btnDelete);
         TextView btnSubmitReview = findViewById(R.id.btnSubmitReview);
-
+        profName.setText(currentProfessor.getFullName());
         findViewById(R.id.btnCancel).setOnClickListener(v -> finish());
 
         btnSubmitReview.setText(isEditMode ? getString(R.string.save_changes) : getString(R.string.submit_review));
