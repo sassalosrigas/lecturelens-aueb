@@ -61,7 +61,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
         public CourseViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Matches your item_course_card.xml component IDs perfectly
             txtCourseTitle = itemView.findViewById(R.id.courseTitle);
             txtCourseRating = itemView.findViewById(R.id.courseRating);
             txtProfessorName = itemView.findViewById(R.id.professorName);

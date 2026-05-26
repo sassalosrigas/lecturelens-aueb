@@ -106,7 +106,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             holder.reviewText.setText(mainText);
         }
 
-        // Action buttons
         if (actionListener != null && !isProfessorView) {
             if (holder.btnEdit != null) holder.btnEdit.setOnClickListener(v -> actionListener.onEditItem(review));
             if (holder.btnDelete != null) holder.btnDelete.setOnClickListener(v -> actionListener.onDeleteItem(review, position));
@@ -119,7 +118,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
                 });
             }
         } else {
-            // Professor view: hide all action buttons
             if (holder.reportButton != null) holder.reportButton.setVisibility(View.VISIBLE);
             if (holder.btnEdit != null) holder.btnEdit.setVisibility(View.GONE);
             if (holder.btnDelete != null) holder.btnDelete.setVisibility(View.GONE);

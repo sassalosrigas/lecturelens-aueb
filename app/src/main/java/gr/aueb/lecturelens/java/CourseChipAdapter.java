@@ -26,7 +26,6 @@ public class CourseChipAdapter extends RecyclerView.Adapter<CourseChipAdapter.Ch
     @NonNull
     @Override
     public ChipViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Ensure you match the layout name layout_item_course_chip or item_course_chip
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course_chip, parent, false);
         return new ChipViewHolder(view);
     }

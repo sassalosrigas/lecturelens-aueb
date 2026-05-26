@@ -10,8 +10,8 @@ public class Course implements Serializable {
     private int ects;
     private String professorName;
     private double rating;
-    private double difficulty;  // ← changed
-    private double hours;       // ← changed
+    private double difficulty;
+    private double hours;
     private String description;
 
     public Course(String id, String code, String title, int semester, int ects,

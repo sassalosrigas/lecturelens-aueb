@@ -57,7 +57,6 @@ public class SearchFragment extends Fragment implements
     private float selectedCourseRating = 0f;
     private float[] selectedCourseDifficulty = {0f, 5f};
     private float[] selectedCourseHours = {0f, 20f};
-
     private float selectedProfRating = 0f;
 
     private View recommendationsScrollView;
@@ -68,6 +67,7 @@ public class SearchFragment extends Fragment implements
     private RecyclerView searchResultsProfessors;
     private CourseChipAdapter searchCourseAdapter;
     private ProfessorAdapter searchProfessorAdapter;
+
     private final List<Course> searchCourseResults = new ArrayList<>();
     private final List<Professor> searchProfessorResults = new ArrayList<>();
 
@@ -77,23 +77,18 @@ public class SearchFragment extends Fragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment (make sure fragment_search matches your XML layout file name)
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         recentSearchesLayout = view.findViewById(R.id.recentSearchesLayout);
         searchEditText = view.findViewById(R.id.searchEditText);
         searchBarContainer = view.findViewById(R.id.searchBarContainer);
-        // Find and set up the cancel search button click action
         TextView cancelSearch = view.findViewById(R.id.cancelSearch);
         if (cancelSearch != null) {
             cancelSearch.setOnClickListener(v -> {
-                // 1. Clear text input layout state
                 searchEditText.setText("");
 
-                // 2. Clear focus and drop soft keyboard input window
                 hideRecentSearches();
 
-                // 3. Clear results arrays and switch back scroll layout flags
                 hideSearchDropdown();
             });
         }
@@ -133,7 +128,6 @@ public class SearchFragment extends Fragment implements
         searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
             searchBarContainer.setBackgroundResource(R.drawable.search_bar_focused_background);
 
-            // Show the cancel text cleanly below the bar when typing starts
             if (cancelSearch != null) {
                 cancelSearch.setVisibility(View.VISIBLE);
             }
@@ -263,7 +257,6 @@ public class SearchFragment extends Fragment implements
         View bottomSheetView = getLayoutInflater().inflate(R.layout.layout_filter_bottom_sheet, null);
         bottomSheetDialog.setContentView(bottomSheetView);
 
-        // Course UI Hookups
         android.widget.RatingBar courseRatingBar = bottomSheetView.findViewById(R.id.courseRatingBar);
         RangeSlider courseDifficultySlider = bottomSheetView.findViewById(R.id.courseDifficultySlider);
         RangeSlider courseHoursSlider = bottomSheetView.findViewById(R.id.courseHoursSlider);
@@ -272,24 +265,19 @@ public class SearchFragment extends Fragment implements
         courseDifficultySlider.setValues(selectedCourseDifficulty[0], selectedCourseDifficulty[1]);
         courseHoursSlider.setValues(selectedCourseHours[0], selectedCourseHours[1]);
 
-        // Professor UI Hookups
         android.widget.RatingBar profRatingBar = bottomSheetView.findViewById(R.id.profRatingBar);
         profRatingBar.setRating(selectedProfRating);
 
-        // Clear Action Handler
         TextView clearAll = bottomSheetView.findViewById(R.id.clearAll);
         clearAll.setOnClickListener(v -> {
             courseRatingBar.setRating(0f);
-            // FIXED: Set minimum bounds explicitly to 0f here so default 0.0 metrics pass through safely
             courseDifficultySlider.setValues(0f, 5.0f);
             courseHoursSlider.setValues(0f, 20.0f);
             profRatingBar.setRating(0f);
         });
 
-        // Apply Action Handler
         View applyButton = bottomSheetView.findViewById(R.id.applyButton);
         applyButton.setOnClickListener(v -> {
-            // Save state updates
             selectedCourseRating = courseRatingBar.getRating();
             selectedCourseDifficulty[0] = courseDifficultySlider.getValues().get(0);
             selectedCourseDifficulty[1] = courseDifficultySlider.getValues().get(1);
@@ -300,10 +288,8 @@ public class SearchFragment extends Fragment implements
 
             bottomSheetDialog.dismiss();
 
-            // Apply filters to currently loaded default collections
             applyFiltersToRecommendations();
 
-            // Re-trigger active endpoint queries if text field contains input strings
             String query = searchEditText.getText().toString().trim();
             if (!query.isEmpty()) {
                 performSearch(query);
@@ -320,10 +306,8 @@ public class SearchFragment extends Fragment implements
         List<Course> filteredCourses = new ArrayList<>();
         for (Course c : cache.cachedCourses) {
 
-            // Check if the rating matches
             boolean matchesRating = c.getRating() >= selectedCourseRating;
 
-            // Matches slider range OR is unconfigured data (0.0)
             boolean matchesDifficulty = (c.getDifficulty() >= selectedCourseDifficulty[0] && c.getDifficulty() <= selectedCourseDifficulty[1])
                     || c.getDifficulty() == 0.0;
 
@@ -338,7 +322,6 @@ public class SearchFragment extends Fragment implements
         randomCourseList.addAll(filteredCourses);
         courseChipAdapter.notifyDataSetChanged();
 
-        // Filter recommendation professors
         List<Professor> filteredProfs = new ArrayList<>();
         for (Professor p : cache.cachedProfessors) {
             if (p.getRating() >= selectedProfRating) {
@@ -361,7 +344,6 @@ public class SearchFragment extends Fragment implements
             return;
         }
 
-        // Thread 1: Course Search (Now parses hybrid nested courses and matching professors)
         new Thread(() -> {
             try {
                 String fullUrl = "http://10.0.2.2:8081/api/courses/search?q=" + encoded;
@@ -383,7 +365,6 @@ public class SearchFragment extends Fragment implements
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject wrapperObj = array.getJSONObject(i);
 
-                        // Parse the nested course object
                         JSONObject courseObj = wrapperObj.getJSONObject("course");
                         String profName = courseObj.optString("professorName", "Staff");
 
@@ -418,12 +399,10 @@ public class SearchFragment extends Fragment implements
 
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (isAdded()) {
-                            // Update core course lists
                             searchCourseResults.clear();
                             searchCourseResults.addAll(courseResults);
                             searchCourseAdapter.notifyDataSetChanged();
 
-                            // Inject linked professors seamlessly without duplicates
                             if (!linkedProfessorsResults.isEmpty()) {
                                 for (Professor p : linkedProfessorsResults) {
                                     if (!containsProfessor(searchProfessorResults, p.getId())) {

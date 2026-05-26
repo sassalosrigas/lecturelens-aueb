@@ -25,13 +25,12 @@ public class SubmissionSuccessActivity extends AppCompatActivity {
             if (isProfessorReview && professor != null) {
                 intent = new Intent(SubmissionSuccessActivity.this, ProfessorDetailsActivity.class);
                 intent.putExtra("CHOSEN_PROFESSOR", professor);
-                intent.putExtra("isProfessor", false); // Only students can submit reviews
+                intent.putExtra("isProfessor", false);
             } else if (!isProfessorReview && course != null) {
                 intent = new Intent(SubmissionSuccessActivity.this, CourseDetailsActivity.class);
                 intent.putExtra("CHOSEN_COURSE", course);
                 intent.putExtra("isProfessor", false);
             } else {
-                // Fallback to MainActivity if data is missing
                 intent = new Intent(SubmissionSuccessActivity.this, MainActivity.class);
             }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

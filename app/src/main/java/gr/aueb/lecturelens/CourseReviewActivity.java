@@ -33,7 +33,7 @@ public class CourseReviewActivity extends AppCompatActivity {
 
     private TextView[] diffButtons;
     private boolean isEditMode;
-    private int selectedDifficulty = 3; // Keep track of selection state globally
+    private int selectedDifficulty = 3;
     private Slider hoursSlider;
     private EditText reviewInput;
     private Course currentCourse;
@@ -57,7 +57,6 @@ public class CourseReviewActivity extends AppCompatActivity {
 
         isEditMode = getIntent().getBooleanExtra("isEditMode", false);
 
-        // Bind layout views
         ratingBar = findViewById(R.id.ratingBar);
         hoursSlider = findViewById(R.id.hoursSlider);
         reviewInput = findViewById(R.id.reviewEditText);
@@ -69,7 +68,6 @@ public class CourseReviewActivity extends AppCompatActivity {
 
         hoursSlider.setLabelFormatter(value -> (int) value + " hours");
 
-        // UI Setup depending on create vs edit mode context
         btnSubmitReview.setText(isEditMode ? getString(R.string.save_changes) : getString(R.string.submit_review));
 
         int initialDifficulty = 3;
@@ -104,8 +102,6 @@ public class CourseReviewActivity extends AppCompatActivity {
                     int responseCode = conn.getResponseCode();
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
-                            /*userReviewsList.remove(position);
-                            reviewsAdapter.notifyItemRemoved(position);*/
                             Toast.makeText(this, "Review deleted successfully", Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
@@ -143,7 +139,7 @@ public class CourseReviewActivity extends AppCompatActivity {
     }
 
     private void selectDifficulty(int difficulty) {
-        selectedDifficulty = difficulty; // Update tracking coordinate
+        selectedDifficulty = difficulty;
         for (int i = 0; i < diffButtons.length; i++) {
             if (i + 1 == difficulty) {
                 diffButtons[i].setBackgroundResource(R.drawable.circle_pink);
@@ -200,7 +196,6 @@ public class CourseReviewActivity extends AppCompatActivity {
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                    // Navigate to success state on UI Thread loop
                     new Handler(Looper.getMainLooper()).post(() -> {
                         triggerHapticFeedback();
                         Intent intent = new Intent(CourseReviewActivity.this, SubmissionSuccessActivity.class);
@@ -225,21 +220,16 @@ public class CourseReviewActivity extends AppCompatActivity {
         android.util.Log.d("LectureLensDebug", "HAPTIC TRIGGERED: Vibrate command sent to system!");
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                // Modern API 31+ approach using VibratorManager
                 android.os.VibratorManager vibratorManager = (android.os.VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
                 if (vibratorManager != null) {
-                    // A quick doublet-tap pattern (Predefined Success effect)
                     vibratorManager.getDefaultVibrator().vibrate(android.os.VibrationEffect.createPredefined(android.os.VibrationEffect.EFFECT_CLICK));
                 }
             } else {
-                // Legacy fallback approach for older API levels
                 android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 if (vibrator != null && vibrator.hasVibrator()) {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        // API 26 to 30: Vibrate for 150ms at standard amplitude strength
                         vibrator.vibrate(android.os.VibrationEffect.createOneShot(150, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
                     } else {
-                        // Ancient API fallback
                         vibrator.vibrate(150);
                     }
                 }

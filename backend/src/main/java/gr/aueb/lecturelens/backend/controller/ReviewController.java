@@ -110,7 +110,7 @@ public class ReviewController {
             existing.setReviewText(updated.getReviewText());
             existing.setAnonymous(updated.isAnonymous());
             Review saved = reviewRepository.save(existing);
-            recalculateCourseStats(existing.getCourseId()); // ← add
+            recalculateCourseStats(existing.getCourseId());
             return ResponseEntity.ok(saved);
         }).orElseGet(() -> {
             System.out.println("No review found for id: " + id);
@@ -122,9 +122,9 @@ public class ReviewController {
     public ResponseEntity<Void> deleteReview(@PathVariable String id) {
         System.out.println("DELETE called with id: " + id);
         return reviewRepository.findById(id).map(review -> {
-            String courseId = review.getCourseId(); // ← save before deleting
+            String courseId = review.getCourseId();
             reviewRepository.deleteById(id);
-            recalculateCourseStats(courseId);       // ← add
+            recalculateCourseStats(courseId);
             return ResponseEntity.noContent().<Void>build();
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -132,7 +132,7 @@ public class ReviewController {
     @PostMapping
     public Review createReview(@RequestBody Review review) {
         Review saved = reviewRepository.save(review);
-        recalculateCourseStats(saved.getCourseId()); // ← add
+        recalculateCourseStats(saved.getCourseId());
         return saved;
     }
 

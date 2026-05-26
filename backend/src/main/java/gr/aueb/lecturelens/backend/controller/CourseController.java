@@ -30,25 +30,11 @@ public class CourseController {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    // This handles the GET request from your Android MainActivity
     @GetMapping
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
     }
 
-    /*
-    @GetMapping("/search")
-    public List<Course> searchCourses(@RequestParam String q) {
-        String regex = ".*" + q + ".*";
-        Query query = new Query();
-        query.addCriteria(new Criteria().orOperator(
-                Criteria.where("code").regex(regex, "i"),
-                Criteria.where("title").regex(regex, "i")
-        ));
-        return mongoTemplate.find(query, Course.class);
-    }
-
-     */
     @GetMapping("/search")
     public List<CourseSearchResult> searchCourses(@RequestParam String q) {
         String regex = ".*" + q + ".*";
@@ -62,13 +48,12 @@ public class CourseController {
         return matchedCourses.stream().map(course -> {
             List<Professor> matchedProfessors = new ArrayList<>();
 
-            // Extract and split names to search for matching professor records
             String profName = course.getProfessorName();
             if (profName != null && !profName.trim().isEmpty()) {
                 String[] parts = profName.trim().split("\\s+");
                 if (parts.length >= 2) {
                     String firstName = parts[0];
-                    String lastName = parts[1]; // Handles basic "First Last" formats
+                    String lastName = parts[1];
 
                     professorRepository.findByFirstNameAndLastName(firstName, lastName)
                             .ifPresent(matchedProfessors::add);
@@ -86,7 +71,6 @@ public class CourseController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Allows you to add new courses manually via Postman if needed
     @PostMapping
     public Course createCourse(@RequestBody Course course) {
         return courseRepository.save(course);

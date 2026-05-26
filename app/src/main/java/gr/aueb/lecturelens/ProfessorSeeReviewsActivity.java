@@ -37,12 +37,10 @@ public class ProfessorSeeReviewsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_professor_see_reviews);
 
-        // Read the bundle metrics directly passed out of your profile fragment
         List<Review> professorReviewsList = (List<Review>) getIntent().getSerializableExtra("PROFESSOR_REVIEWS_LIST");
         double professorAvgRating = getIntent().getDoubleExtra("PROFESSOR_AVG_RATING", -1.0);
 
         if (professorReviewsList == null || professorAvgRating == -1.0) {
-            // If data is missing, fetch it using the logged-in professor's username
             UserSession session = new UserSession(this);
             String username = session.getUsername();
             if (username != null && !username.isEmpty()) {
@@ -101,11 +99,8 @@ public class ProfessorSeeReviewsActivity extends AppCompatActivity {
         if (recyclerView != null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            // 1. Use the default constructor (isProfessorView = false) so the Report button becomes visible.
-            // Since we aren't passing 'this' for the actionListener, the edit/delete buttons remain safely hidden.
             ReviewAdapter adapter = new ReviewAdapter(reviews);
 
-            // 2. Bind the Report action to our background network thread
             UserSession session = new UserSession(this);
             adapter.setOnReportListener(review -> {
                 submitReportToDatabase(review, session.getUsername());
@@ -180,17 +175,14 @@ public class ProfessorSeeReviewsActivity extends AppCompatActivity {
                 conn.setConnectTimeout(5000);
                 conn.setDoOutput(true);
 
-                // Build the JSON payload with the review details
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("reviewId", review.getId());
-                // We map the professorId to the courseId field so the DB schema remains consistent
                 jsonParam.put("courseId", review.getProfessorId());
                 jsonParam.put("authorUsername", review.getUsername());
                 jsonParam.put("reportedBy", reporterUsername);
                 jsonParam.put("reviewText", review.getReviewText());
                 jsonParam.put("status", "PENDING");
 
-                // Transmit data to backend
                 conn.getOutputStream().write(jsonParam.toString().getBytes("UTF-8"));
 
                 int responseCode = conn.getResponseCode();

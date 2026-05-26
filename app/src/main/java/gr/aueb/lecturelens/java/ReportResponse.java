@@ -9,7 +9,6 @@ public class ReportResponse {
     private String reviewText;
     private String status;
 
-    // Getters
     public String getId() { return id; }
     public String getReviewId() { return reviewId; }
     public String getCourseId() { return courseId; }
@@ -18,7 +17,6 @@ public class ReportResponse {
     public String getReviewText() { return reviewText; }
     public String getStatus() { return status; }
 
-    // Setters
     public void setId(String id) { this.id = id; }
     public void setReviewId(String reviewId) { this.reviewId = reviewId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }

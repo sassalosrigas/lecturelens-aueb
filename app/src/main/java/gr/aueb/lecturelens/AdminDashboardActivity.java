@@ -30,7 +30,6 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
     private ReportAdapter reportAdapter;
     private List<ReportResponse> reportsList = new ArrayList<>();
 
-    // Using port 8080 to match your Spring Boot ReportController configurations
     private final String BASE_URL = "http://10.0.2.2:8081/api/reports";
 
     @Override
@@ -38,18 +37,15 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
-        // Bind Views
         tvPendingCount = findViewById(R.id.tvPendingCount);
         tvResolvedCount = findViewById(R.id.tvResolvedCount);
         rvReports = findViewById(R.id.rvReports);
 
         rvReports.setLayoutManager(new LinearLayoutManager(this));
 
-        // Initialized with custom action listener logic
         reportAdapter = new ReportAdapter(reportsList, this);
         rvReports.setAdapter(reportAdapter);
 
-        // Populate Dashboard UI
         fetchReportsData();
     }
 
@@ -74,7 +70,7 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                     JSONArray jsonArray = new JSONArray(response.toString());
 
                     int pendingCounter = 0;
-                    int resolvedCounter = 0; // This will now aggregate both DISMISSED and DELETED actions
+                    int resolvedCounter = 0;
                     final List<ReportResponse> temporaryList = new ArrayList<>();
 
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -84,7 +80,6 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                         if ("PENDING".equalsIgnoreCase(status)) {
                             pendingCounter++;
 
-                            // Map fields matching your schema
                             ReportResponse report = new ReportResponse();
                             report.setId(jsonObject.optString("id"));
                             report.setReviewId(jsonObject.optString("reviewId"));
@@ -96,12 +91,10 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
 
                             temporaryList.add(report);
                         } else if ("DISMISSED".equalsIgnoreCase(status) || "DELETED".equalsIgnoreCase(status)) {
-                            // Increment the resolved metrics counter card whenever a handled action is parsed
                             resolvedCounter++;
                         }
                     }
 
-                    // Finalize UI operations on the safe Foreground main thread loop
                     final int finalPending = pendingCounter;
                     final int finalResolved = resolvedCounter;
                     new Handler(Looper.getMainLooper()).post(() -> {
@@ -125,7 +118,6 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
     public void onDismiss(ReportResponse report, int position) {
         new Thread(() -> {
             try {
-                // Generates endpoint string query structural match: /api/reports/{id}/status?status=DISMISSED
                 URL url = new URL(BASE_URL + "/" + report.getId() + "/status?status=DISMISSED");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("PUT");
@@ -135,7 +127,7 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         reportAdapter.removeAt(position);
-                        fetchReportsData(); // Instantly refresh totals matrices
+                        fetchReportsData();
                         Toast.makeText(this, "Report dismissed successfully", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(this, "Failed to dismiss report", Toast.LENGTH_SHORT).show();
@@ -153,7 +145,6 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
     public void onDeleteReview(ReportResponse report, int position) {
         new Thread(() -> {
             try {
-                // Generates endpoint execution match: DELETE /api/reports/{id}
                 URL url = new URL(BASE_URL + "/" + report.getId());
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("DELETE");
@@ -163,7 +154,7 @@ public class AdminDashboardActivity extends AppCompatActivity implements ReportA
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
                         reportAdapter.removeAt(position);
-                        fetchReportsData(); // Instantly refresh totals matrices
+                        fetchReportsData();
                         Toast.makeText(this, "Review deleted successfully", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(this, "Failed to execute target row database erasure", Toast.LENGTH_SHORT).show();

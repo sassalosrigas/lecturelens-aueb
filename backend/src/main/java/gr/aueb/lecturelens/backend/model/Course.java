@@ -26,7 +26,6 @@ public class Course {
     private double hours;
     private String description;
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getCode() { return code; }

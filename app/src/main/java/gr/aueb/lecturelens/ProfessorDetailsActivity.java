@@ -97,31 +97,27 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
             });
         }
 
-        // 1. HOME BUTTON: Brings back the warm MainActivity and jumps straight to the Home page
         findViewById(R.id.navHome).setOnClickListener(v -> {
             Intent intent = new Intent(ProfessorDetailsActivity.this, MainActivity.class);
-            // FLAG_ACTIVITY_CLEAR_TOP brings back the active instance instead of recreating it
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 0); // Target position index 0 (HomeFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 0);
             startActivity(intent);
             finish();
         });
 
-        // 2. SEARCH BUTTON: Brings back MainActivity and slides smoothly over to the Search screen tab
         findViewById(R.id.navSearch).setOnClickListener(v -> {
             Intent intent = new Intent(ProfessorDetailsActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 1); // Target position index 1 (SearchFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 1);
             startActivity(intent);
             finish();
         });
 
-        // 3. PROFILE BUTTON: Brings back MainActivity and slides directly to the Profile card layout
         findViewById(R.id.navProfile).setOnClickListener(v -> {
             Intent intent = new Intent(ProfessorDetailsActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 2); // Target position index 2 (ProfileFragment)
-            intent.putExtra("isProfessor", isProfessor); // Carry over your teammate's role flags
+            intent.putExtra("NAVIGATE_TO_PAGE", 2);
+            intent.putExtra("isProfessor", isProfessor);
             startActivity(intent);
             finish();
         });
@@ -144,7 +140,6 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
         Log.d("LectureLensDebug", "Entering fetchProfessorDetails for ID: " + professorId);
         new Thread(() -> {
             try {
-                // FIXED URL: Targets the specific professor instead of fetching ALL reviews
                 URL url = new URL("http://10.0.2.2:8081/api/professor-reviews/" + professorId);
                 Log.d("LectureLensDebug", "Attempting connection to: " + url);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -216,7 +211,6 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                 int responseCode = conn.getResponseCode();
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    // Review exists — parse it and open in edit mode
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -306,7 +300,6 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
     private void fetchProfessorCourses(String professorId) {
         new Thread(() -> {
             try {
-                // New simpler endpoint — no mapping table involved
                 URL url = new URL("http://10.0.2.2:8081/api/professors/" + professorId + "/courses");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
@@ -363,17 +356,14 @@ public class ProfessorDetailsActivity extends AppCompatActivity implements Cours
                 conn.setConnectTimeout(5000);
                 conn.setDoOutput(true);
 
-                // Build the JSON payload
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("reviewId", review.getId());
-                // We use the same 'courseId' field from the Report model to store the professor ID context
                 jsonParam.put("courseId", review.getProfessorId());
                 jsonParam.put("authorUsername", review.getUsername());
                 jsonParam.put("reportedBy", reporterUsername);
                 jsonParam.put("reviewText", review.getReviewText());
                 jsonParam.put("status", "PENDING");
 
-                // Transmit data to backend
                 conn.getOutputStream().write(jsonParam.toString().getBytes("UTF-8"));
 
                 int responseCode = conn.getResponseCode();

@@ -36,7 +36,6 @@ public class ReportController {
     @Autowired
     private ProfessorRepository professorRepository;
 
-    // 1. Endpoint for students to submit a new report from the Android app
     @PostMapping
     public ResponseEntity<Report> createReport(@RequestBody Report report) {
         try {
@@ -53,19 +52,16 @@ public class ReportController {
         }
     }
 
-    // 2. Endpoint for Admins to fetch all reports
     @GetMapping
     public List<Report> getAllReports() {
         return reportRepository.findAll();
     }
 
-    // 3. Endpoint for Admins to fetch only pending reports
     @GetMapping("/pending")
     public List<Report> getPendingReports() {
         return reportRepository.findByStatus("PENDING");
     }
 
-    // 4. Endpoint for Admins to update report status (e.g., DISMISSED)
     @PutMapping("/{id}/status")
     public ResponseEntity<Report> updateReportStatus(@PathVariable String id, @RequestParam String status) {
         return reportRepository.findById(id)
@@ -77,34 +73,26 @@ public class ReportController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 5. Endpoint for Admins to delete an offensive review AND its corresponding report tracking entry
-    // 5. Endpoint for Admins to handle offensive review removals (Soft status update for the report)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable String id) {
         return reportRepository.findById(id).map(report -> {
             String reviewId = report.getReviewId();
-            String targetId = report.getCourseId(); // Holds either courseId or professorId
+            String targetId = report.getCourseId();
 
             if (reviewId != null && !reviewId.isEmpty()) {
-                // Look for courseId to distinguish if it's a course review or a professor review
                 if (targetId != null && reviewRepository.existsById(reviewId)) {
-                    // 1. Delete course review document from the reviews collection
                     reviewRepository.deleteById(reviewId);
                     System.out.println("Deleted course review from collection: " + reviewId);
 
-                    // 2. Recalculate Course Stats using your exact logic
                     recalculateCourseStats(targetId);
                 } else if (professorReviewRepository.existsById(reviewId)) {
-                    // 1. Delete professor review document from the professor reviews collection
                     professorReviewRepository.deleteById(reviewId);
                     System.out.println("Deleted professor review from collection: " + reviewId);
 
-                    // 2. Recalculate Professor Stats using your exact logic
                     recalculateProfessorStats(targetId);
                 }
             }
 
-            // CHANGE HERE: Instead of dropping the report document, mark its status as DELETED
             report.setStatus("DELETED");
             reportRepository.save(report);
             System.out.println("Report ID " + id + " status flipped to DELETED for tracking metrics.");
@@ -113,7 +101,6 @@ public class ReportController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Exact stat engine logic replicated from ReviewController
     private void recalculateCourseStats(String courseId) {
         List<Review> reviews = reviewRepository.findByCourseId(courseId);
         double avgRating = 0.0;
@@ -138,7 +125,6 @@ public class ReportController {
         });
     }
 
-    // Exact stat engine logic replicated from ProfessorReviewController
     private void recalculateProfessorStats(String professorId) {
         List<ProfessorReview> professorReviews = professorReviewRepository.findByProfessorId(professorId);
         double avgRating = 0.0;

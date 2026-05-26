@@ -56,11 +56,6 @@ public class ProfessorController {
 
         return matchedProfessors.stream().map(prof -> {
             List<Course> courses = getCoursesByProfessor(prof.getId());
-                    //.stream().map(CourseProfessorMapping::getCourseId).collect(Collectors.toList());
-
-            /*List<Course> courses = courseRepository.findAll().stream()
-                    .filter(c -> courseIds.contains(c.getId()))
-                    .collect(Collectors.toList());*/
 
             return new ProfessorSearchResult(prof, courses);
         }).collect(Collectors.toList());

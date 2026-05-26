@@ -11,7 +11,6 @@ public class CourseSearchResult {
         this.professors = professors;
     }
 
-    // Getters and Setters
     public Course getCourse() { return course; }
     public void setCourse(Course course) { this.course = course; }
 
