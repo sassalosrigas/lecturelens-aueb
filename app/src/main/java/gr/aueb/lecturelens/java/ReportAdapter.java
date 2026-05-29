@@ -37,12 +37,10 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     public void onBindViewHolder(@NonNull ReportViewHolder holder, int position) {
         ReportResponse report = reportList.get(position);
 
-        // Bind data fields cleanly to match the layout context mapping definitions
         holder.tvReviewText.setText(report.getReviewText());
         holder.tvCourseName.setText("Course ID: " + report.getCourseId());
         holder.tvReportedCountText.setText("By: " + report.getReportedBy() + " | Author: " + report.getAuthorUsername());
 
-        // Wire up interacting listener callbacks tracking the item instances
         holder.btnIgnore.setOnClickListener(v -> actionListener.onDismiss(report, position));
         holder.btnDelete.setOnClickListener(v -> actionListener.onDeleteReview(report, position));
     }
@@ -55,7 +53,6 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     public void removeAt(int position) {
         reportList.remove(position);
         notifyItemRemoved(position);
-        // Notifies structural modifications keeping position references aligned
         notifyItemRangeChanged(position, reportList.size() - position);
     }
 
@@ -65,7 +62,6 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
 
         public ReportViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Matched view variables directly to the IDs inside item_report.xml
             tvReviewText = itemView.findViewById(R.id.reviewText);
             tvCourseName = itemView.findViewById(R.id.courseName);
             tvReportedCountText = itemView.findViewById(R.id.reportedCountText);

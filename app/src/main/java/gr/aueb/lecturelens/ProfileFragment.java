@@ -41,19 +41,16 @@ public class ProfileFragment extends Fragment {
     private TextView infoValue1, infoValue2;
     private View alertBox;
 
-    // Track fetched reviews and calculated metrics to pass to the next activity
     private final List<Review> fetchedProfessorReviews = new ArrayList<>();
     private double calculatedProfessorAvgRating = 0.0;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // 1. Inflate the custom profile layout template
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         alertBox = view.findViewById(R.id.alertBox);
 
-        // 2. Read user details dynamically out of the active user session cache layers
         UserSession session = new UserSession(requireContext());
         String fullName = session.getFullName();
         String username = session.getUsername();
@@ -61,7 +58,6 @@ public class ProfileFragment extends Fragment {
         String role = session.getRole();
         String date = session.getCreationDate();
 
-        // 3. Connect individual text views and data cards
         infoValue1 = view.findViewById(R.id.infoValue1);
         TextView infoLabel1 = view.findViewById(R.id.infoLabel1);
         infoValue2 = view.findViewById(R.id.infoValue2);
@@ -104,7 +100,6 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        // 5. Setup Action Click listeners targeting separate workflow sub-activities
         View logoutButton = view.findViewById(R.id.logoutButton);
         if (logoutButton != null) {
             logoutButton.setOnClickListener(v -> {
@@ -130,7 +125,6 @@ public class ProfileFragment extends Fragment {
             manageReviewsAction.setOnClickListener(v -> {
                 Intent intent;
                 if (isProfessor) {
-                    // Navigate to ProfessorSeeReviewsActivity, passing bundled metrics
                     intent = new Intent(getActivity(), ProfessorSeeReviewsActivity.class);
                     intent.putExtra("PROFESSOR_REVIEWS_LIST", (Serializable) fetchedProfessorReviews);
                     intent.putExtra("PROFESSOR_AVG_RATING", calculatedProfessorAvgRating);
@@ -189,12 +183,10 @@ public class ProfileFragment extends Fragment {
         new Thread(() -> {
             try {
                 UserSession methodSession = new UserSession(requireContext());
-                String professorFullName = methodSession.getFullName(); // e.g., "Panagiotis Katerinis"
+                String professorFullName = methodSession.getFullName();
 
-                // URL-encode the string to turn spaces into %20 safely
                 String encodedName = java.net.URLEncoder.encode(professorFullName, "UTF-8");
 
-                // Construct the endpoint query URL
                 URL url = new URL("http://10.0.2.2:8081/api/professor-reviews/by-name?fullName=" + encodedName);
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -209,12 +201,10 @@ public class ProfileFragment extends Fragment {
                     while ((line = in.readLine()) != null) response.append(line.trim());
                     in.close();
 
-                    // LOG 1: See the entire raw JSON string array coming from the server
                     Log.d("LectureLensDebug", "RAW JSON RESPONSE: " + response.toString());
 
                     JSONArray jsonArray = new JSONArray(response.toString());
 
-                    // LOG 2: Check total item count parsed initially
                     Log.d("LectureLensDebug", "Total reviews parsed for professor: " + jsonArray.length());
 
                     double ratingSum = 0.0;
@@ -223,7 +213,6 @@ public class ProfileFragment extends Fragment {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                        // LOG 3: Print individual objects to see internal key-value pairings (id, professorName, rating)
                         Log.d("LectureLensDebug", "Processing Review index [" + i + "]: " + jsonObject.toString());
 
                         Review review = new Review();
@@ -250,7 +239,6 @@ public class ProfileFragment extends Fragment {
 
                     final double finalAvgRating = avgRating;
 
-                    // LOG 4: Confirm calculated average output before dispatching to UI
                     Log.d("LectureLensDebug", "Calculated Average Rating: " + finalAvgRating);
 
                     new Handler(Looper.getMainLooper()).post(() -> {

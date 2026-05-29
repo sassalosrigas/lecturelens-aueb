@@ -88,7 +88,6 @@ public class ProfessorReviewController {
         if (existingReview.isPresent()) {
             return ResponseEntity.ok(existingReview.get());
         } else {
-            // Not found. Send back a 204 No Content status so Android knows it's a new review
             return ResponseEntity.noContent().build();
         }
     }
@@ -117,11 +116,8 @@ public class ProfessorReviewController {
         try {
             System.out.println("DEBUG: Fetching reviews for professor name: [" + fullName + "]");
 
-            // 1. Find the professor object using their first and last name combo
-            // Since database storage trims spaces, we filter all professors to find a match
             List<ProfessorReview> matchedReviews = professorReviewRepository.findAll().stream()
                     .filter(review -> {
-                        // Pull the professor details from the repository to get the full name
                         if (review.getProfessorId() == null) return false;
 
                         return professorRepository.findById(review.getProfessorId())
@@ -132,7 +128,6 @@ public class ProfessorReviewController {
                     })
                     .collect(Collectors.toList());
 
-            // 2. Set the transient professorName on the objects before sending them back
             for (ProfessorReview review : matchedReviews) {
                 review.setProfessorName(fullName.trim());
             }

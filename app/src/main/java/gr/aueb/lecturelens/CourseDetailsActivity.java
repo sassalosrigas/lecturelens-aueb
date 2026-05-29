@@ -67,7 +67,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
         reviewList = new ArrayList<>();
         reviewAdapter = new ReviewAdapter(reviewList, isProfessor);
 
-        // 3. Bind the Report action to our background network thread
         reviewAdapter.setOnReportListener(review -> {
             submitReportToDatabase(review, session.getUsername());
         });
@@ -99,32 +98,27 @@ public class CourseDetailsActivity extends AppCompatActivity {
             });
         }
 
-        // Navigation listeners
-        // 1. HOME BUTTON: Brings back the warm MainActivity and jumps straight to the Home page
         findViewById(R.id.navHome).setOnClickListener(v -> {
             Intent intent = new Intent(CourseDetailsActivity.this, MainActivity.class);
-            // FLAG_ACTIVITY_CLEAR_TOP brings back the active instance instead of recreating it
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 0); // Target position index 0 (HomeFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 0);
             startActivity(intent);
             finish();
         });
 
-        // 2. SEARCH BUTTON: Brings back MainActivity and slides smoothly over to the Search screen tab
         findViewById(R.id.navSearch).setOnClickListener(v -> {
             Intent intent = new Intent(CourseDetailsActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 1); // Target position index 1 (SearchFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 1);
             startActivity(intent);
             finish();
         });
 
-        // 3. PROFILE BUTTON: Brings back MainActivity and slides directly to the Profile card layout
         findViewById(R.id.navProfile).setOnClickListener(v -> {
             Intent intent = new Intent(CourseDetailsActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 2); // Target position index 2 (ProfileFragment)
-            intent.putExtra("isProfessor", isProfessor); // Carry over your teammate's role flags
+            intent.putExtra("NAVIGATE_TO_PAGE", 2);
+            intent.putExtra("isProfessor", isProfessor);
             startActivity(intent);
             finish();
         });
@@ -172,7 +166,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String targetCourseId = jsonObject.optString("courseId");
 
-                        // Check if this item belongs to our current active course
                         if (targetCourseId.equals(courseId)) {
                             Review review = new Review();
                             review.setId(jsonObject.optString("id"));
@@ -190,7 +183,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                         }
                     }
 
-                    // Safely dispatch list view rendering onto your application main thread
                     new Handler(Looper.getMainLooper()).post(() -> {
                         reviewList.clear();
                         reviewList.addAll(parsedReviews);
@@ -226,7 +218,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
                 int responseCode = conn.getResponseCode();
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    // Review exists — parse it and open in edit mode
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -282,7 +273,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
     private void submitReportToDatabase(Review review, String reporterUsername) {
         new Thread(() -> {
             try {
-                URL url = new URL("http://10.0.2.2:8081/api/reports"); // Assuming this is your backend endpoint
+                URL url = new URL("http://10.0.2.2:8081/api/reports");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
@@ -290,16 +281,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
                 conn.setConnectTimeout(5000);
                 conn.setDoOutput(true);
 
-                // Build the JSON payload with all required details
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("reviewId", review.getId());
                 jsonParam.put("courseId", review.getCourseId());
-                jsonParam.put("authorUsername", review.getUsername()); // Person who wrote it
-                jsonParam.put("reportedBy", reporterUsername);         // Person reporting it
+                jsonParam.put("authorUsername", review.getUsername());
+                jsonParam.put("reportedBy", reporterUsername);
                 jsonParam.put("reviewText", review.getReviewText());
-                jsonParam.put("status", "PENDING"); // For your admin dashboard
+                jsonParam.put("status", "PENDING");
 
-                // Send the JSON to the server
                 conn.getOutputStream().write(jsonParam.toString().getBytes("UTF-8"));
 
                 int responseCode = conn.getResponseCode();

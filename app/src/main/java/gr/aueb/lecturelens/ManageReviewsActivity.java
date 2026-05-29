@@ -53,7 +53,6 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
 
         boolean isProfessor = "professor".equals(session.getRole());
 
-        // 4. Initialize the adapter. If student, enable manage mode (edit/delete). If professor, read-only.
         if (isProfessor) {
             reviewsAdapter = new ReviewAdapter(userReviewsList, true);
         } else {
@@ -61,30 +60,26 @@ public class ManageReviewsActivity extends AppCompatActivity implements ReviewAd
         }
         recyclerView.setAdapter(reviewsAdapter);
 
-        // 1. HOME BUTTON: Brings back the warm MainActivity and jumps straight to the Home page
         findViewById(R.id.navHome).setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
-            // FLAG_ACTIVITY_CLEAR_TOP brings back the active instance instead of recreating it
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 0); // Target position index 0 (HomeFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 0);
             startActivity(intent);
             finish();
         });
 
-        // 2. SEARCH BUTTON: Brings back MainActivity and slides smoothly over to the Search screen tab
         findViewById(R.id.navSearch).setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 1); // Target position index 1 (SearchFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 1);
             startActivity(intent);
             finish();
         });
 
-        // 3. PROFILE BUTTON: Brings back MainActivity and slides directly to the Profile card layout
         findViewById(R.id.navProfile).setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("NAVIGATE_TO_PAGE", 2); // Target position index 2 (ProfileFragment)
+            intent.putExtra("NAVIGATE_TO_PAGE", 2);
             startActivity(intent);
             finish();
         });

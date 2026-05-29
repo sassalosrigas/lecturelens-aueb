@@ -39,7 +39,7 @@ public class OcrScanActivity extends AppCompatActivity {
 
     private static final int CAMERA_PERM_CODE = 101;
     private PreviewView viewFinder;
-    private ExecutorService cameraExecutor; // Simplified type reference
+    private ExecutorService cameraExecutor;
     private TextRecognizer textRecognizer;
     private boolean isIdDetected = false;
 
@@ -56,12 +56,11 @@ public class OcrScanActivity extends AppCompatActivity {
         viewFinder = findViewById(R.id.viewFinder);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        // Initialize the local text processor engine
         textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
 
         findViewById(R.id.btnCancelScan).setOnClickListener(v -> {
-            setResult(RESULT_CANCELED); // Inform RegisterActivity that scanning was aborted
-            finish(); // Shut down camera window
+            setResult(RESULT_CANCELED);
+            finish();
         });
 
         View btnCapture = findViewById(R.id.btnCapture);
@@ -85,7 +84,6 @@ public class OcrScanActivity extends AppCompatActivity {
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
 
-                // Instantiate the high-resolution capture configuration block
                 imageCapture = new ImageCapture.Builder()
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                         .build();
@@ -93,7 +91,6 @@ public class OcrScanActivity extends AppCompatActivity {
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
 
                 cameraProvider.unbindAll();
-                // Bind both preview and the static image capture engine use-case
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
             } catch (Exception e) {
@@ -101,7 +98,6 @@ public class OcrScanActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
 
-        // 3. Hook up the capture button click listener in your onCreate or right here:
         findViewById(R.id.btnCapture).setOnClickListener(v -> takePhotoAndProcess());
     }
 
@@ -121,7 +117,7 @@ public class OcrScanActivity extends AppCompatActivity {
                     textRecognizer.process(inputImage)
                             .addOnSuccessListener(visionText -> {
                                 parseExtractedText(visionText.getText());
-                                image.close(); // Crucial: Free memory buffer allocation leak footprint
+                                image.close();
                             })
                             .addOnFailureListener(e -> {
                                 image.close();
@@ -141,7 +137,6 @@ public class OcrScanActivity extends AppCompatActivity {
     private void parseExtractedText(String rawText) {
         if (rawText == null || rawText.isEmpty()) return;
 
-        // 1. Normalize character maps to clear out accent shadow variances
         String cleanText = rawText.toUpperCase()
                 .replaceAll("[ΌΟ]", "O")
                 .replaceAll("[ΆΑ]", "A")
@@ -151,9 +146,6 @@ public class OcrScanActivity extends AppCompatActivity {
                 .replaceAll("[ΎΥ]", "Y")
                 .replaceAll("[ΏΩ]", "Ω");
 
-        // ========================================================
-        // STEP 1: EXTRACT THE ENGLISH (LATIN) NAME FROM THE FRONT
-        // ========================================================
         if (extractedName.isEmpty()) {
             if (cleanText.contains("ΑΚΑΔΗΜΑΪΚΗ") || cleanText.contains("ΤΑΥΤΟΤΗΤΑ") || cleanText.contains("ACADEMIC ID")) {
 
@@ -161,15 +153,11 @@ public class OcrScanActivity extends AppCompatActivity {
                 for (int i = 0; i < lines.length; i++) {
                     String lineUpper = lines[i].toUpperCase();
 
-                    // Look strictly for the student category label line boundary marker
                     if (lineUpper.contains("UNDERGRADUATE") || lineUpper.contains("STUDENT") || lineUpper.contains("ΦΟΙΤΗΤΗΣ")) {
-                        // The English name sits EXACTLY 1 line above the green banner block
                         if (i >= 1) {
                             String structuralLine = lines[i - 1].trim();
 
-                            // Match Guard: Ensure the line is strictly Latin text letters (A-Z) and spaces
                             if (structuralLine.toUpperCase().matches("^[A-Z\\s]+$")) {
-                                extractedName = structuralLine; // Successfully holds "NAME SURNAME"
 
                                 runOnUiThread(() -> {
                                     TextView tvInstructions = findViewById(R.id.tvInstructions);
@@ -191,9 +179,6 @@ public class OcrScanActivity extends AppCompatActivity {
             return;
         }
 
-        // ========================================================
-        // STEP 2: EXTRACT THE REGISTRATION NUMBER FROM THE BACK
-        // ========================================================
         if (extractedAM.isEmpty()) {
             boolean containsBackIdentifiers = cleanText.contains("A.M.") ||
                     cleanText.contains("Α.Μ.") ||

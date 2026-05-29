@@ -11,20 +11,19 @@ public class Report {
     @Id
     private String id;
     private String reviewId;
-    private String courseId; // or professorId if it's a professor review
+    private String courseId;
     private String authorUsername;
     private String reportedBy;
     private String reviewText;
-    private String status; // e.g., "PENDING", "RESOLVED", "DISMISSED"
+    private String status;
 
     @CreatedDate
     private Instant createdAt;
 
     public Report() {
-        this.status = "PENDING"; // Default status when a report is created
+        this.status = "PENDING";
     }
 
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

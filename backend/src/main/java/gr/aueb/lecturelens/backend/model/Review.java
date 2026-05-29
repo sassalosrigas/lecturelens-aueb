@@ -12,19 +12,19 @@ import java.time.Instant;
 public class Review {
     @Id
     private String id;
-    private String courseId;     // Links the review to a specific course
-    private String professorId;  // Links the review to a specific professor
-    private String username;     // Tracks who left the review
+    private String courseId;
+    private String professorId;
+    private String username;
 
     private String courseTitle;
     private double rating;
-    private int difficulty;      // 1 to 5 from your button selection
-    private double studyHours;    // From your Material Slider
-    private String reviewText;   // From your EditText
+    private int difficulty;
+    private double studyHours;
+    private String reviewText;
     @JsonProperty("isAnonymous")
     private boolean isAnonymous;
     @CreatedDate
-    private Instant createdAt; // Automatically managed timestamp field
+    private Instant createdAt;
     public Review() {}
 
     public Review(String courseId, String username, String courseTitle, int difficulty, float studyHours, String reviewText, boolean isAnonymous) {

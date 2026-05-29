@@ -17,7 +17,7 @@ public class Professor implements Serializable {
     }
 
     public String getId() { return id; }
-    public String getFullName() { return this.firstName + " " + this.lastName; } // Returns the full name cleanly
+    public String getFullName() { return this.firstName + " " + this.lastName; }
     public String getTitle() { return title; }
 
     public double getRating() {

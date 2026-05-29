@@ -25,8 +25,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     private MaterialButton registerButton;
     private SwitchCompat studentToggle;
-
-    // Security Caches: Temporarily hold inputs while the scanner activity handles the card
     private String cachedUsername = "";
     private String cachedEmail = "";
     private String cachedPassword = "";
@@ -52,7 +50,6 @@ public class RegisterActivity extends AppCompatActivity {
             boolean isStudent = studentToggle.isChecked();
             cachedRole = isStudent ? "student" : "professor";
 
-            // If it's a Professor, they still fill out their email explicitly via input forms
             if (!isStudent) {
                 cachedEmail = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
                 String fullName = ((EditText) findViewById(R.id.fullNameEditText)).getText().toString().trim();
@@ -70,8 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
                 registerButton.setEnabled(false);
                 sendRegistrationToServer(fullName, cachedUsername, cachedEmail, cachedPassword, cachedRole, "");
             } else {
-                // STUDENT FLOW: Email and Full Name are derived automatically from the ID card.
-                // We only require a username and password to start the scan.
                 if (cachedUsername.isEmpty() || cachedPassword.isEmpty()) {
                     Toast.makeText(this, "Please enter a Username and Password first.", Toast.LENGTH_SHORT).show();
                     return;
@@ -79,7 +74,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                 registerButton.setEnabled(false);
 
-                // Fire up the high-res CameraX picture engine
                 Intent intent = new Intent(RegisterActivity.this, OcrScanActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_OCR);
             }
@@ -95,38 +89,27 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (requestCode == REQUEST_CODE_OCR && resultCode == RESULT_OK && data != null) {
-            String scannedName = data.getStringExtra("EXTRACTED_NAME"); // From ID card Front
-            String scannedAM   = data.getStringExtra("EXTRACTED_AM");   // From ID card Back
+            String scannedName = data.getStringExtra("EXTRACTED_NAME");
+            String scannedAM   = data.getStringExtra("EXTRACTED_AM");
 
-            // 1. Read what the user typed into the form manually
             String typedFullName = ((EditText) findViewById(R.id.fullNameEditText)).getText().toString().trim();
             String typedEmail    = ((EditText) findViewById(R.id.emailEditText)).getText().toString().trim();
 
-            // 2. Mathematically calculate what their official email SHOULD be based on the physical card
             String expectedEmail = "p" + scannedAM + "@aueb.gr";
 
-            // ========================================================
-            // THE SECURITY CROSS-CHECKS
-            // ========================================================
 
-            // Check 1: Does their typed email match the card's actual registration number?
             if (!typedEmail.equalsIgnoreCase(expectedEmail)) {
                 Toast.makeText(this, "Security Validation Failed: Email doesn't match this Academic ID.", Toast.LENGTH_LONG).show();
-                return; // 🛑 Halt registration entirely
+                return;
             }
 
-            // Check 2: Does their typed name match the Latin name printed on the front of the card?
-            // We use .contains() here because typing "John Doe" will still match "DOE JOHN" on the card
             if (!scannedName.toUpperCase().contains(typedFullName.toUpperCase()) &&
                     !typedFullName.toUpperCase().contains(scannedName.toUpperCase())) {
 
                 Toast.makeText(this, "Security Validation Failed: Name does not match the Identity Card.", Toast.LENGTH_LONG).show();
-                return; // 🛑 Halt registration entirely
+                return;
             }
 
-            // ========================================================
-            // SUCCESS: Both checks passed! Send the typed inputs to your backend
-            // ========================================================
             sendRegistrationToServer(typedFullName, cachedUsername, typedEmail, cachedPassword, cachedRole, scannedAM);
 
         } else if (resultCode == RESULT_CANCELED) {

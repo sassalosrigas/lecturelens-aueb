@@ -69,7 +69,6 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
         courseAdapter = new CourseAdapter(courseList, this);
         coursesRecyclerView.setAdapter(courseAdapter);
 
-        // 3. Setup fake Search Bar click interaction to scroll the viewPager to the search tab automatically
         View searchBar = view.findViewById(R.id.searchEditText);
         if (searchBar != null) {
             searchBar.setFocusable(false);
@@ -80,7 +79,6 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
             });
         }
 
-        // 4. Run the network thread to retrieve your MongoDB information parameters
         fetchCoursesFromBackend();
 
         return view;
@@ -88,7 +86,6 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
 
     @Override
     public void onCourseClick(Course course) {
-        // Merged Team Change: Route click actions to details screen with full object bundle matching their implementation
         Intent intent = new Intent(getActivity(), CourseDetailsActivity.class);
         intent.putExtra("CHOSEN_COURSE", course);
         startActivity(intent);
@@ -126,7 +123,6 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
                         String profName = obj.optString("professorName", "Staff");
                         double rating = obj.optDouble("rating", 0.0);
 
-                        // CRITICAL MERGED TEAM FIX: Swapped out strings for doubles to match their new Course constructor fields perfectly!
                         double difficulty = obj.optDouble("difficulty", 0.0);
                         double hours = obj.optDouble("hours", 0.0);
 
@@ -135,7 +131,6 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
                         courseList.add(new Course(id, code, title, semester, ects, profName, rating, difficulty, hours, description));
                     }
 
-                    // Dispatch data changes back onto the safe main UI render thread
                     new Handler(Looper.getMainLooper()).post(() -> courseAdapter.notifyDataSetChanged());
 
                     Log.d("CourseDebug", "================================================");
@@ -145,7 +140,6 @@ public class HomeFragment extends Fragment implements CourseAdapter.OnCourseClic
                 conn.disconnect();
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    // Safety check protecting against loose context crashes if user backs out during call routine
                     if (isAdded()) {
                         Toast.makeText(getContext(), "Network error reading database parameters.", Toast.LENGTH_SHORT).show();
                     }

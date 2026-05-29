@@ -49,7 +49,6 @@ public class Review implements Serializable {
         this.isCourse = false;
     }
 
-    // Getters and Setters
     public float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }
 
