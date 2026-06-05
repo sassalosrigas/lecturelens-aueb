@@ -77,7 +77,7 @@ public class ProfileFragment extends Fragment {
             } else {
                 infoValue1.setText("0 mos");
             }
-            infoLabel1.setText(getString(R.string.courses_count));
+            infoLabel1.setText("Years member");
             infoValue2.setText("-/5");
             infoLabel2.setText(getString(R.string.rating_label));
             primaryActionLabel.setText(getString(R.string.see_my_reviews));
