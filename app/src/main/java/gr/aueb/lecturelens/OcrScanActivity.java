@@ -158,7 +158,7 @@ public class OcrScanActivity extends AppCompatActivity {
                             String structuralLine = lines[i - 1].trim();
 
                             if (structuralLine.toUpperCase().matches("^[A-Z\\s]+$")) {
-
+                                extractedName = structuralLine;
                                 runOnUiThread(() -> {
                                     TextView tvInstructions = findViewById(R.id.tvInstructions);
                                     if (tvInstructions != null) {
