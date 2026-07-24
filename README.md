@@ -2,16 +2,13 @@
 
 > **A native Android application for university course and professor evaluations, featuring camera OCR text scanning.**
 
-[![Android](https://img.shields.io/badge/Platform-Android-green.svg?style=flat&logo=android)](https://www.android.com/)
-[![Java](https://img.shields.io/badge/Language-Java-orange.svg?style=flat&logo=openjdk)](https://www.java.com/)
-[![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot-brightgreen.svg?style=flat&logo=springboot)](https://spring.io/projects/spring-boot)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**Platform:** [Android](https://www.android.com/) | **Language:** [Java](https://www.java.com/) | **Backend:** [Spring Boot](https://spring.io/projects/spring-boot) | **License:** [MIT](LICENSE)
 
 ---
 
 ## 📽️ Video Demo & Screenshots
 
-[![Watch Demo Video](https://img.shields.io/badge/▶️_Watch_Demo-Video-red?style=for-the-badge&logo=youtube)](https://youtu.be/ZojHPQZR8A4?si=1j1rtgXDZ4ZgdA6Q)
+* **Demo Video:** [LectureLens Demo Video](https://youtu.be/ZojHPQZR8A4?si=1j1rtgXDZ4ZgdA6Q)
 
 | Home & Search | Course & Professor Details | Camera OCR Scanner |
 | :---: | :---: | :---: |
@@ -50,14 +47,16 @@
 
 ## 📁 Repository Structure
 
+```
 LectureLens/
 ├── app/                                            # Native Android Client
 │   ├── src/main/    
-|       ├── java/gr/aueb/lecturelens/             # Activities, Fragments, Adapters, Models
-|       ├── res/                                    # Layout XMLs, Drawables, Fonts, Themes
+│   │   ├── java/gr/aueb/lecturelens/               # Activities, Fragments, Adapters, Models
+│   │   └── res/                                    # Layout XMLs, Drawables, Fonts, Themes
 ├── backend/                                        # Spring Boot REST API
 │   └── src/main/java/gr/aueb/lecturelens/backend   # REST Controllers, JPA Repositories, Models
 └── docs/                                           # Documentation & Media Screenshots
+```
 
 ---
 
@@ -72,9 +71,27 @@ LectureLens/
 
 1. **Clone the repository**:
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/lecturelens-aueb.git](https://github.com/YOUR_USERNAME/lecturelens-aueb.git)
+   git clone [https://github.com/sassalosrigas/lecturelens-aueb.git](https://github.com/sassalosrigas/lecturelens-aueb.git)
    cd lecturelens-aueb
 
-**Start the Spring Boot Backend**:
-   cd backend
-./gradlew bootRun
+2. **Start the Spring Boot Backend**:
+
+       cd backend
+        ./gradlew bootRun
+
+3. **Run the Android App**:
+
+    * Open the project root in ***Android Studio***.
+
+    * Sync Gradle files (`File > Sync Project with Gradle Files`)
+
+    * Select a target emulator or physical device and click Run (`Shift + F10`).
+
+---
+
+## 👨‍💻 Authors
+
+**Rigas** - [Github Profile](https://github.com/sassalosrigas), [LinkedIn](https://www.linkedin.com/in/rigas-sassalos-27a256262/) <br>
+**Eleni** - [Github Profile](https://github.com/tsaranto), [LinkedIn](https://www.linkedin.com/in/eleni-antoniadi-tsarampoulidi-4b2279314/) <br>
+**Thodoris** - [Github Profile](https://github.com/ThodTsi), [LinkedIn](https://www.linkedin.com/in/thodoristsirikolias/)
+
