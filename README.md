@@ -15,11 +15,11 @@
 
 | Home & Search | Course & Professor Details | Camera OCR Scanner |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/home_screen.png" width="230"/> | <img src="docs/screenshots/course_details.png" width="230"/> | <img src="docs/screenshots/ocr_scanner.png" width="230"/> |
+| <img src="docs/screenshots/home-search.png" width="230"/> | <img src="docs/screenshots/course-details.png" width="230"/> | <img src="docs/screenshots/ocr-scan.png" width="230"/> |
 
 | Write Review | Admin Moderation | User Profile |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/write_review.png" width="230"/> | <img src="docs/screenshots/admin_dashboard.png" width="230"/> | <img src="docs/screenshots/user_profile.png" width="230"/> |
+| <img src="docs/screenshots/submit-review.png" width="230"/> | <img src="docs/screenshots/admin.png" width="230"/> | <img src="docs/screenshots/profile-myreviews.png" width="230"/> |
 
 ---
 
@@ -49,3 +49,12 @@
 ---
 
 ## 📁 Repository Structure
+
+LectureLens/
+├── app/                                            # Native Android Client
+│   ├── src/main/     
+|       ├── java/gr/aueb/lecturelens/               # Activities, Fragments, Adapters, Models
+|       ├── res/                                    # Layout XMLs, Drawables, Fonts, Themes
+├── backend/                                        # Spring Boot REST API
+│   └── src/main/java/gr/aueb/lecturelens/backend   # REST Controllers, JPA Repositories, Models
+└── docs/                                           # Documentation & Media Screenshots
