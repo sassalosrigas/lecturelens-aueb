@@ -52,9 +52,29 @@
 
 LectureLens/
 ├── app/                                            # Native Android Client
-│   ├── src/main/     
-|       ├── java/gr/aueb/lecturelens/               # Activities, Fragments, Adapters, Models
+│   ├── src/main/    
+|       ├── java/gr/aueb/lecturelens/             # Activities, Fragments, Adapters, Models
 |       ├── res/                                    # Layout XMLs, Drawables, Fonts, Themes
 ├── backend/                                        # Spring Boot REST API
 │   └── src/main/java/gr/aueb/lecturelens/backend   # REST Controllers, JPA Repositories, Models
 └── docs/                                           # Documentation & Media Screenshots
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+* **Android Studio**: Ladybug / Jellyfish (or newer) with JDK 17+
+* **Android SDK**: API Level 24+ (Android 7.0+)
+* **Gradle**: 8.x+
+
+### Installation & Run
+
+1. **Clone the repository**:
+   ```bash
+   git clone [https://github.com/YOUR_USERNAME/lecturelens-aueb.git](https://github.com/YOUR_USERNAME/lecturelens-aueb.git)
+   cd lecturelens-aueb
+
+**Start the Spring Boot Backend**:
+   cd backend
+./gradlew bootRun
